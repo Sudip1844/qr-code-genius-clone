@@ -20,7 +20,11 @@ export const generateQRCode = async ({
   errorCorrectionLevel = 'M'
 }: QROptions): Promise<string> => {
   try {
-    return await QRCode.toDataURL(data, {
+    // Clean the input data to ensure it's valid
+    const cleanData = data.trim();
+    
+    // Generate QR code
+    return await QRCode.toDataURL(cleanData, {
       width: size,
       margin: margin,
       color: color,
@@ -30,4 +34,37 @@ export const generateQRCode = async ({
     console.error('Error generating QR code:', error);
     throw new Error('Failed to generate QR code');
   }
+};
+
+// Utility functions to create specific QR code formats
+export const createUrlQR = (url: string): string => {
+  // Ensure URL has a protocol
+  if (!/^https?:\/\//i.test(url) && url.length > 0) {
+    return `https://${url}`;
+  }
+  return url;
+};
+
+export const createEmailQR = (email: string, subject?: string, body?: string): string => {
+  let mailtoLink = `mailto:${encodeURIComponent(email)}`;
+  
+  const params: string[] = [];
+  if (subject) params.push(`subject=${encodeURIComponent(subject)}`);
+  if (body) params.push(`body=${encodeURIComponent(body)}`);
+  
+  if (params.length > 0) {
+    mailtoLink += '?' + params.join('&');
+  }
+  
+  return mailtoLink;
+};
+
+export const createPhoneQR = (phoneNumber: string): string => {
+  // Remove non-numeric characters except + at the beginning
+  const cleaned = phoneNumber.replace(/^\+|[^\d+]/g, '$&');
+  return `tel:${cleaned}`;
+};
+
+export const createTextQR = (text: string): string => {
+  return text;
 };
