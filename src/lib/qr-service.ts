@@ -23,6 +23,10 @@ export const generateQRCode = async ({
     // Clean the input data to ensure it's valid
     const cleanData = data.trim();
     
+    if (!cleanData) {
+      throw new Error('QR code data cannot be empty');
+    }
+    
     // Generate QR code
     return await QRCode.toDataURL(cleanData, {
       width: size,
@@ -46,6 +50,11 @@ export const createUrlQR = (url: string): string => {
 };
 
 export const createEmailQR = (email: string, subject?: string, body?: string): string => {
+  // Validate email address
+  if (!email || !/\S+@\S+\.\S+/.test(email)) {
+    return '';
+  }
+  
   let mailtoLink = `mailto:${encodeURIComponent(email)}`;
   
   const params: string[] = [];
@@ -61,7 +70,12 @@ export const createEmailQR = (email: string, subject?: string, body?: string): s
 
 export const createPhoneQR = (phoneNumber: string): string => {
   // Remove non-numeric characters except + at the beginning
-  const cleaned = phoneNumber.replace(/^\+|[^\d+]/g, '$&');
+  const cleaned = phoneNumber.replace(/[^\d+]/g, '');
+  
+  if (!cleaned) {
+    return '';
+  }
+  
   return `tel:${cleaned}`;
 };
 

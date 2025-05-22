@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { generateQRCode, QROptions } from '@/lib/qr-service';
+import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, createTextQR } from '@/lib/qr-service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,12 +9,12 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { QrCode, Download, Copy, Share, Settings } from 'lucide-react';
+import { QrCode, Download, Copy, Share, Settings, Mail, Phone, Link, FileText } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const QRGenerator = () => {
-  const [url, setUrl] = useState('https://example.com');
+  const [qrData, setQrData] = useState('https://example.com');
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [size, setSize] = useState(300);
@@ -24,12 +24,33 @@ const QRGenerator = () => {
   const [errorLevel, setErrorLevel] = useState<'L' | 'M' | 'Q' | 'H'>('M');
   const [advancedOptions, setAdvancedOptions] = useState(false);
   const [activeTab, setActiveTab] = useState('url');
+  
+  // Email specific fields
+  const [emailAddress, setEmailAddress] = useState('');
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  
+  // Phone specific field
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const generateQR = async () => {
-    if (!url.trim()) {
+    let finalData = qrData;
+    
+    // Format data based on active tab
+    if (activeTab === 'url') {
+      finalData = createUrlQR(qrData);
+    } else if (activeTab === 'email') {
+      finalData = createEmailQR(emailAddress, emailSubject, emailBody);
+    } else if (activeTab === 'phone') {
+      finalData = createPhoneQR(phoneNumber);
+    } else if (activeTab === 'text') {
+      finalData = createTextQR(qrData);
+    }
+    
+    if (!finalData.trim()) {
       toast({
         title: "Error",
-        description: "Please enter a valid URL or text",
+        description: "Please enter valid content",
         variant: "destructive",
       });
       return;
@@ -38,7 +59,7 @@ const QRGenerator = () => {
     try {
       setLoading(true);
       const options: QROptions = {
-        data: url,
+        data: finalData,
         size,
         margin,
         color: {
@@ -103,82 +124,128 @@ const QRGenerator = () => {
     }
   };
 
+  // Handle tab changes
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
   useEffect(() => {
     generateQR();
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
       <div className="grid md:grid-cols-2 gap-0">
         <div className="p-8 border-r">
           <Tabs 
             value={activeTab} 
-            onValueChange={setActiveTab}
+            onValueChange={handleTabChange}
             className="w-full"
           >
-            <TabsList className="w-full mb-6">
-              <TabsTrigger value="url" className="flex-1">URL</TabsTrigger>
-              <TabsTrigger value="text" className="flex-1">Text</TabsTrigger>
-              <TabsTrigger value="email" className="flex-1">Email</TabsTrigger>
-              <TabsTrigger value="phone" className="flex-1">Phone</TabsTrigger>
+            <TabsList className="grid grid-cols-4 mb-6">
+              <TabsTrigger value="url" className="flex items-center gap-2">
+                <Link className="h-4 w-4" />
+                <span>URL</span>
+              </TabsTrigger>
+              <TabsTrigger value="text" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span>Text</span>
+              </TabsTrigger>
+              <TabsTrigger value="email" className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                <span>Email</span>
+              </TabsTrigger>
+              <TabsTrigger value="phone" className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                <span>Phone</span>
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="url" className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="url">Enter Website URL</Label>
+                <Label htmlFor="url" className="text-base font-medium">Enter Website URL</Label>
                 <Textarea
                   id="url"
                   placeholder="https://example.com"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="min-h-[100px] resize-none"
+                  value={qrData}
+                  onChange={(e) => setQrData(e.target.value)}
+                  className="min-h-[120px] resize-none text-base"
                 />
               </div>
             </TabsContent>
             
             <TabsContent value="text" className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="text">Enter Plain Text</Label>
+                <Label htmlFor="text" className="text-base font-medium">Enter Plain Text</Label>
                 <Textarea
                   id="text"
                   placeholder="Your text message here..."
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="min-h-[100px] resize-none"
+                  value={qrData}
+                  onChange={(e) => setQrData(e.target.value)}
+                  className="min-h-[120px] resize-none text-base"
                 />
               </div>
             </TabsContent>
             
             <TabsContent value="email" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  onChange={(e) => setUrl(`mailto:${e.target.value}`)}
-                />
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="email" className="text-base font-medium">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                    className="mt-1 text-base"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="subject" className="text-base font-medium">Subject (Optional)</Label>
+                  <Input
+                    id="subject"
+                    type="text"
+                    placeholder="Email Subject"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="mt-1 text-base"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="body" className="text-base font-medium">Email Body (Optional)</Label>
+                  <Textarea
+                    id="body"
+                    placeholder="Email content..."
+                    value={emailBody}
+                    onChange={(e) => setEmailBody(e.target.value)}
+                    className="min-h-[80px] resize-none text-base mt-1"
+                  />
+                </div>
               </div>
             </TabsContent>
             
             <TabsContent value="phone" className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone" className="text-base font-medium">Phone Number</Label>
                 <Input
                   id="phone"
                   type="tel"
                   placeholder="+1 234 567 8900"
-                  onChange={(e) => setUrl(`tel:${e.target.value}`)}
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="text-base"
                 />
               </div>
             </TabsContent>
           </Tabs>
           
-          <div className="mt-6">
+          <div className="mt-8">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-muted-foreground" />
-                <span className="font-medium">Design Options</span>
+                <Settings className="h-5 w-5 text-primary" />
+                <span className="font-medium text-base">Design Options</span>
               </div>
               <Switch
                 id="advanced"
@@ -188,11 +255,11 @@ const QRGenerator = () => {
             </div>
             
             {advancedOptions && (
-              <div className="space-y-5 rounded-lg p-5 bg-gray-50">
+              <div className="space-y-6 rounded-lg p-6 bg-slate-50 border">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <Label htmlFor="size">Size</Label>
-                    <span className="text-sm text-muted-foreground">{size}px</span>
+                    <Label htmlFor="size" className="text-base">QR Code Size</Label>
+                    <span className="text-sm text-muted-foreground font-mono">{size}px</span>
                   </div>
                   <Slider
                     id="size"
@@ -206,8 +273,8 @@ const QRGenerator = () => {
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <Label htmlFor="margin">Margin</Label>
-                    <span className="text-sm text-muted-foreground">{margin}</span>
+                    <Label htmlFor="margin" className="text-base">Quiet Zone</Label>
+                    <span className="text-sm text-muted-foreground font-mono">{margin}</span>
                   </div>
                   <Slider
                     id="margin"
@@ -219,53 +286,53 @@ const QRGenerator = () => {
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="darkColor">Foreground Color</Label>
-                    <div className="flex items-center gap-2">
+                    <Label htmlFor="darkColor" className="text-base">Foreground Color</Label>
+                    <div className="flex items-center gap-3">
                       <Input
                         id="darkColor"
                         type="color"
                         value={darkColor}
                         onChange={(e) => setDarkColor(e.target.value)}
-                        className="w-12 h-10 p-0 border-none"
+                        className="w-14 h-12 p-1 border rounded"
                       />
                       <Input
                         type="text"
                         value={darkColor}
                         onChange={(e) => setDarkColor(e.target.value)}
-                        className="flex-1"
+                        className="flex-1 font-mono"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="lightColor">Background Color</Label>
-                    <div className="flex items-center gap-2">
+                    <Label htmlFor="lightColor" className="text-base">Background Color</Label>
+                    <div className="flex items-center gap-3">
                       <Input
                         id="lightColor"
                         type="color"
                         value={lightColor}
                         onChange={(e) => setLightColor(e.target.value)}
-                        className="w-12 h-10 p-0 border-none"
+                        className="w-14 h-12 p-1 border rounded"
                       />
                       <Input
                         type="text"
                         value={lightColor}
                         onChange={(e) => setLightColor(e.target.value)}
-                        className="flex-1"
+                        className="flex-1 font-mono"
                       />
                     </div>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="errorLevel">Error Correction Level</Label>
+                  <Label htmlFor="errorLevel" className="text-base">Error Correction Level</Label>
                   <Select 
                     value={errorLevel} 
                     onValueChange={(value) => setErrorLevel(value as 'L' | 'M' | 'Q' | 'H')}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="text-base">
                       <SelectValue placeholder="Select error correction level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -283,7 +350,7 @@ const QRGenerator = () => {
             )}
             
             <Button 
-              className="w-full mt-6" 
+              className="w-full mt-6 py-6 text-lg" 
               onClick={generateQR}
               disabled={loading}
               size="lg"
@@ -294,14 +361,14 @@ const QRGenerator = () => {
           </div>
         </div>
         
-        <div className="p-8 bg-gray-50">
+        <div className="p-8 bg-slate-50">
           <div className="text-center">
             <h3 className="font-semibold text-xl mb-6">Your QR Code</h3>
             
             <div className="flex flex-col items-center">
               {qrCode ? (
                 <>
-                  <div className="bg-white p-8 rounded-lg shadow-sm mb-8">
+                  <div className="bg-white p-8 rounded-lg shadow-sm mb-8 border">
                     <img 
                       src={qrCode} 
                       alt="QR Code" 
@@ -310,23 +377,23 @@ const QRGenerator = () => {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-4 w-full">
-                    <Button variant="outline" onClick={copyQR} className="flex flex-col items-center h-auto py-3">
+                  <div className="grid grid-cols-3 gap-4 w-full max-w-md mx-auto">
+                    <Button variant="outline" onClick={copyQR} className="flex flex-col items-center h-auto py-3 px-1">
                       <Copy className="h-5 w-5 mb-1" />
                       <span>Copy</span>
                     </Button>
-                    <Button variant="outline" className="flex flex-col items-center h-auto py-3">
+                    <Button variant="outline" className="flex flex-col items-center h-auto py-3 px-1">
                       <Share className="h-5 w-5 mb-1" />
                       <span>Share</span>
                     </Button>
-                    <Button variant="default" onClick={downloadQR} className="flex flex-col items-center h-auto py-3">
+                    <Button variant="default" onClick={downloadQR} className="flex flex-col items-center h-auto py-3 px-1 bg-primary">
                       <Download className="h-5 w-5 mb-1" />
                       <span>Download</span>
                     </Button>
                   </div>
                 </>
               ) : (
-                <div className="w-[300px] h-[300px] flex items-center justify-center bg-muted-foreground/10 animate-pulse rounded-lg">
+                <div className="w-[300px] h-[300px] flex items-center justify-center bg-white border rounded-lg">
                   <QrCode className="h-16 w-16 text-muted-foreground/20" />
                 </div>
               )}
