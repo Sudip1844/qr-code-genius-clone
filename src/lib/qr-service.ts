@@ -43,7 +43,7 @@ export const generateQRCode = async ({
 // Utility functions to create specific QR code formats
 export const createUrlQR = (url: string): string => {
   // Ensure URL has a protocol
-  if (!/^https?:\/\//i.test(url) && url.length > 0) {
+  if (url && !/^https?:\/\//i.test(url)) {
     return `https://${url}`;
   }
   return url;

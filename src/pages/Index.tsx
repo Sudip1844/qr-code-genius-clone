@@ -1,136 +1,90 @@
 
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
-import { QrCode, ArrowRight } from "lucide-react";
+import { QrCode } from "lucide-react";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-white">
-      <header className="py-6 border-b bg-white sticky top-0 z-10">
+    <div className="min-h-screen bg-slate-50">
+      <header className="py-4 bg-white sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <QrCode className="h-7 w-7 text-primary" />
-              <span>QR <span className="text-primary">Code</span> Generator</span>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <div className="text-emerald-500">
+                <QrCode className="h-7 w-7" />
+              </div>
+              <span className="text-slate-700">QR.io</span>
             </h1>
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">Sign In</Button>
-              <Button size="sm">Get Started Free</Button>
-            </div>
+            <button className="block md:hidden">
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
       
-      <main>
-        <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-12">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Create Professional QR Codes</h2>
-              <p className="text-xl text-slate-600">
-                Generate QR codes for URLs, text, contact information, and more.
-                Customize colors and download in high quality.
-              </p>
-            </div>
-            
+      <main className="py-8 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden border">
             <QRGenerator />
           </div>
-        </section>
-        
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="bg-white rounded-xl p-8 shadow-sm border">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-primary">1</span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3 text-center">Select QR Type</h3>
-                  <p className="text-slate-600 text-center">
-                    Choose from URL, text, email, or phone number to create the perfect QR code for your needs
-                  </p>
-                </div>
-                
-                <div className="bg-white rounded-xl p-8 shadow-sm border">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-primary">2</span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3 text-center">Customize Design</h3>
-                  <p className="text-slate-600 text-center">
-                    Personalize colors, size, and error correction to match your brand and style
-                  </p>
-                </div>
-                
-                <div className="bg-white rounded-xl p-8 shadow-sm border">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-primary">3</span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3 text-center">Download & Share</h3>
-                  <p className="text-slate-600 text-center">
-                    Get your QR code as a high-quality image ready to use in print or digital media
-                  </p>
-                </div>
+          
+          <div className="mt-16 grid md:grid-cols-4 gap-8 text-center">
+            <div className="flex flex-col items-center">
+              <div className="text-emerald-500 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                  <line x1="12" y1="18" x2="12" y2="18" />
+                </svg>
               </div>
+              <h3 className="font-medium text-lg text-slate-700">Fully customized landing pages</h3>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="text-emerald-500 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6" />
+                  <line x1="8" y1="12" x2="21" y2="12" />
+                  <line x1="8" y1="18" x2="21" y2="18" />
+                  <line x1="3" y1="6" x2="3" y2="6" />
+                  <line x1="3" y1="12" x2="3" y2="12" />
+                  <line x1="3" y1="18" x2="3" y2="18" />
+                </svg>
+              </div>
+              <h3 className="font-medium text-lg text-slate-700">QR Code Statistics</h3>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="text-emerald-500 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="12" r="6" />
+                  <circle cx="12" cy="12" r="2" />
+                </svg>
+              </div>
+              <h3 className="font-medium text-lg text-slate-700">Customized Colors & Shapes for QR Codes</h3>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="text-emerald-500 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polygon points="21 15 16 10 5 21" />
+                </svg>
+              </div>
+              <h3 className="font-medium text-lg text-slate-700">Add Logos to QR Codes</h3>
             </div>
           </div>
-        </section>
-        
-        <section className="py-16 bg-gradient-to-b from-white to-slate-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-3xl font-bold mb-6">Ready to create professional QR codes?</h2>
-              <p className="text-xl text-slate-600 mb-8">
-                Generate unlimited QR codes for your business, marketing campaigns, or personal use.
-              </p>
-              <Button size="lg" className="gap-2 py-6 px-8 text-lg">
-                Create Your QR Code <ArrowRight className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </section>
+        </div>
       </main>
       
-      <footer className="border-t py-16 bg-slate-50">
+      <footer className="py-8 border-t mt-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="font-bold text-lg flex items-center gap-2 mb-4">
-                <QrCode className="h-5 w-5 text-primary" />
-                QR Code Generator
-              </h3>
-              <p className="text-slate-600">
-                Create custom QR codes quickly and easily for any purpose.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">QR Code Types</h4>
-              <ul className="space-y-2 text-slate-600">
-                <li>URL QR Codes</li>
-                <li>Text QR Codes</li>
-                <li>Email QR Codes</li>
-                <li>Phone QR Codes</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Resources</h4>
-              <ul className="space-y-2 text-slate-600">
-                <li>Help Center</li>
-                <li>Tutorials</li>
-                <li>API Documentation</li>
-                <li>Contact Support</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Company</h4>
-              <ul className="space-y-2 text-slate-600">
-                <li>About Us</li>
-                <li>Blog</li>
-                <li>Terms of Service</li>
-                <li>Privacy Policy</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t text-center text-slate-500">
+          <div className="text-center text-slate-500">
             <p>© {new Date().getFullYear()} QR Code Generator. All rights reserved.</p>
           </div>
         </div>
