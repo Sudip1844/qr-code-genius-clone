@@ -1,7 +1,7 @@
 
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
-import { QrCode, ArrowUp, MessageCircle, ProfileCards, Briefcase, Megaphone } from "lucide-react";
+import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone } from "lucide-react";
 
 const Index = () => {
   return (
@@ -73,7 +73,7 @@ const Index = () => {
                 <div className="bg-white rounded-lg p-8 text-center">
                   <div className="flex justify-center mb-4">
                     <div className="text-slate-500 p-4">
-                      <ProfileCards size={48} />
+                      <UserSquare size={48} />
                     </div>
                   </div>
                   <h4 className="text-slate-700 text-xl font-medium mb-4">Profile Cards</h4>
