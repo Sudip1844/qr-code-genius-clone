@@ -1,6 +1,6 @@
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
-import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image } from "lucide-react";
+import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle } from "lucide-react";
 
 const Index = () => {
   return (
@@ -201,6 +201,62 @@ const Index = () => {
               >
                 Generate QR Code <ArrowUp className="ml-2 rotate-45" />
               </Button>
+            </div>
+          </div>
+          
+          {/* Benefits from QR.io section */}
+          <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold text-slate-800 mb-6">Benefits from QR.io</h2>
+              
+              <p className="mb-4 text-slate-600">
+                By using QR.io you will be able to keep track of how many people scan your QR Codes, from where and on what date.
+              </p>
+              
+              <p className="mb-8 text-slate-600">
+                Also, for those non-developers, you can create fully customized landing pages for your QR Codes. No Coding Required!
+              </p>
+              
+              <div className="space-y-4 mt-8">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-6 w-6 text-emerald-500" />
+                  <span className="text-slate-700">Dynamic QR Codes</span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-6 w-6 text-emerald-500" />
+                  <span className="text-slate-700">Static QR Codes</span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-6 w-6 text-emerald-500" />
+                  <span className="text-slate-700">QR Code Statistics</span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-6 w-6 text-emerald-500" />
+                  <span className="text-slate-700">Fully customized landing pages</span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-6 w-6 text-emerald-500" />
+                  <span className="text-slate-700">Customized Colors & Shapes for QR Codes</span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-6 w-6 text-emerald-500" />
+                  <span className="text-slate-700">No Coding Required</span>
+                </div>
+              </div>
+              
+              <div className="mt-10">
+                <img 
+                  src="/lovable-uploads/6c1a237f-3ff5-4930-b9cb-496fbe82304f.png"
+                  alt="QR Code Customization Features" 
+                  className="rounded-lg shadow-md mx-auto"
+                  style={{ maxWidth: "100%" }}
+                />
+              </div>
             </div>
           </div>
           
