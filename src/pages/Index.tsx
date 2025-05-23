@@ -1,6 +1,7 @@
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
 import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle } from "lucide-react";
+import { Link, Mail, Text, Phone, MessageSquare, Wifi, UserSquare as VCard, CalendarDays } from "lucide-react";
 
 const Index = () => {
   return (
@@ -307,6 +308,110 @@ const Index = () => {
                   className="rounded-lg shadow-md mx-auto"
                   style={{ maxWidth: "100%" }}
                 />
+              </div>
+            </div>
+          </div>
+          
+          {/* QR Code Types section */}
+          <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-3xl font-bold text-slate-800 text-center mb-4">QR Code Types</h2>
+              <p className="text-center text-slate-600 mb-12">Different QR Code types you can use for Static QR Codes.</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Link QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-emerald-500 mb-4">
+                    <Link className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Link</h3>
+                  <p className="text-slate-600 mb-4">Link to any Website URL</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
+                
+                {/* Email QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-blue-600 mb-4">
+                    <Mail className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">E-mail</h3>
+                  <p className="text-slate-600 mb-4">Send an email</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
+                
+                {/* Text QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-orange-500 mb-4">
+                    <Text className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Text</h3>
+                  <p className="text-slate-600 mb-4">Share Text</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
+                
+                {/* Call QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-emerald-500 mb-4">
+                    <Phone className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Call</h3>
+                  <p className="text-slate-600 mb-4">Make a call</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
+                
+                {/* SMS QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-blue-600 mb-4">
+                    <MessageSquare className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">SMS</h3>
+                  <p className="text-slate-600 mb-4">Send message</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
+                
+                {/* WhatsApp QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-orange-500 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 11.9a7.977 7.977 0 0 1 .904-3.687l-1.147-3.280 3.299 1.144a8 8 0 1 1 4.949 10.019" />
+                      <path d="M8.73 14.633a29.667 29.667 0 0 0 5.871-2.283 10.079 10.079 0 0 0 3.12-2.885C18.723 8.421 19 7.277 19 6.166c0-2.089-1.09-3.313-2.949-3.313-1.036 0-1.797.248-2.285.741" />
+                      <path d="M9.865 5.766c-.784.975-.995 2.252-.995 3.152 0 1.086.287 2.033.913 2.826.678.855 1.092 1.434 2.063 2.132 1.001.72 2.440 1.239 4.12 1.239 1.575 0 2.735-.465 3.421-1.211.69-.758.991-1.791.991-2.92 0-1.215-.347-2.209-.968-2.78-.502-.465-.97-.636-1.906-.636-1.992 0-3.444.943-3.444 2.328" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">WhatsApp</h3>
+                  <p className="text-slate-600 mb-4">Send WhatsApp message</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
+                
+                {/* WiFi QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-emerald-500 mb-4">
+                    <Wifi className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">WI-FI</h3>
+                  <p className="text-slate-600 mb-4">Connect to WI-FI</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
+                
+                {/* VCard QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-blue-600 mb-4">
+                    <VCard className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Vcard</h3>
+                  <p className="text-slate-600 mb-4">Save a contact to the phone scanning</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
+                
+                {/* Event QR */}
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                  <div className="text-orange-500 mb-4">
+                    <CalendarDays className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Event</h3>
+                  <p className="text-slate-600 mb-4">Invite people to your event</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                </div>
               </div>
             </div>
           </div>
