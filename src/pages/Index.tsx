@@ -1,7 +1,6 @@
-
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
-import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone } from "lucide-react";
+import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send } from "lucide-react";
 
 const Index = () => {
   return (
@@ -109,6 +108,99 @@ const Index = () => {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          {/* How to Use section */}
+          <div className="mt-16 py-16">
+            <div className="text-center mb-12">
+              <div className="inline-block px-6 py-2 bg-emerald-500 text-white rounded-full font-medium mb-6">
+                How to Use
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">
+                Creating QR Codes with QR.io is pretty simple.
+              </h2>
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                Create an account and use our QR Code Generator to create unlimited dynamic & static QR Codes.
+              </p>
+            </div>
+
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-200 transform -translate-x-1/2"></div>
+              
+              {/* Step 1 */}
+              <div className="relative z-10 flex flex-col md:flex-row items-center mb-24">
+                <div className="md:w-1/2 md:pr-12 mb-8 md:mb-0 md:text-right">
+                  <h3 className="text-xl font-bold text-slate-800 mb-3">Choose QR Code Type</h3>
+                  <p className="text-slate-600">
+                    First step would be to choose your QR Code Type. This will define what your QR Code will do.
+                  </p>
+                </div>
+                <div className="rounded-full w-12 h-12 bg-white border-4 border-emerald-500 flex items-center justify-center z-20">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
+                </div>
+                <div className="md:w-1/2 md:pl-12 flex justify-start md:justify-center">
+                  <div className="border-2 border-emerald-500 rounded-full p-12 relative">
+                    <div className="text-blue-800">
+                      <MousePointer className="h-12 w-12" />
+                    </div>
+                    <span className="absolute bottom-4 text-sm text-blue-800 font-medium">Choose QR Code Type</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Step 2 */}
+              <div className="relative z-10 flex flex-col md:flex-row-reverse items-center mb-24">
+                <div className="md:w-1/2 md:pl-12 mb-8 md:mb-0 md:text-left">
+                  <h3 className="text-xl font-bold text-slate-800 mb-3">Fill required fields</h3>
+                  <p className="text-slate-600">
+                    Then, you'll need to fill the required fields that the QR Code type is asking. For example, Type 'Link' will ask for a website URL.
+                  </p>
+                </div>
+                <div className="rounded-full w-12 h-12 bg-white border-4 border-emerald-500 flex items-center justify-center z-20">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
+                </div>
+                <div className="md:w-1/2 md:pr-12 flex justify-end md:justify-center">
+                  <div className="border-2 border-emerald-500 rounded-full p-12 relative">
+                    <div className="text-blue-800">
+                      <FileEdit className="h-12 w-12" />
+                    </div>
+                    <span className="absolute bottom-4 text-sm text-blue-800 font-medium">Fill required fields</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Step 3 */}
+              <div className="relative z-10 flex flex-col md:flex-row items-center">
+                <div className="md:w-1/2 md:pr-12 mb-8 md:mb-0 md:text-right">
+                  <h3 className="text-xl font-bold text-slate-800 mb-3">Download & Share QR Code</h3>
+                  <p className="text-slate-600">
+                    Finally, you can download and share your QR Code Generated from your dashboard and edit if needed.
+                  </p>
+                </div>
+                <div className="rounded-full w-12 h-12 bg-white border-4 border-emerald-500 flex items-center justify-center z-20">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
+                </div>
+                <div className="md:w-1/2 md:pl-12 flex justify-start md:justify-center">
+                  <div className="border-2 border-emerald-500 rounded-full p-12 relative">
+                    <div className="text-blue-800">
+                      <Send className="h-12 w-12" />
+                    </div>
+                    <span className="absolute bottom-4 text-sm text-blue-800 font-medium">Download & Share QR Code</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-20 text-center">
+              <Button 
+                variant="default" 
+                size="lg" 
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
+              >
+                Generate QR Code <ArrowUp className="ml-2 rotate-45" />
+              </Button>
             </div>
           </div>
           
