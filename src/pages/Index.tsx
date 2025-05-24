@@ -1,4 +1,3 @@
-
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
 import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle } from "lucide-react";
@@ -192,10 +191,9 @@ const Index = () => {
                   </p>
                 </div>
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-4 border-white shadow-lg flex items-center justify-center z-20">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-4 border-white shadow-lg flex items-center justify-center">
                     <MousePointer className="h-10 w-10 text-white" />
                   </div>
-                  <div className="absolute inset-0 w-20 h-20 rounded-full bg-emerald-100 animate-pulse"></div>
                 </div>
                 <div className="md:w-1/2 md:pl-12"></div>
               </div>
@@ -210,10 +208,9 @@ const Index = () => {
                   </p>
                 </div>
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 border-4 border-white shadow-lg flex items-center justify-center z-20">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 border-4 border-white shadow-lg flex items-center justify-center">
                     <FileEdit className="h-10 w-10 text-white" />
                   </div>
-                  <div className="absolute inset-0 w-20 h-20 rounded-full bg-blue-100 animate-pulse"></div>
                 </div>
                 <div className="md:w-1/2 md:pr-12"></div>
               </div>
@@ -228,10 +225,9 @@ const Index = () => {
                   </p>
                 </div>
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 border-4 border-white shadow-lg flex items-center justify-center z-20">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 border-4 border-white shadow-lg flex items-center justify-center">
                     <Send className="h-10 w-10 text-white" />
                   </div>
-                  <div className="absolute inset-0 w-20 h-20 rounded-full bg-purple-100 animate-pulse"></div>
                 </div>
                 <div className="md:w-1/2 md:pl-12"></div>
               </div>

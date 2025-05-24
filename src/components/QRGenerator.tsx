@@ -808,8 +808,8 @@ const QRGenerator = () => {
   const currentType = qrTypes.find(type => type.id === qrType);
 
   return (
-    <div className="w-full h-[608px] bg-gray-50 rounded-2xl p-6">
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm h-full flex flex-col">
+    <div className="w-full bg-gray-50 rounded-2xl p-6">
+      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm flex flex-col">
         {/* Header */}
         <div className="text-center py-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">Preview QR Code</h2>
