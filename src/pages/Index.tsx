@@ -1,3 +1,4 @@
+
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
 import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle } from "lucide-react";
@@ -32,17 +33,17 @@ const Index = () => {
             <QRGenerator />
           </div>
           
-          {/* Features section - moved above What are QR Codes */}
+          {/* Features section */}
           <div className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm">
             <div className="text-center mb-12">
               <div className="inline-block px-6 py-2 bg-emerald-500 text-white rounded-full font-medium mb-6">
                 Features
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">
-                Everything you need for your QR Codes
+                Powerful Features for Your QR Code Needs
               </h2>
               <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                Create, customize, and track your QR codes with our powerful features
+                Create, customize, and track your QR codes with our comprehensive suite of professional features
               </p>
             </div>
             
@@ -51,14 +52,14 @@ const Index = () => {
                 <div className="text-emerald-500 mb-3">
                   <Smartphone className="h-12 w-12" />
                 </div>
-                <h3 className="font-medium text-lg text-slate-700">Fully customized landing pages</h3>
+                <h3 className="font-medium text-lg text-slate-700">Custom Landing Pages</h3>
               </div>
               
               <div className="flex flex-col items-center">
                 <div className="text-emerald-500 mb-3">
                   <List className="h-12 w-12" />
                 </div>
-                <h3 className="font-medium text-lg text-slate-700">QR Code Statistics</h3>
+                <h3 className="font-medium text-lg text-slate-700">Advanced Analytics</h3>
               </div>
               
               <div className="flex flex-col items-center">
@@ -71,14 +72,14 @@ const Index = () => {
                     </svg>
                   </div>
                 </div>
-                <h3 className="font-medium text-lg text-slate-700">Customized Colors & Shapes for QR Codes</h3>
+                <h3 className="font-medium text-lg text-slate-700">Design Customization</h3>
               </div>
               
               <div className="flex flex-col items-center">
                 <div className="text-emerald-500 mb-3">
                   <Image className="h-12 w-12" />
                 </div>
-                <h3 className="font-medium text-lg text-slate-700">Add Logos to QR Codes</h3>
+                <h3 className="font-medium text-lg text-slate-700">Logo Integration</h3>
               </div>
             </div>
           </div>
@@ -87,17 +88,17 @@ const Index = () => {
           <div className="mt-16 py-16 px-4 bg-emerald-500 text-white rounded-lg">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-xl font-medium mb-3">What are QR Codes?</h2>
-              <h3 className="text-4xl font-bold mb-6">QR Codes stands for 'Quick Response'</h3>
+              <h3 className="text-4xl font-bold mb-6">QR stands for 'Quick Response'</h3>
               
               <p className="mb-6 text-lg opacity-90">
-                They were created in 1994 by Denso Wave to track vehicles during manufacturing. They quickly
-                gained popularity when it spread to smartphones. You can now even scan QR Codes from your
-                phone camera.
+                QR Codes were invented in 1994 by Denso Wave for tracking automotive parts during manufacturing. 
+                They gained massive popularity with the rise of smartphones, making it possible to scan codes 
+                directly with your phone's camera.
               </p>
               
               <p className="mb-8 text-lg opacity-90">
-                I will break down some of the benefits from using QR Codes and the most requested QR Codes
-                features.
+                Today, QR Codes have revolutionized how we share information instantly. Let me show you the key 
+                benefits and most popular QR Code applications that can transform your business.
               </p>
               
               <Button 
@@ -105,7 +106,7 @@ const Index = () => {
                 size="lg" 
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
               >
-                Generate QR Code <ArrowUp className="ml-2 rotate-45" />
+                Create QR Code <ArrowUp className="ml-2 rotate-45" />
               </Button>
               
               <div className="grid md:grid-cols-2 gap-6 mt-12">
@@ -115,9 +116,9 @@ const Index = () => {
                       <MessageCircle size={48} />
                     </div>
                   </div>
-                  <h4 className="text-slate-700 text-xl font-medium mb-4">Gather Feedback</h4>
+                  <h4 className="text-slate-700 text-xl font-medium mb-4">Collect Customer Feedback</h4>
                   <p className="text-slate-600">
-                    You can ask users to give some feedback when they scan the QR Code.
+                    Enable instant feedback collection by directing customers to review forms or surveys when they scan your QR Code.
                   </p>
                 </div>
                 
@@ -127,10 +128,10 @@ const Index = () => {
                       <UserSquare size={48} />
                     </div>
                   </div>
-                  <h4 className="text-slate-700 text-xl font-medium mb-4">Profile Cards</h4>
+                  <h4 className="text-slate-700 text-xl font-medium mb-4">Digital Business Cards</h4>
                   <p className="text-slate-600">
-                    Physical profile cards are every day more rare and digital profile cards are a great
-                    alternative.
+                    Replace traditional paper business cards with smart digital profiles that can be instantly 
+                    saved to contacts with a simple scan.
                   </p>
                 </div>
                 
@@ -140,10 +141,10 @@ const Index = () => {
                       <Briefcase size={48} />
                     </div>
                   </div>
-                  <h4 className="text-slate-700 text-xl font-medium mb-4">Describe your Business</h4>
+                  <h4 className="text-slate-700 text-xl font-medium mb-4">Business Information Hub</h4>
                   <p className="text-slate-600">
-                    You can redirect your clients to some instruction page for your business when
-                    they scan the QR Code.
+                    Direct customers to detailed business information, instructions, or service pages 
+                    to enhance their experience with your brand.
                   </p>
                 </div>
                 
@@ -153,10 +154,10 @@ const Index = () => {
                       <Megaphone size={48} />
                     </div>
                   </div>
-                  <h4 className="text-slate-700 text-xl font-medium mb-4">Promote Events & Discounts</h4>
+                  <h4 className="text-slate-700 text-xl font-medium mb-4">Event Promotion & Offers</h4>
                   <p className="text-slate-600">
-                    You can promote any event or give discount codes when people scan the QR
-                    Code.
+                    Promote special events, share exclusive discount codes, or announce limited-time 
+                    offers through engaging QR Code campaigns.
                   </p>
                 </div>
               </div>
@@ -170,78 +171,69 @@ const Index = () => {
                 How to Use
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">
-                Creating QR Codes with QR.io is pretty simple.
+                Creating QR Codes with QR.io is Simple and Fast
               </h2>
               <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                Create an account and use our QR Code Generator to create unlimited dynamic & static QR Codes.
+                Get started in minutes with our intuitive QR Code generator. Create unlimited dynamic and static QR Codes for any purpose.
               </p>
             </div>
 
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-200 transform -translate-x-1/2"></div>
+              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-200 transform -translate-x-1/2 hidden md:block"></div>
               
               {/* Step 1 */}
               <div className="relative z-10 flex flex-col md:flex-row items-center mb-24">
                 <div className="md:w-1/2 md:pr-12 mb-8 md:mb-0 md:text-right">
-                  <h3 className="text-xl font-bold text-slate-800 mb-3">Choose QR Code Type</h3>
-                  <p className="text-slate-600">
-                    First step would be to choose your QR Code Type. This will define what your QR Code will do.
+                  <h3 className="text-2xl font-bold text-slate-800 mb-4">1. Choose QR Code Type</h3>
+                  <p className="text-slate-600 text-lg">
+                    Select from 9 different QR Code types including URL, Email, WiFi, VCard, and more. 
+                    Each type is optimized for specific use cases.
                   </p>
                 </div>
-                <div className="rounded-full w-12 h-12 bg-white border-4 border-emerald-500 flex items-center justify-center z-20">
-                  <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
-                </div>
-                <div className="md:w-1/2 md:pl-12 flex justify-start md:justify-center">
-                  <div className="border-2 border-emerald-500 rounded-full p-12 relative">
-                    <div className="text-blue-800">
-                      <MousePointer className="h-12 w-12" />
-                    </div>
-                    <span className="absolute bottom-4 text-sm text-blue-800 font-medium">Choose QR Code Type</span>
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-4 border-white shadow-lg flex items-center justify-center z-20">
+                    <MousePointer className="h-10 w-10 text-white" />
                   </div>
+                  <div className="absolute inset-0 w-20 h-20 rounded-full bg-emerald-100 animate-pulse"></div>
                 </div>
+                <div className="md:w-1/2 md:pl-12"></div>
               </div>
               
               {/* Step 2 */}
               <div className="relative z-10 flex flex-col md:flex-row-reverse items-center mb-24">
                 <div className="md:w-1/2 md:pl-12 mb-8 md:mb-0 md:text-left">
-                  <h3 className="text-xl font-bold text-slate-800 mb-3">Fill required fields</h3>
-                  <p className="text-slate-600">
-                    Then, you'll need to fill the required fields that the QR Code type is asking. For example, Type 'Link' will ask for a website URL.
+                  <h3 className="text-2xl font-bold text-slate-800 mb-4">2. Fill Required Information</h3>
+                  <p className="text-slate-600 text-lg">
+                    Enter the specific information for your chosen QR Code type. For example, 
+                    a URL QR Code requires a website link, while a WiFi QR Code needs network credentials.
                   </p>
                 </div>
-                <div className="rounded-full w-12 h-12 bg-white border-4 border-emerald-500 flex items-center justify-center z-20">
-                  <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
-                </div>
-                <div className="md:w-1/2 md:pr-12 flex justify-end md:justify-center">
-                  <div className="border-2 border-emerald-500 rounded-full p-12 relative">
-                    <div className="text-blue-800">
-                      <FileEdit className="h-12 w-12" />
-                    </div>
-                    <span className="absolute bottom-4 text-sm text-blue-800 font-medium">Fill required fields</span>
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 border-4 border-white shadow-lg flex items-center justify-center z-20">
+                    <FileEdit className="h-10 w-10 text-white" />
                   </div>
+                  <div className="absolute inset-0 w-20 h-20 rounded-full bg-blue-100 animate-pulse"></div>
                 </div>
+                <div className="md:w-1/2 md:pr-12"></div>
               </div>
               
               {/* Step 3 */}
               <div className="relative z-10 flex flex-col md:flex-row items-center">
                 <div className="md:w-1/2 md:pr-12 mb-8 md:mb-0 md:text-right">
-                  <h3 className="text-xl font-bold text-slate-800 mb-3">Download & Share QR Code</h3>
-                  <p className="text-slate-600">
-                    Finally, you can download and share your QR Code Generated from your dashboard and edit if needed.
+                  <h3 className="text-2xl font-bold text-slate-800 mb-4">3. Download & Share</h3>
+                  <p className="text-slate-600 text-lg">
+                    Generate your QR Code instantly, download it in high quality, and start sharing. 
+                    You can always come back to edit or track its performance.
                   </p>
                 </div>
-                <div className="rounded-full w-12 h-12 bg-white border-4 border-emerald-500 flex items-center justify-center z-20">
-                  <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
-                </div>
-                <div className="md:w-1/2 md:pl-12 flex justify-start md:justify-center">
-                  <div className="border-2 border-emerald-500 rounded-full p-12 relative">
-                    <div className="text-blue-800">
-                      <Send className="h-12 w-12" />
-                    </div>
-                    <span className="absolute bottom-4 text-sm text-blue-800 font-medium">Download & Share QR Code</span>
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 border-4 border-white shadow-lg flex items-center justify-center z-20">
+                    <Send className="h-10 w-10 text-white" />
                   </div>
+                  <div className="absolute inset-0 w-20 h-20 rounded-full bg-purple-100 animate-pulse"></div>
                 </div>
+                <div className="md:w-1/2 md:pl-12"></div>
               </div>
             </div>
 
@@ -251,7 +243,7 @@ const Index = () => {
                 size="lg" 
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
               >
-                Generate QR Code <ArrowUp className="ml-2 rotate-45" />
+                Start Creating <ArrowUp className="ml-2 rotate-45" />
               </Button>
             </div>
           </div>
@@ -259,55 +251,69 @@ const Index = () => {
           {/* Benefits from QR.io section */}
           <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold text-slate-800 mb-6">Benefits from QR.io</h2>
+              <h2 className="text-3xl font-bold text-slate-800 mb-6">Why Choose QR.io?</h2>
               
-              <p className="mb-4 text-slate-600">
-                By using QR.io you will be able to keep track of how many people scan your QR Codes, from where and on what date.
+              <p className="mb-4 text-slate-600 text-lg">
+                QR.io provides comprehensive analytics to track scan rates, locations, and timing data for all your QR Codes. 
+                Make data-driven decisions to optimize your campaigns.
               </p>
               
-              <p className="mb-8 text-slate-600">
-                Also, for those non-developers, you can create fully customized landing pages for your QR Codes. No Coding Required!
+              <p className="mb-8 text-slate-600 text-lg">
+                Create stunning, fully customized landing pages for your QR Codes without any coding knowledge. 
+                Our drag-and-drop interface makes professional design accessible to everyone.
               </p>
               
-              <div className="space-y-4 mt-8">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-emerald-500" />
-                  <span className="text-slate-700">Dynamic QR Codes</span>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-emerald-500 flex-shrink-0" />
+                    <span className="text-slate-700">Dynamic QR Codes with real-time editing</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-emerald-500 flex-shrink-0" />
+                    <span className="text-slate-700">Static QR Codes for permanent content</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-emerald-500 flex-shrink-0" />
+                    <span className="text-slate-700">Detailed analytics and scan tracking</span>
+                  </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-emerald-500" />
-                  <span className="text-slate-700">Static QR Codes</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-emerald-500" />
-                  <span className="text-slate-700">QR Code Statistics</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-emerald-500" />
-                  <span className="text-slate-700">Fully customized landing pages</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-emerald-500" />
-                  <span className="text-slate-700">Customized Colors & Shapes for QR Codes</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-emerald-500" />
-                  <span className="text-slate-700">No Coding Required</span>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-emerald-500 flex-shrink-0" />
+                    <span className="text-slate-700">Custom landing pages and branding</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-emerald-500 flex-shrink-0" />
+                    <span className="text-slate-700">Color and shape customization</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-emerald-500 flex-shrink-0" />
+                    <span className="text-slate-700">No coding or technical skills required</span>
+                  </div>
                 </div>
               </div>
               
-              <div className="mt-10">
-                <img 
-                  src="/lovable-uploads/6c1a237f-3ff5-4930-b9cb-496fbe82304f.png"
-                  alt="QR Code Customization Features" 
-                  className="rounded-lg shadow-md mx-auto"
-                  style={{ maxWidth: "100%" }}
-                />
+              <div className="mt-12 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-xl p-8">
+                <div className="grid md:grid-cols-3 gap-6 text-center">
+                  <div>
+                    <div className="text-3xl font-bold text-emerald-600 mb-2">9+</div>
+                    <div className="text-slate-600">QR Code Types</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-blue-600 mb-2">∞</div>
+                    <div className="text-slate-600">Unlimited Scans</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-purple-600 mb-2">24/7</div>
+                    <div className="text-slate-600">Analytics Tracking</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -316,101 +322,97 @@ const Index = () => {
           <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold text-slate-800 text-center mb-4">QR Code Types</h2>
-              <p className="text-center text-slate-600 mb-12">Different QR Code types you can use for Static QR Codes.</p>
+              <p className="text-center text-slate-600 mb-12">Choose from our comprehensive collection of QR Code types for any business need.</p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Link QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
                   <div className="text-emerald-500 mb-4">
                     <Link className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-medium text-slate-800 mb-2">Link</h3>
-                  <p className="text-slate-600 mb-4">Link to any Website URL</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Website URL</h3>
+                  <p className="text-slate-600 mb-4">Direct users to any website or landing page</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
                 
                 {/* Email QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
                   <div className="text-blue-600 mb-4">
                     <Mail className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-medium text-slate-800 mb-2">E-mail</h3>
-                  <p className="text-slate-600 mb-4">Send an email</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Email</h3>
+                  <p className="text-slate-600 mb-4">Pre-compose emails with subject and message</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
                 
                 {/* Text QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
                   <div className="text-orange-500 mb-4">
                     <Text className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-medium text-slate-800 mb-2">Text</h3>
-                  <p className="text-slate-600 mb-4">Share Text</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Plain Text</h3>
+                  <p className="text-slate-600 mb-4">Share any text message or information</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
                 
                 {/* Call QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
                   <div className="text-emerald-500 mb-4">
                     <Phone className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-medium text-slate-800 mb-2">Call</h3>
-                  <p className="text-slate-600 mb-4">Make a call</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Phone Call</h3>
+                  <p className="text-slate-600 mb-4">Enable one-tap calling to your number</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
                 
                 {/* SMS QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
                   <div className="text-blue-600 mb-4">
                     <MessageSquare className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-medium text-slate-800 mb-2">SMS</h3>
-                  <p className="text-slate-600 mb-4">Send message</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">SMS Message</h3>
+                  <p className="text-slate-600 mb-4">Send pre-written text messages</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
                 
                 {/* WhatsApp QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
-                  <div className="text-orange-500 mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M4 11.9a7.977 7.977 0 0 1 .904-3.687l-1.147-3.280 3.299 1.144a8 8 0 1 1 4.949 10.019" />
-                      <path d="M8.73 14.633a29.667 29.667 0 0 0 5.871-2.283 10.079 10.079 0 0 0 3.12-2.885C18.723 8.421 19 7.277 19 6.166c0-2.089-1.09-3.313-2.949-3.313-1.036 0-1.797.248-2.285.741" />
-                      <path d="M9.865 5.766c-.784.975-.995 2.252-.995 3.152 0 1.086.287 2.033.913 2.826.678.855 1.092 1.434 2.063 2.132 1.001.72 2.440 1.239 4.12 1.239 1.575 0 2.735-.465 3.421-1.211.69-.758.991-1.791.991-2.92 0-1.215-.347-2.209-.968-2.78-.502-.465-.97-.636-1.906-.636-1.992 0-3.444.943-3.444 2.328" />
-                    </svg>
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                  <div className="text-green-500 mb-4">
+                    <MessageSquare className="h-12 w-12" />
                   </div>
                   <h3 className="text-xl font-medium text-slate-800 mb-2">WhatsApp</h3>
-                  <p className="text-slate-600 mb-4">Send WhatsApp message</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <p className="text-slate-600 mb-4">Start WhatsApp conversations instantly</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
                 
                 {/* WiFi QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
                   <div className="text-emerald-500 mb-4">
                     <Wifi className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-medium text-slate-800 mb-2">WI-FI</h3>
-                  <p className="text-slate-600 mb-4">Connect to WI-FI</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">WiFi Network</h3>
+                  <p className="text-slate-600 mb-4">Share WiFi credentials for easy connection</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
                 
                 {/* VCard QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
                   <div className="text-blue-600 mb-4">
                     <VCard className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-medium text-slate-800 mb-2">Vcard</h3>
-                  <p className="text-slate-600 mb-4">Save a contact to the phone scanning</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Contact Card</h3>
+                  <p className="text-slate-600 mb-4">Save contact information to phone</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
                 
                 {/* Event QR */}
-                <div className="border rounded-lg p-6 flex flex-col items-center text-center">
+                <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
                   <div className="text-orange-500 mb-4">
                     <CalendarDays className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-medium text-slate-800 mb-2">Event</h3>
-                  <p className="text-slate-600 mb-4">Invite people to your event</p>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Choose</Button>
+                  <h3 className="text-xl font-medium text-slate-800 mb-2">Calendar Event</h3>
+                  <p className="text-slate-600 mb-4">Add events directly to calendar apps</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
                 </div>
               </div>
             </div>
