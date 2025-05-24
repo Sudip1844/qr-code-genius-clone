@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload, ChevronDown } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 type QRType = 'url' | 'email' | 'text' | 'phone' | 'sms' | 'whatsapp' | 'wifi' | 'vcard' | 'event';
@@ -73,7 +74,7 @@ const QRGenerator = () => {
   const [selectedLogo, setSelectedLogo] = useState('none');
 
   const qrTypes = [
-    { id: 'url', name: 'URL', icon: LinkIcon, color: 'text-emerald-500' },
+    { id: 'url', name: 'Link', icon: LinkIcon, color: 'text-emerald-500' },
     { id: 'email', name: 'Email', icon: Mail, color: 'text-blue-600' },
     { id: 'text', name: 'Text', icon: MessageSquare, color: 'text-orange-500' },
     { id: 'phone', name: 'Phone', icon: Phone, color: 'text-emerald-500' },
@@ -807,152 +808,122 @@ const QRGenerator = () => {
   const currentType = qrTypes.find(type => type.id === qrType);
 
   return (
-    <div>
-      <div className="p-6 bg-white">
-        <h2 className="text-center text-xl font-medium text-slate-700 mb-4">Preview QR Code</h2>
-        <div className="flex justify-center mb-6">
-          {qrCode ? (
-            <div className="p-8 border rounded-lg bg-white">
-              <img src={qrCode} alt="QR Code" className="max-w-full h-auto" style={{ width: '200px', height: '200px' }} />
-            </div>
-          ) : (
-            <div className="p-8 border rounded-lg bg-white flex items-center justify-center" style={{ width: '200px', height: '200px' }}>
-              <p className="text-slate-400">Loading QR code...</p>
-            </div>
-          )}
+    <div className="w-full h-[608px] bg-gray-50 rounded-2xl p-6">
+      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm h-full flex flex-col">
+        {/* Header */}
+        <div className="text-center py-6">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Preview QR Code</h2>
+          
+          {/* QR Code Preview */}
+          <div className="bg-gray-100 rounded-xl p-8 mb-6 mx-4">
+            {qrCode ? (
+              <img src={qrCode} alt="QR Code" className="w-48 h-48 mx-auto" />
+            ) : (
+              <div className="w-48 h-48 mx-auto bg-gray-200 rounded-lg flex items-center justify-center">
+                <div className="text-gray-400 text-6xl font-mono">QR</div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex mb-6">
+        {/* Tab Navigation */}
+        <div className="flex mx-4 mb-6">
           <button
             onClick={() => setActiveTab('content')}
-            className={`flex-1 py-3 text-center rounded-l-md ${
+            className={`flex-1 py-3 px-4 rounded-l-xl flex items-center justify-center font-medium transition-all ${
               activeTab === 'content' 
-                ? 'bg-emerald-100 text-emerald-600 font-medium' 
-                : 'bg-slate-100 text-slate-500'
+                ? 'bg-emerald-500 text-white' 
+                : 'bg-gray-200 text-gray-600'
             }`}
           >
-            <span className={`${activeTab === 'content' ? 'bg-emerald-500' : 'bg-slate-400'} text-white rounded-full w-6 h-6 inline-flex items-center justify-center mr-2`}>1</span>
+            <span className={`${activeTab === 'content' ? 'bg-white text-emerald-500' : 'bg-gray-400 text-white'} rounded-full w-6 h-6 inline-flex items-center justify-center mr-2 text-sm font-bold`}>1</span>
             Content
           </button>
           <button
             onClick={() => setActiveTab('design')}
-            className={`flex-1 py-3 text-center rounded-r-md ${
+            className={`flex-1 py-3 px-4 rounded-r-xl flex items-center justify-center font-medium transition-all ${
               activeTab === 'design' 
-                ? 'bg-emerald-100 text-emerald-600 font-medium' 
-                : 'bg-slate-100 text-slate-500'
+                ? 'bg-emerald-500 text-white' 
+                : 'bg-gray-200 text-gray-600'
             }`}
           >
-            <span className={`${activeTab === 'design' ? 'bg-emerald-500' : 'bg-slate-400'} text-white rounded-full w-6 h-6 inline-flex items-center justify-center mr-2`}>2</span>
+            <span className={`${activeTab === 'design' ? 'bg-white text-emerald-500' : 'bg-gray-400 text-white'} rounded-full w-6 h-6 inline-flex items-center justify-center mr-2 text-sm font-bold`}>2</span>
             Design
           </button>
         </div>
 
-        {activeTab === 'content' && (
-          <div>
-            {/* QR Type Selector */}
-            <div className="mb-6">
-              <Label className="block text-slate-700 mb-3">QR Code Type</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {qrTypes.map((type) => {
-                  const IconComponent = type.icon;
-                  return (
-                    <button
-                      key={type.id}
-                      onClick={() => setQrType(type.id as QRType)}
-                      className={`p-3 rounded-lg border text-center transition-colors ${
-                        qrType === type.id 
-                          ? 'bg-emerald-50 border-emerald-500 text-emerald-600' 
-                          : 'bg-white border-gray-200 text-slate-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className={`flex justify-center mb-2 ${type.color}`}>
-                        <IconComponent className="h-6 w-6" />
-                      </div>
-                      <span className="text-sm font-medium">{type.name}</span>
-                    </button>
-                  );
-                })}
+        {/* Content */}
+        <div className="flex-1 px-4 pb-4">
+          {activeTab === 'content' && (
+            <div className="space-y-4">
+              {/* QR Type Selector */}
+              <div>
+                <Select value={qrType} onValueChange={(value) => setQrType(value as QRType)}>
+                  <SelectTrigger className="w-full bg-emerald-50 border-emerald-200 text-emerald-700 h-12">
+                    <div className="flex items-center">
+                      {currentType && <currentType.icon className="h-5 w-5 mr-3" />}
+                      <SelectValue placeholder="Select QR type" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {qrTypes.map((type) => {
+                      const IconComponent = type.icon;
+                      return (
+                        <SelectItem key={type.id} value={type.id}>
+                          <div className="flex items-center">
+                            <IconComponent className={`h-4 w-4 mr-3 ${type.color}`} />
+                            {type.name}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Dynamic Form */}
+              <div className="space-y-4">
+                {renderForm()}
               </div>
             </div>
+          )}
 
-            {/* Current Type Display */}
-            {currentType && (
-              <div className="mb-6 bg-emerald-50 p-4 rounded-md flex items-center justify-between">
-                <div className="flex items-center">
-                  <currentType.icon className="h-5 w-5 text-emerald-500 mr-2" />
-                  <span className="text-emerald-700">{currentType.name}</span>
-                </div>
-              </div>
-            )}
-            
-            {/* Dynamic Form */}
-            <div className="mb-6">
-              {renderForm()}
+          {activeTab === 'design' && (
+            <div>
+              <Tabs value={designTab} onValueChange={setDesignTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="frame">Frame</TabsTrigger>
+                  <TabsTrigger value="shape">Shape</TabsTrigger>
+                  <TabsTrigger value="logo">Logo</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="frame" className="mt-4">
+                  {renderDesignContent()}
+                </TabsContent>
+                
+                <TabsContent value="shape" className="mt-4">
+                  {renderDesignContent()}
+                </TabsContent>
+                
+                <TabsContent value="logo" className="mt-4">
+                  {renderDesignContent()}
+                </TabsContent>
+              </Tabs>
             </div>
+          )}
+        </div>
 
-            <div className="flex gap-3">
-              <Button 
-                onClick={generateQR}
-                disabled={loading}
-                className="flex-1 py-6 bg-emerald-500 hover:bg-emerald-600 text-white"
-              >
-                {loading ? 'Generating...' : 'Generate QR Code'}
-              </Button>
-              
-              <Button 
-                onClick={downloadQR}
-                disabled={!qrCode || loading}
-                className="py-6 bg-slate-200 hover:bg-slate-300 text-slate-700"
-                variant="ghost"
-              >
-                <Download className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'design' && (
-          <div>
-            <Tabs value={designTab} onValueChange={setDesignTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="frame" className="text-emerald-600">Frame</TabsTrigger>
-                <TabsTrigger value="shape">Shape</TabsTrigger>
-                <TabsTrigger value="logo">Logo</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="frame" className="mt-6">
-                {renderDesignContent()}
-              </TabsContent>
-              
-              <TabsContent value="shape" className="mt-6">
-                {renderDesignContent()}
-              </TabsContent>
-              
-              <TabsContent value="logo" className="mt-6">
-                {renderDesignContent()}
-              </TabsContent>
-            </Tabs>
-
-            <div className="flex gap-3 mt-6">
-              <Button 
-                onClick={generateQR}
-                disabled={loading}
-                className="flex-1 py-6 bg-emerald-500 hover:bg-emerald-600 text-white"
-              >
-                {loading ? 'Generating...' : 'Generate QR Code'}
-              </Button>
-              
-              <Button 
-                onClick={downloadQR}
-                disabled={!qrCode || loading}
-                className="py-6 bg-slate-200 hover:bg-slate-300 text-slate-700"
-                variant="ghost"
-              >
-                <Download className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* Download Button */}
+        <div className="px-4 pb-4">
+          <Button 
+            onClick={downloadQR}
+            disabled={!qrCode || loading}
+            className="w-full h-12 bg-gray-400 hover:bg-gray-500 text-white rounded-xl"
+          >
+            <Download className="h-5 w-5 mr-2" />
+            Download QR Code
+          </Button>
+        </div>
       </div>
     </div>
   );
