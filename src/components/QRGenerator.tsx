@@ -1,11 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, createTextQR } from '@/lib/qr-service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 type QRType = 'url' | 'email' | 'text' | 'phone' | 'sms' | 'whatsapp' | 'wifi' | 'vcard' | 'event';
@@ -15,6 +15,7 @@ const QRGenerator = () => {
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
+  const [designTab, setDesignTab] = useState('frame');
 
   // URL fields
   const [url, setUrl] = useState('');
@@ -55,6 +56,22 @@ const QRGenerator = () => {
   const [eventStart, setEventStart] = useState('');
   const [eventEnd, setEventEnd] = useState('');
 
+  // Design options state
+  const [selectedFrame, setSelectedFrame] = useState('none');
+  const [frameText, setFrameText] = useState('SCAN ME');
+  const [frameFont, setFrameFont] = useState('Sans-Serif');
+  const [frameColor, setFrameColor] = useState('#000000');
+  const [selectedShape, setSelectedShape] = useState('square');
+  const [shapeColor, setShapeColor] = useState('#000000');
+  const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
+  const [transparentBackground, setTransparentBackground] = useState(false);
+  const [gradient, setGradient] = useState(false);
+  const [borderStyle, setBorderStyle] = useState('square');
+  const [borderColor, setBorderColor] = useState('#000000');
+  const [centerStyle, setCenterStyle] = useState('square');
+  const [centerColor, setCenterColor] = useState('#000000');
+  const [selectedLogo, setSelectedLogo] = useState('none');
+
   const qrTypes = [
     { id: 'url', name: 'URL', icon: LinkIcon, color: 'text-emerald-500' },
     { id: 'email', name: 'Email', icon: Mail, color: 'text-blue-600' },
@@ -65,6 +82,67 @@ const QRGenerator = () => {
     { id: 'wifi', name: 'WiFi', icon: Wifi, color: 'text-emerald-500' },
     { id: 'vcard', name: 'VCard', icon: User, color: 'text-blue-600' },
     { id: 'event', name: 'Event', icon: Calendar, color: 'text-orange-500' },
+  ];
+
+  const frameOptions = [
+    { id: 'none', label: 'No Frame', icon: '✕' },
+    { id: 'basic', label: 'Basic Frame', icon: '📱' },
+    { id: 'rounded', label: 'Rounded Frame', icon: '🔲' },
+    { id: 'circle', label: 'Circle Frame', icon: '⭕' },
+    { id: 'banner', label: 'Banner Frame', icon: '🏷️' },
+    { id: 'badge', label: 'Badge Frame', icon: '🎫' },
+    { id: 'button', label: 'Button Frame', icon: '🔘' },
+    { id: 'card', label: 'Card Frame', icon: '💳' }
+  ];
+
+  const shapeOptions = [
+    { id: 'square', pattern: '▪️' },
+    { id: 'rounded', pattern: '🔲' },
+    { id: 'circle', pattern: '⭕' },
+    { id: 'diamond', pattern: '🔶' },
+    { id: 'star', pattern: '⭐' },
+    { id: 'heart', pattern: '❤️' },
+    { id: 'hexagon', pattern: '⬡' },
+    { id: 'triangle', pattern: '🔺' }
+  ];
+
+  const borderOptions = [
+    { id: 'square', icon: '⬜' },
+    { id: 'rounded', icon: '🔲' },
+    { id: 'circle', icon: '⭕' },
+    { id: 'diamond', icon: '🔶' },
+    { id: 'oval', icon: '🥚' },
+    { id: 'hexagon', icon: '⬡' },
+    { id: 'octagon', icon: '🛑' },
+    { id: 'leaf', icon: '🍃' }
+  ];
+
+  const centerOptions = [
+    { id: 'square', icon: '⬛' },
+    { id: 'rounded', icon: '🔲' },
+    { id: 'circle', icon: '⭕' },
+    { id: 'diamond', icon: '🔶' },
+    { id: 'star', icon: '⭐' },
+    { id: 'heart', icon: '❤️' },
+    { id: 'flower', icon: '🌸' },
+    { id: 'cross', icon: '➕' }
+  ];
+
+  const logoOptions = [
+    { id: 'none', icon: '✕', label: 'No Logo' },
+    { id: 'link', icon: '🔗', label: 'Link' },
+    { id: 'location', icon: '📍', label: 'Location' },
+    { id: 'email', icon: '📧', label: 'Email' },
+    { id: 'whatsapp', icon: '💬', label: 'WhatsApp' },
+    { id: 'wifi', icon: '📶', label: 'WiFi' },
+    { id: 'vcard', icon: '👤', label: 'Contact' },
+    { id: 'paypal', icon: '💳', label: 'PayPal' },
+    { id: 'bitcoin', icon: '₿', label: 'Bitcoin' },
+    { id: 'scan1', icon: '📱', label: 'Scan Me 1' },
+    { id: 'scan2', icon: '📄', label: 'Scan Me 2' },
+    { id: 'qr', icon: '📊', label: 'QR Code' },
+    { id: 'menu', icon: '📋', label: 'Menu' },
+    { id: 'fullscreen', icon: '⛶', label: 'Fullscreen' }
   ];
 
   const generateQRData = (): string => {
@@ -114,8 +192,8 @@ const QRGenerator = () => {
         size: 300,
         margin: 4,
         color: {
-          dark: '#000000',
-          light: '#FFFFFF',
+          dark: shapeColor,
+          light: transparentBackground ? '#00000000' : backgroundColor,
         },
         errorCorrectionLevel: 'M',
       };
@@ -414,6 +492,318 @@ const QRGenerator = () => {
     }
   };
 
+  const renderDesignContent = () => {
+    switch (designTab) {
+      case 'frame':
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-4 gap-3">
+              {frameOptions.map((frame) => (
+                <button
+                  key={frame.id}
+                  onClick={() => setSelectedFrame(frame.id)}
+                  className={`p-3 rounded-lg border text-center transition-colors ${
+                    selectedFrame === frame.id 
+                      ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                      : 'bg-white border-gray-200 text-slate-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="text-2xl mb-1">{frame.icon}</div>
+                  <div className="text-xs">{frame.label}</div>
+                </button>
+              ))}
+            </div>
+
+            {selectedFrame !== 'none' && (
+              <div className="space-y-4">
+                <div>
+                  <Label className="block text-slate-700 mb-2">Frame phrase</Label>
+                  <Input
+                    value={frameText}
+                    onChange={(e) => setFrameText(e.target.value)}
+                    placeholder="SCAN ME"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="block text-slate-700 mb-2">Phrase font</Label>
+                    <select
+                      value={frameFont}
+                      onChange={(e) => setFrameFont(e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="Sans-Serif">Sans-Serif</option>
+                      <option value="Serif">Serif</option>
+                      <option value="Monospace">Monospace</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <Label className="block text-slate-700 mb-2">Frame color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        value={frameColor}
+                        onChange={(e) => setFrameColor(e.target.value)}
+                        placeholder="#000000"
+                        className="flex-1"
+                      />
+                      <div 
+                        className="w-10 h-10 rounded border cursor-pointer"
+                        style={{ backgroundColor: frameColor }}
+                        onClick={() => document.getElementById('frameColorPicker')?.click()}
+                      />
+                      <input
+                        id="frameColorPicker"
+                        type="color"
+                        value={frameColor}
+                        onChange={(e) => setFrameColor(e.target.value)}
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'shape':
+        return (
+          <div className="space-y-6">
+            <div>
+              <Label className="block text-slate-700 mb-3">Shape & Color</Label>
+              
+              <div className="mb-4">
+                <Label className="block text-slate-700 mb-2">Shape style</Label>
+                <div className="grid grid-cols-4 gap-2">
+                  {shapeOptions.map((shape) => (
+                    <button
+                      key={shape.id}
+                      onClick={() => setSelectedShape(shape.id)}
+                      className={`p-3 rounded-lg border text-center transition-colors ${
+                        selectedShape === shape.id 
+                          ? 'bg-blue-50 border-blue-500' 
+                          : 'bg-white border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="text-xl">{shape.pattern}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4 bg-slate-50 p-4 rounded-lg">
+                <div>
+                  <Label className="block text-slate-700 mb-2">Background color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="text"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      placeholder="#FFFFFF"
+                      className="flex-1"
+                    />
+                    <div 
+                      className="w-10 h-10 rounded border cursor-pointer"
+                      style={{ backgroundColor: backgroundColor }}
+                      onClick={() => document.getElementById('bgColorPicker')?.click()}
+                    />
+                    <input
+                      id="bgColorPicker"
+                      type="color"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="hidden"
+                    />
+                  </div>
+                  <label className="flex items-center mt-2">
+                    <input
+                      type="checkbox"
+                      checked={transparentBackground}
+                      onChange={(e) => setTransparentBackground(e.target.checked)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-slate-600">Transparent background</span>
+                  </label>
+                </div>
+
+                <div>
+                  <Label className="block text-slate-700 mb-2">Shape color</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="text"
+                      value={shapeColor}
+                      onChange={(e) => setShapeColor(e.target.value)}
+                      placeholder="#000000"
+                      className="flex-1"
+                    />
+                    <div 
+                      className="w-10 h-10 rounded border cursor-pointer"
+                      style={{ backgroundColor: shapeColor }}
+                      onClick={() => document.getElementById('shapeColorPicker')?.click()}
+                    />
+                    <input
+                      id="shapeColorPicker"
+                      type="color"
+                      value={shapeColor}
+                      onChange={(e) => setShapeColor(e.target.value)}
+                      className="hidden"
+                    />
+                  </div>
+                  <label className="flex items-center mt-2">
+                    <input
+                      type="checkbox"
+                      checked={gradient}
+                      onChange={(e) => setGradient(e.target.checked)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-slate-600">Gradient</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Label className="block text-slate-700 mb-2">Border style</Label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {borderOptions.map((border) => (
+                      <button
+                        key={border.id}
+                        onClick={() => setBorderStyle(border.id)}
+                        className={`p-3 rounded-lg border text-center transition-colors ${
+                          borderStyle === border.id 
+                            ? 'bg-blue-50 border-blue-500' 
+                            : 'bg-white border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="text-xl">{border.icon}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <Label className="block text-slate-700 mb-2">Border color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="text"
+                      value={borderColor}
+                      onChange={(e) => setBorderColor(e.target.value)}
+                      placeholder="#000000"
+                      className="flex-1"
+                    />
+                    <div 
+                      className="w-10 h-10 rounded border cursor-pointer"
+                      style={{ backgroundColor: borderColor }}
+                      onClick={() => document.getElementById('borderColorPicker')?.click()}
+                    />
+                    <input
+                      id="borderColorPicker"
+                      type="color"
+                      value={borderColor}
+                      onChange={(e) => setBorderColor(e.target.value)}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="block text-slate-700 mb-2">Center style</Label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {centerOptions.map((center) => (
+                      <button
+                        key={center.id}
+                        onClick={() => setCenterStyle(center.id)}
+                        className={`p-3 rounded-lg border text-center transition-colors ${
+                          centerStyle === center.id 
+                            ? 'bg-blue-50 border-blue-500' 
+                            : 'bg-white border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="text-xl">{center.icon}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <Label className="block text-slate-700 mb-2">Center color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="text"
+                      value={centerColor}
+                      onChange={(e) => setCenterColor(e.target.value)}
+                      placeholder="#000000"
+                      className="flex-1"
+                    />
+                    <div 
+                      className="w-10 h-10 rounded border cursor-pointer"
+                      style={{ backgroundColor: centerColor }}
+                      onClick={() => document.getElementById('centerColorPicker')?.click()}
+                    />
+                    <input
+                      id="centerColorPicker"
+                      type="color"
+                      value={centerColor}
+                      onChange={(e) => setCenterColor(e.target.value)}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'logo':
+        return (
+          <div className="space-y-6">
+            <div>
+              <Label className="block text-slate-700 mb-3">Upload Logo</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  id="logoUpload"
+                />
+                <label htmlFor="logoUpload" className="cursor-pointer">
+                  <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                  <div className="text-sm text-gray-500">Choose file</div>
+                </label>
+                <Button variant="outline" className="mt-2">Browse</Button>
+              </div>
+            </div>
+
+            <div>
+              <Label className="block text-slate-700 mb-3">Or choose from here</Label>
+              <div className="grid grid-cols-4 gap-3">
+                {logoOptions.map((logo) => (
+                  <button
+                    key={logo.id}
+                    onClick={() => setSelectedLogo(logo.id)}
+                    className={`p-3 rounded-lg border text-center transition-colors ${
+                      selectedLogo === logo.id 
+                        ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                        : 'bg-white border-gray-200 text-slate-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{logo.icon}</div>
+                    <div className="text-xs">{logo.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   const currentType = qrTypes.find(type => type.id === qrType);
 
   return (
@@ -522,8 +912,45 @@ const QRGenerator = () => {
         )}
 
         {activeTab === 'design' && (
-          <div className="text-center p-6">
-            <p className="text-slate-500">Design options will be available here</p>
+          <div>
+            <Tabs value={designTab} onValueChange={setDesignTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="frame" className="text-emerald-600">Frame</TabsTrigger>
+                <TabsTrigger value="shape">Shape</TabsTrigger>
+                <TabsTrigger value="logo">Logo</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="frame" className="mt-6">
+                {renderDesignContent()}
+              </TabsContent>
+              
+              <TabsContent value="shape" className="mt-6">
+                {renderDesignContent()}
+              </TabsContent>
+              
+              <TabsContent value="logo" className="mt-6">
+                {renderDesignContent()}
+              </TabsContent>
+            </Tabs>
+
+            <div className="flex gap-3 mt-6">
+              <Button 
+                onClick={generateQR}
+                disabled={loading}
+                className="flex-1 py-6 bg-emerald-500 hover:bg-emerald-600 text-white"
+              >
+                {loading ? 'Generating...' : 'Generate QR Code'}
+              </Button>
+              
+              <Button 
+                onClick={downloadQR}
+                disabled={!qrCode || loading}
+                className="py-6 bg-slate-200 hover:bg-slate-300 text-slate-700"
+                variant="ghost"
+              >
+                <Download className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
