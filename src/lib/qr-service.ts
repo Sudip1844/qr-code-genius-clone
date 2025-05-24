@@ -82,3 +82,67 @@ export const createPhoneQR = (phoneNumber: string): string => {
 export const createTextQR = (text: string): string => {
   return text;
 };
+
+export const createSMSQR = (phoneNumber: string, message?: string): string => {
+  const cleaned = phoneNumber.replace(/[^\d+]/g, '');
+  
+  if (!cleaned) {
+    return '';
+  }
+  
+  return `sms:${cleaned}${message ? `?body=${encodeURIComponent(message)}` : ''}`;
+};
+
+export const createWhatsAppQR = (phoneNumber: string, message?: string): string => {
+  const cleaned = phoneNumber.replace(/[^\d]/g, '');
+  
+  if (!cleaned) {
+    return '';
+  }
+  
+  return `https://wa.me/${cleaned}${message ? `?text=${encodeURIComponent(message)}` : ''}`;
+};
+
+export const createWiFiQR = (ssid: string, password: string, security: string = 'WPA'): string => {
+  if (!ssid) {
+    return '';
+  }
+  
+  return `WIFI:T:${security};S:${ssid};P:${password};;`;
+};
+
+export const createVCardQR = (name: string, phone?: string, email?: string, organization?: string): string => {
+  if (!name) {
+    return '';
+  }
+  
+  let vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}`;
+  
+  if (phone) vcard += `\nTEL:${phone}`;
+  if (email) vcard += `\nEMAIL:${email}`;
+  if (organization) vcard += `\nORG:${organization}`;
+  
+  vcard += '\nEND:VCARD';
+  
+  return vcard;
+};
+
+export const createEventQR = (title: string, location?: string, startDate?: string, endDate?: string): string => {
+  if (!title) {
+    return '';
+  }
+  
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+  
+  let event = `BEGIN:VEVENT\nSUMMARY:${title}`;
+  
+  if (location) event += `\nLOCATION:${location}`;
+  if (startDate) event += `\nDTSTART:${formatDate(startDate)}`;
+  if (endDate) event += `\nDTEND:${formatDate(endDate)}`;
+  
+  event += '\nEND:VEVENT';
+  
+  return event;
+};

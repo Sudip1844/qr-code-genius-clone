@@ -32,6 +32,57 @@ const Index = () => {
             <QRGenerator />
           </div>
           
+          {/* Features section - moved above What are QR Codes */}
+          <div className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm">
+            <div className="text-center mb-12">
+              <div className="inline-block px-6 py-2 bg-emerald-500 text-white rounded-full font-medium mb-6">
+                Features
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">
+                Everything you need for your QR Codes
+              </h2>
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                Create, customize, and track your QR codes with our powerful features
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-4 gap-8 text-center">
+              <div className="flex flex-col items-center">
+                <div className="text-emerald-500 mb-3">
+                  <Smartphone className="h-12 w-12" />
+                </div>
+                <h3 className="font-medium text-lg text-slate-700">Fully customized landing pages</h3>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <div className="text-emerald-500 mb-3">
+                  <List className="h-12 w-12" />
+                </div>
+                <h3 className="font-medium text-lg text-slate-700">QR Code Statistics</h3>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <div className="text-emerald-500 mb-3">
+                  <div className="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <circle cx="12" cy="12" r="6" />
+                      <circle cx="12" cy="12" r="2" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="font-medium text-lg text-slate-700">Customized Colors & Shapes for QR Codes</h3>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <div className="text-emerald-500 mb-3">
+                  <Image className="h-12 w-12" />
+                </div>
+                <h3 className="font-medium text-lg text-slate-700">Add Logos to QR Codes</h3>
+              </div>
+            </div>
+          </div>
+          
           {/* What are QR Codes section */}
           <div className="mt-16 py-16 px-4 bg-emerald-500 text-white rounded-lg">
             <div className="max-w-3xl mx-auto">
@@ -108,57 +159,6 @@ const Index = () => {
                     Code.
                   </p>
                 </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Features section */}
-          <div className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm">
-            <div className="text-center mb-12">
-              <div className="inline-block px-6 py-2 bg-emerald-500 text-white rounded-full font-medium mb-6">
-                Features
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">
-                Everything you need for your QR Codes
-              </h2>
-              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                Create, customize, and track your QR codes with our powerful features
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-4 gap-8 text-center">
-              <div className="flex flex-col items-center">
-                <div className="text-emerald-500 mb-3">
-                  <Smartphone className="h-12 w-12" />
-                </div>
-                <h3 className="font-medium text-lg text-slate-700">Fully customized landing pages</h3>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div className="text-emerald-500 mb-3">
-                  <List className="h-12 w-12" />
-                </div>
-                <h3 className="font-medium text-lg text-slate-700">QR Code Statistics</h3>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div className="text-emerald-500 mb-3">
-                  <div className="relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="12" r="6" />
-                      <circle cx="12" cy="12" r="2" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="font-medium text-lg text-slate-700">Customized Colors & Shapes for QR Codes</h3>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                <div className="text-emerald-500 mb-3">
-                  <Image className="h-12 w-12" />
-                </div>
-                <h3 className="font-medium text-lg text-slate-700">Add Logos to QR Codes</h3>
               </div>
             </div>
           </div>
