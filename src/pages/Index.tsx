@@ -1,7 +1,33 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, QrCode, Zap, Palette, Download } from "lucide-react";
+import { 
+  ArrowRight, 
+  QrCode, 
+  Zap, 
+  Palette, 
+  Download,
+  ArrowUp,
+  MessageCircle,
+  UserSquare,
+  Briefcase,
+  Megaphone,
+  MousePointer,
+  FileEdit,
+  Send,
+  CheckCircle,
+  Link,
+  Mail,
+  Phone,
+  MessageSquare,
+  Wifi,
+  CalendarDays,
+  Type,
+  Smartphone,
+  List,
+  Image
+} from "lucide-react";
 import QRGenerator from "@/components/QRGenerator";
 import { QRCodeType } from "@/types/qr-types";
 
@@ -413,7 +439,12 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">Website URL</h3>
               <p className="text-slate-600 mb-4">Direct users to any website or landing page</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('url')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
             
             {/* Email QR */}
@@ -423,17 +454,27 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">Email</h3>
               <p className="text-slate-600 mb-4">Pre-compose emails with subject and message</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('email')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
             
             {/* Text QR */}
             <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
               <div className="text-orange-500 mb-4">
-                <Text className="h-12 w-12" />
+                <Type className="h-12 w-12" />
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">Plain Text</h3>
               <p className="text-slate-600 mb-4">Share any text message or information</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('text')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
             
             {/* Call QR */}
@@ -443,7 +484,12 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">Phone Call</h3>
               <p className="text-slate-600 mb-4">Enable one-tap calling to your number</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('phone')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
             
             {/* SMS QR */}
@@ -453,7 +499,12 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">SMS Message</h3>
               <p className="text-slate-600 mb-4">Send pre-written text messages</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('sms')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
             
             {/* WhatsApp QR */}
@@ -463,7 +514,12 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">WhatsApp</h3>
               <p className="text-slate-600 mb-4">Start WhatsApp conversations instantly</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('whatsapp')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
             
             {/* WiFi QR */}
@@ -473,17 +529,27 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">WiFi Network</h3>
               <p className="text-slate-600 mb-4">Share WiFi credentials for easy connection</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('wifi')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
             
             {/* VCard QR */}
             <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
               <div className="text-blue-600 mb-4">
-                <VCard className="h-12 w-12" />
+                <UserSquare className="h-12 w-12" />
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">Contact Card</h3>
               <p className="text-slate-600 mb-4">Save contact information to phone</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('vcard')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
             
             {/* Event QR */}
@@ -493,7 +559,12 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-medium text-slate-800 mb-2">Calendar Event</h3>
               <p className="text-slate-600 mb-4">Add events directly to calendar apps</p>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+              <Button 
+                onClick={() => handleSelectQRType('event')}
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+              >
+                Select
+              </Button>
             </div>
           </div>
         </div>
