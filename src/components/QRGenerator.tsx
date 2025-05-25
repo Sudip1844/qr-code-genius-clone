@@ -4,10 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { ChevronDown, Download, Upload, X } from "lucide-react";
 import { generateQRCode, downloadQRCode } from "@/lib/qr-service";
 import { QRCodeType, QRCodeData } from "@/types/qr-types";
@@ -15,17 +13,17 @@ import { useToast } from "@/hooks/use-toast";
 
 const qrTypes = [
   {
-    id: 'url',
+    id: 'url' as QRCodeType,
     label: 'Website URL',
-    icon: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>,
+    icon: ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>,
     fields: [
       { name: 'url', label: 'URL', type: 'text', placeholder: 'https://example.com', required: true },
     ],
   },
   {
-    id: 'email',
+    id: 'email' as QRCodeType,
     label: 'Email',
-    icon: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-mail"><rect width="22" height="16" x="1" y="4" rx="2" ry="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>,
+    icon: ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="22" height="16" x="1" y="4" rx="2" ry="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>,
     fields: [
       { name: 'email', label: 'Email Address', type: 'email', placeholder: 'name@example.com', required: true },
       { name: 'subject', label: 'Subject', type: 'text', placeholder: 'Subject of the email' },
@@ -140,8 +138,12 @@ const shapes = [
   // { id: 'shape4', style: 'circle' },
 ];
 
-const QRGenerator = () => {
-  const [qrType, setQrType] = useState<string>('url');
+interface QRGeneratorProps {
+  initialType?: QRCodeType;
+}
+
+const QRGenerator = ({ initialType }: QRGeneratorProps) => {
+  const [qrType, setQrType] = useState<QRCodeType>(initialType || 'url');
   const [qrData, setQrData] = useState<QRCodeData>({ url: '' });
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('content');
