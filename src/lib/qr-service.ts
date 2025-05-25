@@ -1,6 +1,5 @@
 
 import QRCode from 'qrcode';
-import { QRCodeType, QRCodeData, QRGenerationOptions } from '../types/qr-types';
 
 export type QROptions = {
   data: string;
@@ -13,83 +12,31 @@ export type QROptions = {
   errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H';
 };
 
-export const generateQRCode = async (
-  type: QRCodeType,
-  data: QRCodeData,
-  options?: QRGenerationOptions
-): Promise<string> => {
+export const generateQRCode = async ({
+  data,
+  size = 300,
+  margin = 4,
+  color = { dark: '#000000', light: '#ffffff' },
+  errorCorrectionLevel = 'M'
+}: QROptions): Promise<string> => {
   try {
-    let qrData = '';
+    // Clean the input data to ensure it's valid
+    const cleanData = data.trim();
     
-    // Generate the appropriate QR data based on type
-    switch (type) {
-      case 'url':
-        qrData = createUrlQR(data.url || '');
-        break;
-      case 'email':
-        qrData = createEmailQR(data.email || '', data.subject, data.body);
-        break;
-      case 'text':
-        qrData = createTextQR(data.text || '');
-        break;
-      case 'phone':
-        qrData = createPhoneQR(data.phone || '');
-        break;
-      case 'sms':
-        qrData = createSMSQR(data.phone || '', data.message);
-        break;
-      case 'whatsapp':
-        qrData = createWhatsAppQR(data.phone || '', data.message);
-        break;
-      case 'wifi':
-        qrData = createWiFiQR(data.ssid || '', data.password || '', data.encryption);
-        break;
-      case 'vcard':
-        qrData = createVCardQR(
-          `${data.firstName || ''} ${data.lastName || ''}`.trim(),
-          data.phone,
-          data.email,
-          data.organization
-        );
-        break;
-      case 'event':
-        qrData = createEventQR(data.eventName || '', data.location, data.startDate, data.endDate);
-        break;
-      default:
-        throw new Error('Unsupported QR code type');
-    }
-
-    if (!qrData) {
+    if (!cleanData) {
       throw new Error('QR code data cannot be empty');
     }
-
-    // Generate QR code with options
-    return await QRCode.toDataURL(qrData, {
-      width: options?.size || 300,
-      margin: options?.margin || 4,
-      color: {
-        dark: options?.foregroundColor || '#000000',
-        light: options?.backgroundColor || '#ffffff',
-      },
-      errorCorrectionLevel: (options?.errorCorrectionLevel as 'L' | 'M' | 'Q' | 'H') || 'M',
+    
+    // Generate QR code
+    return await QRCode.toDataURL(cleanData, {
+      width: size,
+      margin: margin,
+      color: color,
+      errorCorrectionLevel: errorCorrectionLevel,
     });
   } catch (error) {
     console.error('Error generating QR code:', error);
     throw new Error('Failed to generate QR code');
-  }
-};
-
-export const downloadQRCode = async (dataUrl: string, filename: string = 'qrcode.png') => {
-  try {
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = dataUrl;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (error) {
-    console.error('Error downloading QR code:', error);
-    throw new Error('Failed to download QR code');
   }
 };
 
