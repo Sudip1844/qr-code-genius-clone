@@ -230,6 +230,22 @@ const QRGenerator = () => {
     generateQR();
   }, [qrType]);
 
+  // Listen for QR type selection events from the landing page
+  useEffect(() => {
+    const handleQRTypeSelect = (event: CustomEvent) => {
+      const { type } = event.detail;
+      if (type && qrTypes.find(t => t.id === type)) {
+        setQrType(type as QRType);
+      }
+    };
+
+    window.addEventListener('qrTypeSelect', handleQRTypeSelect as EventListener);
+    
+    return () => {
+      window.removeEventListener('qrTypeSelect', handleQRTypeSelect as EventListener);
+    };
+  }, []);
+
   const renderForm = () => {
     switch (qrType) {
       case 'url':

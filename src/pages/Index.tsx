@@ -1,4 +1,3 @@
-
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
 import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle } from "lucide-react";
@@ -42,13 +41,13 @@ const Index = () => {
         </div>
       </header>
       
-      <main className="w-full py-8 px-4">
-        <div ref={qrGeneratorRef}>
+      <main className="w-full py-8">
+        <div ref={qrGeneratorRef} className="px-4">
           <QRGenerator />
         </div>
         
         {/* Features section */}
-        <div className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm">
+        <div className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm mx-4">
           <div className="text-center mb-12">
             <div className="inline-block px-6 py-2 bg-emerald-500 text-white rounded-full font-medium mb-6">
               Features
@@ -99,7 +98,7 @@ const Index = () => {
         </div>
         
         {/* What are QR Codes section */}
-        <div className="mt-16 py-16 px-4 bg-emerald-500 text-white rounded-lg">
+        <div className="mt-16 py-16 px-4 bg-emerald-500 text-white rounded-lg mx-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-xl font-medium mb-3">What are QR Codes?</h2>
             <h3 className="text-4xl font-bold mb-6">QR stands for 'Quick Response'</h3>
@@ -179,7 +178,7 @@ const Index = () => {
         </div>
         
         {/* How to Use section */}
-        <div className="mt-16 py-16">
+        <div className="mt-16 py-16 px-4">
           <div className="text-center mb-12">
             <div className="inline-block px-6 py-2 bg-emerald-500 text-white rounded-full font-medium mb-6">
               How to Use
@@ -260,7 +259,7 @@ const Index = () => {
         </div>
         
         {/* Benefits from QR.io section */}
-        <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm">
+        <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm mx-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold text-slate-800 mb-6">Why Choose QR.io?</h2>
             
@@ -330,7 +329,7 @@ const Index = () => {
         </div>
         
         {/* QR Code Types section */}
-        <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm">
+        <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm mx-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold text-slate-800 text-center mb-4">QR Code Types</h2>
             <p className="text-center text-slate-600 mb-12">Choose from our comprehensive collection of QR Code types for any business need.</p>
