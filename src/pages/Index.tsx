@@ -1,13 +1,29 @@
+
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
 import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle } from "lucide-react";
 import { Link, Mail, Text, Phone, MessageSquare, Wifi, UserSquare as VCard, CalendarDays } from "lucide-react";
+import { useRef } from "react";
 
 const Index = () => {
+  const qrGeneratorRef = useRef<HTMLDivElement>(null);
+
+  const handleQRTypeSelect = (type: string) => {
+    // Scroll to QR generator section
+    qrGeneratorRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+    
+    // Trigger QR type selection in the generator
+    const event = new CustomEvent('qrTypeSelect', { detail: { type } });
+    window.dispatchEvent(event);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="py-4 bg-white sticky top-0 z-10 shadow-sm">
-        <div className="container mx-auto px-4">
+        <div className="w-full px-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <div className="text-emerald-500">
@@ -26,8 +42,10 @@ const Index = () => {
         </div>
       </header>
       
-      <main className="container mx-auto py-8 px-4">
-        <QRGenerator />
+      <main className="w-full py-8 px-4">
+        <div ref={qrGeneratorRef}>
+          <QRGenerator />
+        </div>
         
         {/* Features section */}
         <div className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm">
@@ -325,7 +343,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">Website URL</h3>
                 <p className="text-slate-600 mb-4">Direct users to any website or landing page</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('url')}
+                >
+                  Select
+                </Button>
               </div>
               
               {/* Email QR */}
@@ -335,7 +358,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">Email</h3>
                 <p className="text-slate-600 mb-4">Pre-compose emails with subject and message</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('email')}
+                >
+                  Select
+                </Button>
               </div>
               
               {/* Text QR */}
@@ -345,7 +373,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">Plain Text</h3>
                 <p className="text-slate-600 mb-4">Share any text message or information</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('text')}
+                >
+                  Select
+                </Button>
               </div>
               
               {/* Call QR */}
@@ -355,7 +388,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">Phone Call</h3>
                 <p className="text-slate-600 mb-4">Enable one-tap calling to your number</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('phone')}
+                >
+                  Select
+                </Button>
               </div>
               
               {/* SMS QR */}
@@ -365,7 +403,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">SMS Message</h3>
                 <p className="text-slate-600 mb-4">Send pre-written text messages</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('sms')}
+                >
+                  Select
+                </Button>
               </div>
               
               {/* WhatsApp QR */}
@@ -375,7 +418,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">WhatsApp</h3>
                 <p className="text-slate-600 mb-4">Start WhatsApp conversations instantly</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('whatsapp')}
+                >
+                  Select
+                </Button>
               </div>
               
               {/* WiFi QR */}
@@ -385,7 +433,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">WiFi Network</h3>
                 <p className="text-slate-600 mb-4">Share WiFi credentials for easy connection</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('wifi')}
+                >
+                  Select
+                </Button>
               </div>
               
               {/* VCard QR */}
@@ -395,7 +448,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">Contact Card</h3>
                 <p className="text-slate-600 mb-4">Save contact information to phone</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('vcard')}
+                >
+                  Select
+                </Button>
               </div>
               
               {/* Event QR */}
@@ -405,7 +463,12 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-medium text-slate-800 mb-2">Calendar Event</h3>
                 <p className="text-slate-600 mb-4">Add events directly to calendar apps</p>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Select</Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('event')}
+                >
+                  Select
+                </Button>
               </div>
             </div>
           </div>
@@ -413,7 +476,7 @@ const Index = () => {
       </main>
       
       <footer className="py-8 border-t mt-16 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="w-full px-4">
           <div className="text-center text-slate-500">
             <p>© {new Date().getFullYear()} QR Code Generator. All rights reserved.</p>
           </div>
