@@ -202,6 +202,20 @@ const QRGenerator = () => {
           light: transparentBackground ? '#00000000' : backgroundColor,
         },
         errorCorrectionLevel: 'M',
+        // Pass design options to the service
+        design: {
+          frame: selectedFrame,
+          frameText: frameText,
+          frameFont: frameFont,
+          frameColor: frameColor,
+          shape: selectedShape,
+          borderStyle: borderStyle,
+          borderColor: borderColor,
+          centerStyle: centerStyle,
+          centerColor: centerColor,
+          logo: selectedLogo,
+          gradient: gradient
+        }
       };
       
       const qrDataUrl = await generateQRCode(options);
@@ -249,6 +263,11 @@ const QRGenerator = () => {
   useEffect(() => {
     resetGeneration();
   }, [qrType, url, email, text, phone, smsPhone, whatsappPhone, wifiSSID, vcardName, eventTitle]);
+
+  // Reset generation when design options change
+  useEffect(() => {
+    resetGeneration();
+  }, [selectedFrame, frameText, frameFont, frameColor, selectedShape, shapeColor, backgroundColor, transparentBackground, gradient, borderStyle, borderColor, centerStyle, centerColor, selectedLogo]);
 
   // Listen for QR type selection events from the landing page
   useEffect(() => {
