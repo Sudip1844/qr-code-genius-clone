@@ -6,8 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload, ChevronDown } from 'lucide-react';
+import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload, QrCode } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type QRType = 'url' | 'email' | 'text' | 'phone' | 'sms' | 'whatsapp' | 'wifi' | 'vcard' | 'event';
 
@@ -15,6 +16,7 @@ const QRGenerator = () => {
   const [qrType, setQrType] = useState<QRType>('url');
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [hasGenerated, setHasGenerated] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
   const [designTab, setDesignTab] = useState('frame');
 
@@ -85,26 +87,28 @@ const QRGenerator = () => {
     { id: 'event', name: 'Event', icon: Calendar, color: 'text-orange-500' },
   ];
 
+  // Updated frame options based on your images
   const frameOptions = [
-    { id: 'none', label: 'No Frame', icon: '✕' },
-    { id: 'basic', label: 'Basic Frame', icon: '📱' },
-    { id: 'rounded', label: 'Rounded Frame', icon: '🔲' },
-    { id: 'circle', label: 'Circle Frame', icon: '⭕' },
-    { id: 'banner', label: 'Banner Frame', icon: '🏷️' },
-    { id: 'badge', label: 'Badge Frame', icon: '🎫' },
-    { id: 'button', label: 'Button Frame', icon: '🔘' },
-    { id: 'card', label: 'Card Frame', icon: '💳' }
+    { id: 'none', label: 'No Frame', preview: '✕' },
+    { id: 'basic', label: 'Basic Frame', preview: '⬜' },
+    { id: 'rounded', label: 'Rounded Frame', preview: '🔲' },
+    { id: 'banner', label: 'Banner Frame', preview: '🏷️' },
+    { id: 'badge', label: 'Badge Frame', preview: '🎫' },
+    { id: 'button', label: 'Button Frame', preview: '🔘' },
+    { id: 'card', label: 'Card Frame', preview: '💳' },
+    { id: 'phone', label: 'Phone Frame', preview: '📱' }
   ];
 
+  // Updated shape options based on your images
   const shapeOptions = [
-    { id: 'square', pattern: '▪️' },
-    { id: 'rounded', pattern: '🔲' },
-    { id: 'circle', pattern: '⭕' },
-    { id: 'diamond', pattern: '🔶' },
-    { id: 'star', pattern: '⭐' },
-    { id: 'heart', pattern: '❤️' },
-    { id: 'hexagon', pattern: '⬡' },
-    { id: 'triangle', pattern: '🔺' }
+    { id: 'square', pattern: '⬛', label: 'Square' },
+    { id: 'circle', pattern: '⚫', label: 'Circle' },
+    { id: 'rounded', pattern: '🔲', label: 'Rounded' },
+    { id: 'diamond', pattern: '🔶', label: 'Diamond' },
+    { id: 'dots', pattern: '⚪', label: 'Dots' },
+    { id: 'lines', pattern: '▬', label: 'Lines' },
+    { id: 'crosses', pattern: '✚', label: 'Crosses' },
+    { id: 'stars', pattern: '✦', label: 'Stars' }
   ];
 
   const borderOptions = [
@@ -129,16 +133,17 @@ const QRGenerator = () => {
     { id: 'cross', icon: '➕' }
   ];
 
+  // Updated logo options based on your images
   const logoOptions = [
     { id: 'none', icon: '✕', label: 'No Logo' },
-    { id: 'link', icon: '🔗', label: 'Link' },
-    { id: 'location', icon: '📍', label: 'Location' },
-    { id: 'email', icon: '📧', label: 'Email' },
-    { id: 'whatsapp', icon: '💬', label: 'WhatsApp' },
-    { id: 'wifi', icon: '📶', label: 'WiFi' },
-    { id: 'vcard', icon: '👤', label: 'Contact' },
-    { id: 'paypal', icon: '💳', label: 'PayPal' },
-    { id: 'bitcoin', icon: '₿', label: 'Bitcoin' },
+    { id: 'link', icon: '🔗', label: 'Link', color: '#8B5CF6' },
+    { id: 'location', icon: '📍', label: 'Location', color: '#EF4444' },
+    { id: 'email', icon: '✉️', label: 'Email', color: '#F59E0B' },
+    { id: 'whatsapp', icon: '💬', label: 'WhatsApp', color: '#10B981' },
+    { id: 'wifi', icon: '📶', label: 'WiFi', color: '#3B82F6' },
+    { id: 'vcard', icon: '👤', label: 'Contact', color: '#6366F1' },
+    { id: 'paypal', icon: '💳', label: 'PayPal', color: '#0070BA' },
+    { id: 'bitcoin', icon: '₿', label: 'Bitcoin', color: '#F7931A' },
     { id: 'scan1', icon: '📱', label: 'Scan Me 1' },
     { id: 'scan2', icon: '📄', label: 'Scan Me 2' },
     { id: 'qr', icon: '📊', label: 'QR Code' },
@@ -201,6 +206,7 @@ const QRGenerator = () => {
       
       const qrDataUrl = await generateQRCode(options);
       setQrCode(qrDataUrl);
+      setHasGenerated(true);
     } catch (error) {
       toast({
         title: "Error",
@@ -226,9 +232,23 @@ const QRGenerator = () => {
     });
   };
 
+  const handleButtonClick = () => {
+    if (!hasGenerated) {
+      generateQR();
+    } else {
+      downloadQR();
+    }
+  };
+
+  const resetGeneration = () => {
+    setQrCode(null);
+    setHasGenerated(false);
+  };
+
+  // Reset generation when QR type or content changes
   useEffect(() => {
-    generateQR();
-  }, [qrType]);
+    resetGeneration();
+  }, [qrType, url, email, text, phone, smsPhone, whatsappPhone, wifiSSID, vcardName, eventTitle]);
 
   // Listen for QR type selection events from the landing page
   useEffect(() => {
@@ -525,7 +545,7 @@ const QRGenerator = () => {
                       : 'bg-white border-gray-200 text-slate-600 hover:bg-gray-50'
                   }`}
                 >
-                  <div className="text-2xl mb-1">{frame.icon}</div>
+                  <div className="text-2xl mb-1">{frame.preview}</div>
                   <div className="text-xs">{frame.label}</div>
                 </button>
               ))}
@@ -605,7 +625,8 @@ const QRGenerator = () => {
                           : 'bg-white border-gray-200 hover:bg-gray-50'
                       }`}
                     >
-                      <div className="text-xl">{shape.pattern}</div>
+                      <div className="text-xl mb-1">{shape.pattern}</div>
+                      <div className="text-xs">{shape.label}</div>
                     </button>
                   ))}
                 </div>
@@ -806,6 +827,7 @@ const QRGenerator = () => {
                         ? 'bg-blue-50 border-blue-500 text-blue-600' 
                         : 'bg-white border-gray-200 text-slate-600 hover:bg-gray-50'
                     }`}
+                    style={{ color: logo.color || undefined }}
                   >
                     <div className="text-2xl mb-1">{logo.icon}</div>
                     <div className="text-xs">{logo.label}</div>
@@ -821,6 +843,47 @@ const QRGenerator = () => {
     }
   };
 
+  const renderQRPreview = () => {
+    if (loading) {
+      return (
+        <div className="w-48 h-48 mx-auto bg-gray-100 rounded-lg flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-32 h-32 border-4 border-gray-300 rounded-lg relative">
+              <div className="absolute inset-2 grid grid-cols-8 gap-1">
+                {Array.from({ length: 64 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-gray-400 rounded-sm animate-pulse"
+                    style={{
+                      animationDelay: `${(i % 8) * 0.1}s`,
+                      animationDuration: '1s'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+            <div className="flex items-center space-x-2 text-gray-500">
+              <QrCode className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Generating...</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (qrCode) {
+      return <img src={qrCode} alt="QR Code" className="w-48 h-48 mx-auto" />;
+    }
+
+    return (
+      <div className="w-48 h-48 mx-auto">
+        <Skeleton className="w-full h-full rounded-lg" />
+      </div>
+    );
+  };
+
   const currentType = qrTypes.find(type => type.id === qrType);
 
   return (
@@ -832,13 +895,7 @@ const QRGenerator = () => {
           
           {/* QR Code Preview */}
           <div className="bg-gray-100 rounded-xl p-8 mb-6 mx-4">
-            {qrCode ? (
-              <img src={qrCode} alt="QR Code" className="w-48 h-48 mx-auto" />
-            ) : (
-              <div className="w-48 h-48 mx-auto bg-gray-200 rounded-lg flex items-center justify-center">
-                <div className="text-gray-400 text-6xl font-mono">QR</div>
-              </div>
-            )}
+            {renderQRPreview()}
           </div>
         </div>
 
@@ -929,15 +986,29 @@ const QRGenerator = () => {
           )}
         </div>
 
-        {/* Download Button */}
+        {/* Generate/Download Button */}
         <div className="px-4 pb-4">
           <Button 
-            onClick={downloadQR}
-            disabled={!qrCode || loading}
-            className="w-full h-12 bg-gray-400 hover:bg-gray-500 text-white rounded-xl"
+            onClick={handleButtonClick}
+            disabled={loading}
+            className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium transition-colors"
           >
-            <Download className="h-5 w-5 mr-2" />
-            Download QR Code
+            {loading ? (
+              <>
+                <QrCode className="h-5 w-5 mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : !hasGenerated ? (
+              <>
+                <QrCode className="h-5 w-5 mr-2" />
+                Generate QR Code
+              </>
+            ) : (
+              <>
+                <Download className="h-5 w-5 mr-2" />
+                Download QR Code
+              </>
+            )}
           </Button>
         </div>
       </div>
