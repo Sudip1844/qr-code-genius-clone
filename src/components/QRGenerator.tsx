@@ -99,38 +99,40 @@ const QRGenerator = () => {
     { id: 'phone', label: 'Phone Frame', preview: '📱' }
   ];
 
-  // Updated shape options based on your images
+  // Updated shape options based on your images - exact patterns from the uploaded image
   const shapeOptions = [
-    { id: 'square', pattern: '⬛', label: 'Square' },
-    { id: 'circle', pattern: '⚫', label: 'Circle' },
-    { id: 'rounded', pattern: '🔲', label: 'Rounded' },
-    { id: 'diamond', pattern: '🔶', label: 'Diamond' },
-    { id: 'dots', pattern: '⚪', label: 'Dots' },
-    { id: 'lines', pattern: '▬', label: 'Lines' },
-    { id: 'crosses', pattern: '✚', label: 'Crosses' },
-    { id: 'stars', pattern: '✦', label: 'Stars' }
+    { id: 'classic', pattern: '▣', label: 'Classic', preview: 'M2,2 L2,14 L14,14 L14,2 Z M4,4 L4,6 L6,6 L6,4 Z M8,4 L8,6 L10,6 L10,4 Z M4,8 L4,10 L6,10 L6,8 Z M8,8 L8,10 L10,10 L10,8 Z' },
+    { id: 'liquid', pattern: '◪', label: 'Liquid', preview: 'M2,2 C2,2 5,2 8,5 C11,8 14,8 14,11 C14,14 11,14 8,14 C5,14 2,11 2,8 C2,5 5,2 8,2 Z' },
+    { id: 'horizontal', pattern: '▬', label: 'Horizontal', preview: 'M2,4 L14,4 L14,6 L2,6 Z M2,8 L14,8 L14,10 L2,10 Z M2,12 L14,12 L14,14 L2,14 Z' },
+    { id: 'vertical', pattern: '▥', label: 'Vertical', preview: 'M4,2 L6,2 L6,14 L4,14 Z M8,2 L10,2 L10,14 L8,14 Z M12,2 L14,2 L14,14 L12,14 Z' },
+    { id: 'small-square', pattern: '▪', label: 'Small Square', preview: 'M3,3 L5,3 L5,5 L3,5 Z M7,3 L9,3 L9,5 L7,5 Z M11,3 L13,3 L13,5 L11,5 Z M3,7 L5,7 L5,9 L3,9 Z M7,7 L9,7 L9,9 L7,9 Z M11,7 L13,7 L13,9 L11,9 Z M3,11 L5,11 L5,13 L3,13 Z M7,11 L9,11 L9,13 L7,13 Z M11,11 L13,11 L13,13 L11,13 Z' },
+    { id: 'blob', pattern: '◉', label: 'Blob', preview: 'M8,2 C11,2 14,5 14,8 C14,11 11,14 8,14 C4,14 2,11 2,8 C2,5 4,2 8,2 Z' },
+    { id: 'pointed', pattern: '◆', label: 'Pointed', preview: 'M8,2 L14,8 L8,14 L2,8 Z' },
+    { id: 'circle', pattern: '⚫', label: 'Circle', preview: 'M8,3 C11,3 13,5 13,8 C13,11 11,13 8,13 C5,13 3,11 3,8 C3,5 5,3 8,3 Z' }
   ];
 
+  // Updated border options based on your images - exact styles from the uploaded image
   const borderOptions = [
-    { id: 'square', icon: '⬜' },
-    { id: 'rounded', icon: '🔲' },
-    { id: 'circle', icon: '⭕' },
-    { id: 'diamond', icon: '🔶' },
-    { id: 'oval', icon: '🥚' },
-    { id: 'hexagon', icon: '⬡' },
-    { id: 'octagon', icon: '🛑' },
-    { id: 'leaf', icon: '🍃' }
+    { id: 'square', icon: '⬜', preview: 'M2,2 L14,2 L14,14 L2,14 Z M4,4 L12,4 L12,12 L4,12 Z' },
+    { id: 'rounded-square', icon: '▢', preview: 'M4,2 C3,2 2,3 2,4 L2,12 C2,13 3,14 4,14 L12,14 C13,14 14,13 14,12 L14,4 C14,3 13,2 12,2 Z M5,4 C4.5,4 4,4.5 4,5 L4,11 C4,11.5 4.5,12 5,12 L11,12 C11.5,12 12,11.5 12,11 L12,5 C12,4.5 11.5,4 11,4 Z' },
+    { id: 'circle', icon: '⭕', preview: 'M8,4 C10,4 12,6 12,8 C12,10 10,12 8,12 C6,12 4,10 4,8 C4,6 6,4 8,4 Z' },
+    { id: 'diamond', icon: '◇', preview: 'M8,4 L12,8 L8,12 L4,8 Z' },
+    { id: 'leaf-left', icon: '◗', preview: 'M2,8 C2,5 4,2 8,2 C12,2 14,5 14,8 C14,11 12,14 8,14 C4,14 2,11 2,8 Z M4,8 C4,6 5,4 8,4 C9,4 10,5 10,6 C10,7 9,8 8,8 C5,8 4,7 4,8 Z' },
+    { id: 'leaf-right', icon: '◖', preview: 'M8,2 C12,2 14,5 14,8 C14,11 12,14 8,14 C4,14 2,11 2,8 C2,5 4,2 8,2 Z M8,4 C6,4 6,5 6,6 C6,7 7,8 8,8 C11,8 12,7 12,8 C12,6 11,4 8,4 Z' },
+    { id: 'dot-square', icon: '⊡', preview: 'M2,2 L14,2 L14,14 L2,14 Z M6,6 L10,6 L10,10 L6,10 Z' },
+    { id: 'rounded-bottom', icon: '⌒', preview: 'M2,2 L14,2 L14,10 C14,13 11,14 8,14 C5,14 2,13 2,10 Z M4,4 L12,4 L12,10 C12,11 10,12 8,12 C6,12 4,11 4,10 Z' }
   ];
 
+  // Updated center options based on your images - exact styles from the uploaded image
   const centerOptions = [
-    { id: 'square', icon: '⬛' },
-    { id: 'rounded', icon: '🔲' },
-    { id: 'circle', icon: '⭕' },
-    { id: 'diamond', icon: '🔶' },
-    { id: 'star', icon: '⭐' },
-    { id: 'heart', icon: '❤️' },
-    { id: 'flower', icon: '🌸' },
-    { id: 'cross', icon: '➕' }
+    { id: 'square', icon: '⬛', preview: 'M4,4 L12,4 L12,12 L4,12 Z' },
+    { id: 'rounded-square', icon: '▢', preview: 'M6,4 C5,4 4,5 4,6 L4,10 C4,11 5,12 6,12 L10,12 C11,12 12,11 12,10 L12,6 C12,5 11,4 10,4 Z' },
+    { id: 'circle', icon: '⭕', preview: 'M8,4 C10,4 12,6 12,8 C12,10 10,12 8,12 C6,12 4,10 4,8 C4,6 6,4 8,4 Z' },
+    { id: 'diamond', icon: '◆', preview: 'M8,4 L12,8 L8,12 L4,8 Z' },
+    { id: 'star', icon: '✦', preview: 'M8,4 L9,7 L12,7 L10,9 L11,12 L8,10 L5,12 L6,9 L4,7 L7,7 Z' },
+    { id: 'heart', icon: '♥', preview: 'M8,12 C8,12 4,8 4,6 C4,4 6,4 8,6 C10,4 12,4 12,6 C12,8 8,12 8,12 Z' },
+    { id: 'flower', icon: '✿', preview: 'M8,4 C9,4 10,5 10,6 C11,5 12,6 12,7 C12,8 11,9 10,8 C11,9 10,10 9,10 C8,10 7,9 8,8 C7,9 6,8 6,7 C6,6 7,5 8,6 C7,5 8,4 8,4 Z' },
+    { id: 'plus', icon: '➕', preview: 'M8,4 L8,7 L11,7 L11,9 L8,9 L8,12 L6,12 L6,9 L3,9 L3,7 L6,7 L6,4 Z' }
   ];
 
   // Updated logo options based on your images
@@ -202,7 +204,6 @@ const QRGenerator = () => {
           light: transparentBackground ? '#00000000' : backgroundColor,
         },
         errorCorrectionLevel: 'M',
-        // Pass design options to the service
         design: {
           frame: selectedFrame,
           frameText: frameText,
@@ -638,7 +639,7 @@ const QRGenerator = () => {
                     <button
                       key={shape.id}
                       onClick={() => setSelectedShape(shape.id)}
-                      className={`p-3 rounded-lg border text-center transition-colors ${
+                      className={`p-3 rounded-lg border text-center transition-colors relative ${
                         selectedShape === shape.id 
                           ? 'bg-blue-50 border-blue-500' 
                           : 'bg-white border-gray-200 hover:bg-gray-50'
@@ -1010,7 +1011,7 @@ const QRGenerator = () => {
           <Button 
             onClick={handleButtonClick}
             disabled={loading}
-            className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium transition-colors"
+            className="w-full h-12 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors"
           >
             {loading ? (
               <>
