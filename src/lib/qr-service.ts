@@ -40,7 +40,7 @@ export const generateQRCode = async ({
       throw new Error('QR code data cannot be empty');
     }
     
-    // Configure QR code options based on design
+    // Generate base QR code with basic options
     const qrOptions: any = {
       width: size,
       margin: margin,
@@ -48,44 +48,12 @@ export const generateQRCode = async ({
       errorCorrectionLevel: errorCorrectionLevel,
     };
     
-    // Apply shape styling
-    if (design?.shape && design.shape !== 'square') {
-      switch (design.shape) {
-        case 'circle':
-          qrOptions.type = 'png';
-          qrOptions.rendererOpts = {
-            ...qrOptions.rendererOpts,
-            modules: {
-              shape: 'circle'
-            }
-          };
-          break;
-        case 'rounded':
-          qrOptions.rendererOpts = {
-            ...qrOptions.rendererOpts,
-            modules: {
-              shape: 'rounded'
-            }
-          };
-          break;
-        case 'dots':
-          qrOptions.rendererOpts = {
-            ...qrOptions.rendererOpts,
-            modules: {
-              shape: 'circle',
-              size: 0.8
-            }
-          };
-          break;
-      }
-    }
-    
     // Generate base QR code
     let qrDataUrl = await QRCode.toDataURL(cleanData, qrOptions);
     
-    // Apply additional design features (frame, logo) using canvas manipulation
-    if (design && (design.frame !== 'none' || design.logo !== 'none')) {
-      qrDataUrl = await applyDesignFeatures(qrDataUrl, design, size);
+    // Apply design features using canvas manipulation
+    if (design) {
+      qrDataUrl = await applyDesignFeatures(qrDataUrl, design, size, color);
     }
     
     return qrDataUrl;
@@ -95,7 +63,7 @@ export const generateQRCode = async ({
   }
 };
 
-const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number): Promise<string> => {
+const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number, color: any): Promise<string> => {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -105,35 +73,229 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number)
     }
     
     // Set canvas size with extra space for frame
-    const frameSize = design.frame !== 'none' ? 60 : 0;
+    const frameSize = design.frame !== 'none' ? 80 : 0;
     canvas.width = size + frameSize;
     canvas.height = size + frameSize;
     
     const img = new Image();
     img.onload = () => {
-      // Clear canvas
-      ctx.fillStyle = design.frame !== 'none' ? '#ffffff' : 'transparent';
+      // Clear canvas with background
+      ctx.fillStyle = design.frame !== 'none' ? color.light : 'transparent';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Draw frame if selected
-      if (design.frame !== 'none') {
+      // Draw frame first if selected
+      if (design.frame && design.frame !== 'none') {
         drawFrame(ctx, design, canvas.width, canvas.height);
       }
       
-      // Draw QR code
+      // Create a temporary canvas for QR code manipulation
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) {
+        resolve(qrDataUrl);
+        return;
+      }
+      
+      tempCanvas.width = size;
+      tempCanvas.height = size;
+      
+      // Draw original QR code to temp canvas
+      tempCtx.drawImage(img, 0, 0, size, size);
+      
+      // Apply shape modifications
+      if (design.shape && design.shape !== 'square') {
+        applyShapeStyle(tempCtx, design.shape, size, color);
+      }
+      
+      // Apply border style
+      if (design.borderStyle && design.borderStyle !== 'square') {
+        applyBorderStyle(tempCtx, design.borderStyle, design.borderColor || color.dark, size);
+      }
+      
+      // Apply center style
+      if (design.centerStyle && design.centerStyle !== 'square') {
+        applyCenterStyle(tempCtx, design.centerStyle, design.centerColor || color.dark, size);
+      }
+      
+      // Draw the modified QR code to main canvas
       const qrX = frameSize / 2;
       const qrY = frameSize / 2;
-      ctx.drawImage(img, qrX, qrY, size, size);
+      ctx.drawImage(tempCanvas, qrX, qrY);
       
       // Draw logo if selected
-      if (design.logo !== 'none') {
-        drawLogo(ctx, design.logo, qrX + size/2, qrY + size/2);
+      if (design.logo && design.logo !== 'none') {
+        drawLogo(ctx, design.logo, qrX + size/2, qrY + size/2, size);
       }
       
       resolve(canvas.toDataURL());
     };
     img.src = qrDataUrl;
   });
+};
+
+const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: number, color: any) => {
+  const imageData = ctx.getImageData(0, 0, size, size);
+  const data = imageData.data;
+  const moduleSize = size / 25; // Approximate QR module size
+  
+  // Process each module
+  for (let y = 0; y < size; y += moduleSize) {
+    for (let x = 0; x < size; x += moduleSize) {
+      const centerX = x + moduleSize / 2;
+      const centerY = y + moduleSize / 2;
+      
+      // Check if this module should be dark
+      const pixelIndex = (Math.floor(centerY) * size + Math.floor(centerX)) * 4;
+      if (data[pixelIndex] < 128) { // Dark module
+        // Clear the square module first
+        ctx.fillStyle = color.light;
+        ctx.fillRect(x, y, moduleSize, moduleSize);
+        
+        // Draw new shape
+        ctx.fillStyle = color.dark;
+        drawModuleShape(ctx, shape, centerX, centerY, moduleSize * 0.8);
+      }
+    }
+  }
+};
+
+const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number, y: number, size: number) => {
+  const radius = size / 2;
+  
+  switch (shape) {
+    case 'circle':
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+      ctx.fill();
+      break;
+      
+    case 'rounded':
+      const cornerRadius = size * 0.3;
+      ctx.beginPath();
+      ctx.roundRect(x - radius, y - radius, size, size, cornerRadius);
+      ctx.fill();
+      break;
+      
+    case 'dots':
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 0.7, 0, 2 * Math.PI);
+      ctx.fill();
+      break;
+      
+    case 'diamond':
+      ctx.beginPath();
+      ctx.moveTo(x, y - radius);
+      ctx.lineTo(x + radius, y);
+      ctx.lineTo(x, y + radius);
+      ctx.lineTo(x - radius, y);
+      ctx.closePath();
+      ctx.fill();
+      break;
+      
+    case 'star':
+      drawStar(ctx, x, y, radius);
+      break;
+      
+    case 'heart':
+      drawHeart(ctx, x, y, radius);
+      break;
+      
+    case 'leaf':
+      drawLeaf(ctx, x, y, radius);
+      break;
+      
+    default: // square
+      ctx.fillRect(x - radius, y - radius, size, size);
+      break;
+  }
+};
+
+const applyBorderStyle = (ctx: CanvasRenderingContext2D, borderStyle: string, borderColor: string, size: number) => {
+  ctx.strokeStyle = borderColor;
+  ctx.lineWidth = 4;
+  
+  switch (borderStyle) {
+    case 'rounded':
+      ctx.beginPath();
+      ctx.roundRect(10, 10, size - 20, size - 20, 25);
+      ctx.stroke();
+      break;
+      
+    case 'circle':
+      ctx.beginPath();
+      ctx.arc(size/2, size/2, size/2 - 10, 0, 2 * Math.PI);
+      ctx.stroke();
+      break;
+      
+    case 'diamond':
+      ctx.beginPath();
+      ctx.moveTo(size/2, 10);
+      ctx.lineTo(size - 10, size/2);
+      ctx.lineTo(size/2, size - 10);
+      ctx.lineTo(10, size/2);
+      ctx.closePath();
+      ctx.stroke();
+      break;
+      
+    case 'dashed':
+      ctx.setLineDash([10, 5]);
+      ctx.strokeRect(10, 10, size - 20, size - 20);
+      ctx.setLineDash([]);
+      break;
+      
+    default:
+      ctx.strokeRect(10, 10, size - 20, size - 20);
+      break;
+  }
+};
+
+const applyCenterStyle = (ctx: CanvasRenderingContext2D, centerStyle: string, centerColor: string, size: number) => {
+  const centerX = size / 2;
+  const centerY = size / 2;
+  const centerSize = size * 0.2;
+  
+  // Clear center area first
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(centerX - centerSize/2, centerY - centerSize/2, centerSize, centerSize);
+  
+  // Draw center style
+  ctx.fillStyle = centerColor;
+  
+  switch (centerStyle) {
+    case 'circle':
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, centerSize/2, 0, 2 * Math.PI);
+      ctx.fill();
+      break;
+      
+    case 'rounded':
+      ctx.beginPath();
+      ctx.roundRect(centerX - centerSize/2, centerY - centerSize/2, centerSize, centerSize, centerSize * 0.2);
+      ctx.fill();
+      break;
+      
+    case 'diamond':
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY - centerSize/2);
+      ctx.lineTo(centerX + centerSize/2, centerY);
+      ctx.lineTo(centerX, centerY + centerSize/2);
+      ctx.lineTo(centerX - centerSize/2, centerY);
+      ctx.closePath();
+      ctx.fill();
+      break;
+      
+    case 'star':
+      drawStar(ctx, centerX, centerY, centerSize/2);
+      break;
+      
+    case 'heart':
+      drawHeart(ctx, centerX, centerY, centerSize/2);
+      break;
+      
+    default:
+      ctx.fillRect(centerX - centerSize/2, centerY - centerSize/2, centerSize, centerSize);
+      break;
+  }
 };
 
 const drawFrame = (ctx: CanvasRenderingContext2D, design: any, width: number, height: number) => {
@@ -143,50 +305,61 @@ const drawFrame = (ctx: CanvasRenderingContext2D, design: any, width: number, he
   
   switch (design.frame) {
     case 'basic':
-      // Draw basic border
       ctx.strokeStyle = design.frameColor || '#000000';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(2, 2, width - 4, height - 4);
+      ctx.lineWidth = 6;
+      ctx.strokeRect(5, 5, width - 10, height - 10);
       break;
+      
     case 'rounded':
-      // Draw rounded border
-      const radius = 20;
-      ctx.beginPath();
-      ctx.roundRect(10, 10, width - 20, height - 20, radius);
       ctx.strokeStyle = design.frameColor || '#000000';
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.roundRect(10, 10, width - 20, height - 20, 25);
       ctx.stroke();
       break;
+      
     case 'banner':
-      // Draw banner with text
-      ctx.fillRect(0, 0, width, 30);
+      ctx.fillRect(0, 0, width, 40);
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(design.frameText || 'SCAN ME', width/2, 20);
+      ctx.fillText(design.frameText || 'SCAN ME', width/2, 25);
+      break;
+      
+    case 'badge':
+      // Draw badge-like frame
+      ctx.fillStyle = design.frameColor || '#000000';
+      ctx.beginPath();
+      ctx.roundRect(15, 15, width - 30, height - 30, 15);
+      ctx.stroke();
+      ctx.lineWidth = 3;
       break;
   }
   
   // Add frame text if not banner
   if (design.frame !== 'banner' && design.frameText) {
     ctx.fillStyle = design.frameColor || '#000000';
-    ctx.fillText(design.frameText, width/2, height - 10);
+    ctx.fillText(design.frameText, width/2, height - 15);
   }
 };
 
-const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y: number) => {
-  const logoSize = 40;
-  const logoX = x - logoSize/2;
-  const logoY = y - logoSize/2;
+const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y: number, qrSize: number) => {
+  const logoSize = qrSize * 0.15; // 15% of QR code size
   
   // Draw white background circle for logo
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
-  ctx.arc(x, y, logoSize/2 + 5, 0, 2 * Math.PI);
+  ctx.arc(x, y, logoSize/2 + 8, 0, 2 * Math.PI);
   ctx.fill();
+  
+  // Draw border around logo area
+  ctx.strokeStyle = '#e0e0e0';
+  ctx.lineWidth = 2;
+  ctx.stroke();
   
   // Draw logo based on type
   ctx.fillStyle = '#000000';
-  ctx.font = 'bold 24px Arial';
+  ctx.font = `bold ${logoSize * 0.6}px Arial`;
   ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
   
   const logoEmojis: { [key: string]: string } = {
     link: '🔗',
@@ -197,14 +370,84 @@ const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y:
     vcard: '👤',
     paypal: '💳',
     bitcoin: '₿',
-    scan1: '📱',
-    scan2: '📄',
-    qr: '📊',
-    menu: '📋',
-    fullscreen: '⛶'
+    instagram: '📷',
+    facebook: '📘',
+    twitter: '🐦',
+    youtube: '📺',
+    linkedin: '💼',
+    tiktok: '🎵'
   };
   
-  ctx.fillText(logoEmojis[logoType] || '📱', x, y + 8);
+  if (logoEmojis[logoType]) {
+    ctx.font = `${logoSize * 0.8}px Arial`;
+    ctx.fillText(logoEmojis[logoType], x, y);
+  } else {
+    // For text logos like "SCAN ME"
+    ctx.font = `bold ${logoSize * 0.3}px Arial`;
+    ctx.fillText(logoType === 'scan' ? 'SCAN' : '📱', x, y);
+  }
+};
+
+// Helper functions for complex shapes
+const drawStar = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) => {
+  const spikes = 5;
+  const outerRadius = radius;
+  const innerRadius = radius * 0.5;
+  
+  ctx.beginPath();
+  for (let i = 0; i < spikes * 2; i++) {
+    const angle = (i * Math.PI) / spikes;
+    const r = i % 2 === 0 ? outerRadius : innerRadius;
+    const px = x + Math.cos(angle - Math.PI / 2) * r;
+    const py = y + Math.sin(angle - Math.PI / 2) * r;
+    
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+};
+
+const drawHeart = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) => {
+  ctx.beginPath();
+  const topCurveHeight = radius * 0.3;
+  ctx.moveTo(x, y + topCurveHeight);
+  
+  // Left curve
+  ctx.bezierCurveTo(
+    x, y, 
+    x - radius / 2, y, 
+    x - radius / 2, y + topCurveHeight
+  );
+  ctx.bezierCurveTo(
+    x - radius / 2, y + (radius + topCurveHeight) / 2, 
+    x, y + (radius + topCurveHeight) / 2, 
+    x, y + radius
+  );
+  
+  // Right curve
+  ctx.bezierCurveTo(
+    x, y + (radius + topCurveHeight) / 2, 
+    x + radius / 2, y + (radius + topCurveHeight) / 2, 
+    x + radius / 2, y + topCurveHeight
+  );
+  ctx.bezierCurveTo(
+    x + radius / 2, y, 
+    x, y, 
+    x, y + topCurveHeight
+  );
+  
+  ctx.closePath();
+  ctx.fill();
+};
+
+const drawLeaf = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) => {
+  ctx.beginPath();
+  ctx.moveTo(x - radius, y);
+  ctx.quadraticCurveTo(x, y - radius, x + radius, y);
+  ctx.quadraticCurveTo(x, y + radius, x - radius, y);
+  ctx.closePath();
+  ctx.fill();
 };
 
 // Utility functions to create specific QR code formats
