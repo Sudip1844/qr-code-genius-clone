@@ -20,6 +20,11 @@ export type QROptions = {
     centerStyle?: string;
     centerColor?: string;
     logo?: string;
+    customLogo?: string;
+    logoSize?: number;
+    logoOpacity?: number;
+    logoPosition?: string;
+    logoShape?: string;
     gradient?: boolean;
   };
 };
@@ -122,8 +127,10 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
       const qrY = frameSize / 2;
       ctx.drawImage(tempCanvas, qrX, qrY);
       
-      // Draw logo if selected
-      if (design.logo && design.logo !== 'none') {
+      // Draw logo if selected (either predefined or custom)
+      if (design.customLogo) {
+        drawCustomLogo(ctx, design, qrX + size/2, qrY + size/2, size);
+      } else if (design.logo && design.logo !== 'none') {
         drawLogo(ctx, design.logo, qrX + size/2, qrY + size/2, size);
       }
       
@@ -131,6 +138,79 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
     };
     img.src = qrDataUrl;
   });
+};
+
+const drawCustomLogo = (
+  ctx: CanvasRenderingContext2D, 
+  design: any, 
+  centerX: number, 
+  centerY: number, 
+  qrSize: number
+) => {
+  const logoImg = new Image();
+  logoImg.onload = () => {
+    const logoSize = (design.logoSize || 15) / 100 * qrSize;
+    const opacity = (design.logoOpacity || 100) / 100;
+    
+    // Save context for opacity
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    
+    // Calculate position
+    let x = centerX - logoSize / 2;
+    let y = centerY - logoSize / 2;
+    
+    switch (design.logoPosition) {
+      case 'top-left':
+        x = centerX - qrSize / 2 + 20;
+        y = centerY - qrSize / 2 + 20;
+        break;
+      case 'top-right':
+        x = centerX + qrSize / 2 - logoSize - 20;
+        y = centerY - qrSize / 2 + 20;
+        break;
+      case 'bottom-left':
+        x = centerX - qrSize / 2 + 20;
+        y = centerY + qrSize / 2 - logoSize - 20;
+        break;
+      case 'bottom-right':
+        x = centerX + qrSize / 2 - logoSize - 20;
+        y = centerY + qrSize / 2 - logoSize - 20;
+        break;
+    }
+    
+    // Draw white background circle for better visibility
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(x + logoSize/2, y + logoSize/2, logoSize/2 + 8, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Apply logo shape
+    ctx.save();
+    switch (design.logoShape) {
+      case 'circle':
+        ctx.beginPath();
+        ctx.arc(x + logoSize/2, y + logoSize/2, logoSize/2, 0, 2 * Math.PI);
+        ctx.clip();
+        break;
+      case 'rounded':
+        ctx.beginPath();
+        ctx.roundRect(x, y, logoSize, logoSize, logoSize * 0.2);
+        ctx.clip();
+        break;
+      case 'square':
+        ctx.beginPath();
+        ctx.rect(x, y, logoSize, logoSize);
+        ctx.clip();
+        break;
+    }
+    
+    // Draw the logo
+    ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+    ctx.restore();
+    ctx.restore();
+  };
+  logoImg.src = design.customLogo;
 };
 
 const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: number, color: any) => {

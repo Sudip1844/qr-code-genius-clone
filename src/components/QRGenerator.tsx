@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload, QrCode } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ImageUpload } from '@/components/ImageUpload';
+import { ImageControls } from '@/components/ImageControls';
 
 type QRType = 'url' | 'email' | 'text' | 'phone' | 'sms' | 'whatsapp' | 'wifi' | 'vcard' | 'event';
 
@@ -446,437 +448,6 @@ const QRForm = ({
   );
 };
 
-const DesignTabs = ({
-  designTab,
-  setDesignTab,
-  frameOptions,
-  selectedFrame,
-  setSelectedFrame,
-  frameText,
-  setFrameText,
-  frameFont,
-  setFrameFont,
-  frameColor,
-  setFrameColor,
-  shapeOptions,
-  selectedShape,
-  setSelectedShape,
-  backgroundColor,
-  setBackgroundColor,
-  transparentBackground,
-  setTransparentBackground,
-  shapeColor,
-  setShapeColor,
-  gradient,
-  setGradient,
-  borderOptions,
-  borderStyle,
-  setBorderStyle,
-  borderColor,
-  setBorderColor,
-  centerOptions,
-  centerStyle,
-  setCenterStyle,
-  centerColor,
-  setCenterColor,
-  logoOptions,
-  selectedLogo,
-  setSelectedLogo,
-}: {
-  designTab: string;
-  setDesignTab: (value: string) => void;
-  frameOptions: { id: string; label: string; preview: string }[];
-  selectedFrame: string;
-  setSelectedFrame: (value: string) => void;
-  frameText: string;
-  setFrameText: (value: string) => void;
-  frameFont: string;
-  setFrameFont: (value: string) => void;
-  frameColor: string;
-  setFrameColor: (value: string) => void;
-  shapeOptions: { id: string; pattern: string; label: string; preview: string }[];
-  selectedShape: string;
-  setSelectedShape: (value: string) => void;
-  backgroundColor: string;
-  setBackgroundColor: (value: string) => void;
-  transparentBackground: boolean;
-  setTransparentBackground: (value: boolean) => void;
-  shapeColor: string;
-  setShapeColor: (value: string) => void;
-  gradient: boolean;
-  setGradient: (value: boolean) => void;
-  borderOptions: { id: string; icon: string; preview: string }[];
-  borderStyle: string;
-  setBorderStyle: (value: string) => void;
-  borderColor: string;
-  setBorderColor: (value: string) => void;
-  centerOptions: { id: string; icon: string; preview: string }[];
-  centerStyle: string;
-  setCenterStyle: (value: string) => void;
-  centerColor: string;
-  setCenterColor: (value: string) => void;
-  logoOptions: {
-    id: string;
-    icon: string;
-    label: string;
-    bgColor?: string;
-    iconColor?: string;
-    isText?: boolean;
-    fontSize?: string;
-  }[];
-  selectedLogo: string;
-  setSelectedLogo: (value: string) => void;
-}) => {
-  const renderDesignContent = () => {
-    switch (designTab) {
-      case 'frame':
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-4 gap-3">
-              {frameOptions.map((frame) => (
-                <button
-                  key={frame.id}
-                  onClick={() => setSelectedFrame(frame.id)}
-                  className={`p-3 rounded-lg border text-center transition-colors ${
-                    selectedFrame === frame.id 
-                      ? 'bg-blue-50 border-blue-500 text-blue-600' 
-                      : 'bg-white border-gray-200 text-slate-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{frame.preview}</div>
-                  <div className="text-xs">{frame.label}</div>
-                </button>
-              ))}
-            </div>
-
-            {selectedFrame !== 'none' && (
-              <div className="space-y-4">
-                <div>
-                  <Label className="block text-slate-700 mb-2">Frame phrase</Label>
-                  <Input
-                    value={frameText}
-                    onChange={(e) => setFrameText(e.target.value)}
-                    placeholder="SCAN ME"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="block text-slate-700 mb-2">Phrase font</Label>
-                    <select
-                      value={frameFont}
-                      onChange={(e) => setFrameFont(e.target.value)}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    >
-                      <option value="Sans-Serif">Sans-Serif</option>
-                      <option value="Serif">Serif</option>
-                      <option value="Monospace">Monospace</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <Label className="block text-slate-700 mb-2">Frame color</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="text"
-                        value={frameColor}
-                        onChange={(e) => setFrameColor(e.target.value)}
-                        placeholder="#000000"
-                        className="flex-1"
-                      />
-                      <div 
-                        className="w-10 h-10 rounded border cursor-pointer"
-                        style={{ backgroundColor: frameColor }}
-                        onClick={() => document.getElementById('frameColorPicker')?.click()}
-                      />
-                      <input
-                        id="frameColorPicker"
-                        type="color"
-                        value={frameColor}
-                        onChange={(e) => setFrameColor(e.target.value)}
-                        className="hidden"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      case 'shape':
-        return (
-          <div className="space-y-6">
-            <div>
-              <Label className="block text-slate-700 mb-3">Shape & Color</Label>
-              
-              <div className="mb-4">
-                <Label className="block text-slate-700 mb-2">Shape style</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {shapeOptions.map((shape) => (
-                    <button
-                      key={shape.id}
-                      onClick={() => setSelectedShape(shape.id)}
-                      className={`p-3 rounded-lg border text-center transition-colors relative ${
-                        selectedShape === shape.id 
-                          ? 'bg-blue-50 border-blue-500' 
-                          : 'bg-white border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="text-xl mb-1">{shape.pattern}</div>
-                      <div className="text-xs">{shape.label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4 bg-slate-50 p-4 rounded-lg">
-                <div>
-                  <Label className="block text-slate-700 mb-2">Background color</Label>
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      type="text"
-                      value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
-                      placeholder="#FFFFFF"
-                      className="flex-1"
-                    />
-                    <div 
-                      className="w-10 h-10 rounded border cursor-pointer"
-                      style={{ backgroundColor: backgroundColor }}
-                      onClick={() => document.getElementById('bgColorPicker')?.click()}
-                    />
-                    <input
-                      id="bgColorPicker"
-                      type="color"
-                      value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="hidden"
-                    />
-                  </div>
-                  <label className="flex items-center mt-2">
-                    <input
-                      type="checkbox"
-                      checked={transparentBackground}
-                      onChange={(e) => setTransparentBackground(e.target.checked)}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-slate-600">Transparent background</span>
-                  </label>
-                </div>
-
-                <div>
-                  <Label className="block text-slate-700 mb-2">Shape color</Label>
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      type="text"
-                      value={shapeColor}
-                      onChange={(e) => setShapeColor(e.target.value)}
-                      placeholder="#000000"
-                      className="flex-1"
-                    />
-                    <div 
-                      className="w-10 h-10 rounded border cursor-pointer"
-                      style={{ backgroundColor: shapeColor }}
-                      onClick={() => document.getElementById('shapeColorPicker')?.click()}
-                    />
-                    <input
-                      id="shapeColorPicker"
-                      type="color"
-                      value={shapeColor}
-                      onChange={(e) => setShapeColor(e.target.value)}
-                      className="hidden"
-                    />
-                  </div>
-                  <label className="flex items-center mt-2">
-                    <input
-                      type="checkbox"
-                      checked={gradient}
-                      onChange={(e) => setGradient(e.target.checked)}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-slate-600">Gradient</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <Label className="block text-slate-700 mb-2">Border style</Label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {borderOptions.map((border) => (
-                      <button
-                        key={border.id}
-                        onClick={() => setBorderStyle(border.id)}
-                        className={`p-3 rounded-lg border text-center transition-colors ${
-                          borderStyle === border.id 
-                            ? 'bg-blue-50 border-blue-500' 
-                            : 'bg-white border-gray-200 hover:bg-gray-50'
-                        }`}
-                      >
-                        <div className="text-xl">{border.icon}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <Label className="block text-slate-700 mb-2">Border color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="text"
-                      value={borderColor}
-                      onChange={(e) => setBorderColor(e.target.value)}
-                      placeholder="#000000"
-                      className="flex-1"
-                    />
-                    <div 
-                      className="w-10 h-10 rounded border cursor-pointer"
-                      style={{ backgroundColor: borderColor }}
-                      onClick={() => document.getElementById('borderColorPicker')?.click()}
-                    />
-                    <input
-                      id="borderColorPicker"
-                      type="color"
-                      value={borderColor}
-                      onChange={(e) => setBorderColor(e.target.value)}
-                      className="hidden"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="block text-slate-700 mb-2">Center style</Label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {centerOptions.map((center) => (
-                      <button
-                        key={center.id}
-                        onClick={() => setCenterStyle(center.id)}
-                        className={`p-3 rounded-lg border text-center transition-colors ${
-                          centerStyle === center.id 
-                            ? 'bg-blue-50 border-blue-500' 
-                            : 'bg-white border-gray-200 hover:bg-gray-50'
-                        }`}
-                      >
-                        <div className="text-xl">{center.icon}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <Label className="block text-slate-700 mb-2">Center color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="text"
-                      value={centerColor}
-                      onChange={(e) => setCenterColor(e.target.value)}
-                      placeholder="#000000"
-                      className="flex-1"
-                    />
-                    <div 
-                      className="w-10 h-10 rounded border cursor-pointer"
-                      style={{ backgroundColor: centerColor }}
-                      onClick={() => document.getElementById('centerColorPicker')?.click()}
-                    />
-                    <input
-                      id="centerColorPicker"
-                      type="color"
-                      value={centerColor}
-                      onChange={(e) => setCenterColor(e.target.value)}
-                      className="hidden"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'logo':
-        return (
-          <div className="space-y-6">
-            <div>
-              <Label className="block text-slate-700 mb-3">Upload Logo</Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  id="logoUpload"
-                />
-                <label htmlFor="logoUpload" className="cursor-pointer">
-                  <Upload className="mx-auto h-6 w-6 text-gray-400 mb-2" />
-                  <div className="text-sm text-gray-500 mb-2">Choose file</div>
-                  <Button variant="outline" size="sm">Browse</Button>
-                </label>
-              </div>
-            </div>
-
-            <div>
-              <Label className="block text-slate-700 mb-3">Or choose from here</Label>
-              <div className="grid grid-cols-4 gap-3">
-                {logoOptions.map((logo) => (
-                  <button
-                    key={logo.id}
-                    onClick={() => setSelectedLogo(logo.id)}
-                    className={`relative p-3 rounded-lg border transition-all duration-200 ${
-                      selectedLogo === logo.id 
-                        ? 'border-blue-500 ring-2 ring-blue-200' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center space-y-2">
-                      <div 
-                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${logo.bgColor}`}
-                      >
-                        <span 
-                          className={`${logo.iconColor} ${logo.fontSize || 'text-lg'} font-bold ${logo.isText ? 'leading-none' : ''}`}
-                        >
-                          {logo.icon}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-600 text-center leading-tight">
-                        {logo.label}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div>
-      <Tabs value={designTab} onValueChange={setDesignTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="frame">Frame</TabsTrigger>
-          <TabsTrigger value="shape">Shape</TabsTrigger>
-          <TabsTrigger value="logo">Logo</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="frame" className="mt-4">
-          {renderDesignContent()}
-        </TabsContent>
-        
-        <TabsContent value="shape" className="mt-4">
-          {renderDesignContent()}
-        </TabsContent>
-        
-        <TabsContent value="logo" className="mt-4">
-          {renderDesignContent()}
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
-
 const QRGenerator = () => {
   const [qrType, setQrType] = useState<QRType>('url');
   const [qrCode, setQrCode] = useState<string | null>(null);
@@ -939,6 +510,13 @@ const QRGenerator = () => {
   const [centerStyle, setCenterStyle] = useState('square');
   const [centerColor, setCenterColor] = useState('#000000');
   const [selectedLogo, setSelectedLogo] = useState('none');
+
+  // New image-related state
+  const [customLogo, setCustomLogo] = useState<string>('');
+  const [logoSize, setLogoSize] = useState(15);
+  const [logoOpacity, setLogoOpacity] = useState(100);
+  const [logoPosition, setLogoPosition] = useState('center');
+  const [logoShape, setLogoShape] = useState('original');
 
   const qrTypes = [
     { id: 'url', name: 'Link', icon: LinkIcon, color: 'text-emerald-500' },
@@ -1008,6 +586,13 @@ const QRGenerator = () => {
       label: 'No Logo',
       bgColor: 'bg-blue-100',
       iconColor: 'text-gray-800'
+    },
+    { 
+      id: 'custom', 
+      icon: '📁', 
+      label: 'Custom Upload',
+      bgColor: 'bg-purple-100',
+      iconColor: 'text-purple-600'
     },
     { 
       id: 'link', 
@@ -1168,7 +753,12 @@ const QRGenerator = () => {
           borderColor: borderColor,
           centerStyle: centerStyle,
           centerColor: centerColor,
-          logo: selectedLogo,
+          logo: selectedLogo === 'custom' ? undefined : selectedLogo,
+          customLogo: selectedLogo === 'custom' ? customLogo : undefined,
+          logoSize: logoSize,
+          logoOpacity: logoOpacity,
+          logoPosition: logoPosition,
+          logoShape: logoShape,
           gradient: gradient
         }
       };
@@ -1219,10 +809,10 @@ const QRGenerator = () => {
     resetGeneration();
   }, [qrType, url, email, text, phone, smsPhone, whatsappPhone, wifiSSID, vcardName, eventTitle]);
 
-  // Reset generation when design options change
+  // Reset generation when design options change (updated)
   useEffect(() => {
     resetGeneration();
-  }, [selectedFrame, frameText, frameFont, frameColor, selectedShape, shapeColor, backgroundColor, transparentBackground, gradient, borderStyle, borderColor, centerStyle, centerColor, selectedLogo]);
+  }, [selectedFrame, frameText, frameFont, frameColor, selectedShape, shapeColor, backgroundColor, transparentBackground, gradient, borderStyle, borderColor, centerStyle, centerColor, selectedLogo, customLogo, logoSize, logoOpacity, logoPosition, logoShape]);
 
   // Listen for QR type selection events from the landing page
   useEffect(() => {
@@ -1332,43 +922,337 @@ const QRGenerator = () => {
           )}
 
           {activeTab === 'design' && (
-            <DesignTabs
-              designTab={designTab}
-              setDesignTab={setDesignTab}
-              frameOptions={frameOptions}
-              selectedFrame={selectedFrame}
-              setSelectedFrame={setSelectedFrame}
-              frameText={frameText}
-              setFrameText={setFrameText}
-              frameFont={frameFont}
-              setFrameFont={setFrameFont}
-              frameColor={frameColor}
-              setFrameColor={setFrameColor}
-              shapeOptions={shapeOptions}
-              selectedShape={selectedShape}
-              setSelectedShape={setSelectedShape}
-              backgroundColor={backgroundColor}
-              setBackgroundColor={setBackgroundColor}
-              transparentBackground={transparentBackground}
-              setTransparentBackground={setTransparentBackground}
-              shapeColor={shapeColor}
-              setShapeColor={setShapeColor}
-              gradient={gradient}
-              setGradient={setGradient}
-              borderOptions={borderOptions}
-              borderStyle={borderStyle}
-              setBorderStyle={setBorderStyle}
-              borderColor={borderColor}
-              setBorderColor={setBorderColor}
-              centerOptions={centerOptions}
-              centerStyle={centerStyle}
-              setCenterStyle={setCenterStyle}
-              centerColor={centerColor}
-              setCenterColor={setCenterColor}
-              logoOptions={logoOptions}
-              selectedLogo={selectedLogo}
-              setSelectedLogo={setSelectedLogo}
-            />
+            <div>
+              <Tabs value={designTab} onValueChange={setDesignTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="frame">Frame</TabsTrigger>
+                  <TabsTrigger value="shape">Shape</TabsTrigger>
+                  <TabsTrigger value="logo">Logo</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="frame" className="mt-4">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-4 gap-3">
+                      {frameOptions.map((frame) => (
+                        <button
+                          key={frame.id}
+                          onClick={() => setSelectedFrame(frame.id)}
+                          className={`p-3 rounded-lg border text-center transition-colors ${
+                            selectedFrame === frame.id 
+                              ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                              : 'bg-white border-gray-200 text-slate-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="text-2xl mb-1">{frame.preview}</div>
+                          <div className="text-xs">{frame.label}</div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {selectedFrame !== 'none' && (
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="block text-slate-700 mb-2">Frame phrase</Label>
+                          <Input
+                            value={frameText}
+                            onChange={(e) => setFrameText(e.target.value)}
+                            placeholder="SCAN ME"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label className="block text-slate-700 mb-2">Phrase font</Label>
+                            <select
+                              value={frameFont}
+                              onChange={(e) => setFrameFont(e.target.value)}
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            >
+                              <option value="Sans-Serif">Sans-Serif</option>
+                              <option value="Serif">Serif</option>
+                              <option value="Monospace">Monospace</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <Label className="block text-slate-700 mb-2">Frame color</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                type="text"
+                                value={frameColor}
+                                onChange={(e) => setFrameColor(e.target.value)}
+                                placeholder="#000000"
+                                className="flex-1"
+                              />
+                              <div 
+                                className="w-10 h-10 rounded border cursor-pointer"
+                                style={{ backgroundColor: frameColor }}
+                                onClick={() => document.getElementById('frameColorPicker')?.click()}
+                              />
+                              <input
+                                id="frameColorPicker"
+                                type="color"
+                                value={frameColor}
+                                onChange={(e) => setFrameColor(e.target.value)}
+                                className="hidden"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="shape" className="mt-4">
+                  <div className="space-y-6">
+                    <div>
+                      <Label className="block text-slate-700 mb-3">Shape & Color</Label>
+                      
+                      <div className="mb-4">
+                        <Label className="block text-slate-700 mb-2">Shape style</Label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {shapeOptions.map((shape) => (
+                            <button
+                              key={shape.id}
+                              onClick={() => setSelectedShape(shape.id)}
+                              className={`p-3 rounded-lg border text-center transition-colors relative ${
+                                selectedShape === shape.id 
+                                  ? 'bg-blue-50 border-blue-500' 
+                                  : 'bg-white border-gray-200 hover:bg-gray-50'
+                              }`}
+                            >
+                              <div className="text-xl mb-1">{shape.pattern}</div>
+                              <div className="text-xs">{shape.label}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 bg-slate-50 p-4 rounded-lg">
+                        <div>
+                          <Label className="block text-slate-700 mb-2">Background color</Label>
+                          <div className="flex gap-2 items-center">
+                            <Input
+                              type="text"
+                              value={backgroundColor}
+                              onChange={(e) => setBackgroundColor(e.target.value)}
+                              placeholder="#FFFFFF"
+                              className="flex-1"
+                            />
+                            <div 
+                              className="w-10 h-10 rounded border cursor-pointer"
+                              style={{ backgroundColor: backgroundColor }}
+                              onClick={() => document.getElementById('bgColorPicker')?.click()}
+                            />
+                            <input
+                              id="bgColorPicker"
+                              type="color"
+                              value={backgroundColor}
+                              onChange={(e) => setBackgroundColor(e.target.value)}
+                              className="hidden"
+                            />
+                          </div>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="checkbox"
+                              checked={transparentBackground}
+                              onChange={(e) => setTransparentBackground(e.target.checked)}
+                              className="mr-2"
+                            />
+                            <span className="text-sm text-slate-600">Transparent background</span>
+                          </label>
+                        </div>
+
+                        <div>
+                          <Label className="block text-slate-700 mb-2">Shape color</Label>
+                          <div className="flex gap-2 items-center">
+                            <Input
+                              type="text"
+                              value={shapeColor}
+                              onChange={(e) => setShapeColor(e.target.value)}
+                              placeholder="#000000"
+                              className="flex-1"
+                            />
+                            <div 
+                              className="w-10 h-10 rounded border cursor-pointer"
+                              style={{ backgroundColor: shapeColor }}
+                              onClick={() => document.getElementById('shapeColorPicker')?.click()}
+                            />
+                            <input
+                              id="shapeColorPicker"
+                              type="color"
+                              value={shapeColor}
+                              onChange={(e) => setShapeColor(e.target.value)}
+                              className="hidden"
+                            />
+                          </div>
+                          <label className="flex items-center mt-2">
+                            <input
+                              type="checkbox"
+                              checked={gradient}
+                              onChange={(e) => setGradient(e.target.checked)}
+                              className="mr-2"
+                            />
+                            <span className="text-sm text-slate-600">Gradient</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="block text-slate-700 mb-2">Border style</Label>
+                          <div className="grid grid-cols-4 gap-2">
+                            {borderOptions.map((border) => (
+                              <button
+                                key={border.id}
+                                onClick={() => setBorderStyle(border.id)}
+                                className={`p-3 rounded-lg border text-center transition-colors ${
+                                  borderStyle === border.id 
+                                    ? 'bg-blue-50 border-blue-500' 
+                                    : 'bg-white border-gray-200 hover:bg-gray-50'
+                                }`}
+                              >
+                                <div className="text-xl">{border.icon}</div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-4 rounded-lg">
+                          <Label className="block text-slate-700 mb-2">Border color</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="text"
+                              value={borderColor}
+                              onChange={(e) => setBorderColor(e.target.value)}
+                              placeholder="#000000"
+                              className="flex-1"
+                            />
+                            <div 
+                              className="w-10 h-10 rounded border cursor-pointer"
+                              style={{ backgroundColor: borderColor }}
+                              onClick={() => document.getElementById('borderColorPicker')?.click()}
+                            />
+                            <input
+                              id="borderColorPicker"
+                              type="color"
+                              value={borderColor}
+                              onChange={(e) => setBorderColor(e.target.value)}
+                              className="hidden"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label className="block text-slate-700 mb-2">Center style</Label>
+                          <div className="grid grid-cols-4 gap-2">
+                            {centerOptions.map((center) => (
+                              <button
+                                key={center.id}
+                                onClick={() => setCenterStyle(center.id)}
+                                className={`p-3 rounded-lg border text-center transition-colors ${
+                                  centerStyle === center.id 
+                                    ? 'bg-blue-50 border-blue-500' 
+                                    : 'bg-white border-gray-200 hover:bg-gray-50'
+                                }`}
+                              >
+                                <div className="text-xl">{center.icon}</div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-4 rounded-lg">
+                          <Label className="block text-slate-700 mb-2">Center color</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="text"
+                              value={centerColor}
+                              onChange={(e) => setCenterColor(e.target.value)}
+                              placeholder="#000000"
+                              className="flex-1"
+                            />
+                            <div 
+                              className="w-10 h-10 rounded border cursor-pointer"
+                              style={{ backgroundColor: centerColor }}
+                              onClick={() => document.getElementById('centerColorPicker')?.click()}
+                            />
+                            <input
+                              id="centerColorPicker"
+                              type="color"
+                              value={centerColor}
+                              onChange={(e) => setCenterColor(e.target.value)}
+                              className="hidden"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="logo" className="mt-4">
+                  <div className="space-y-6">
+                    {selectedLogo === 'custom' && (
+                      <ImageUpload
+                        onImageUpload={setCustomLogo}
+                        onImageRemove={() => setCustomLogo('')}
+                        currentImage={customLogo}
+                        label="Upload Custom Logo"
+                        maxWidth={200}
+                        maxHeight={200}
+                      />
+                    )}
+
+                    <div>
+                      <Label className="block text-slate-700 mb-3">Choose Logo Type</Label>
+                      <div className="grid grid-cols-4 gap-3">
+                        {logoOptions.map((logo) => (
+                          <button
+                            key={logo.id}
+                            onClick={() => setSelectedLogo(logo.id)}
+                            className={`relative p-3 rounded-lg border transition-all duration-200 ${
+                              selectedLogo === logo.id 
+                                ? 'border-blue-500 ring-2 ring-blue-200' 
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex flex-col items-center space-y-2">
+                              <div 
+                                className={`w-12 h-12 rounded-lg flex items-center justify-center ${logo.bgColor}`}
+                              >
+                                <span 
+                                  className={`${logo.iconColor} ${logo.fontSize || 'text-lg'} font-bold ${logo.isText ? 'leading-none' : ''}`}
+                                >
+                                  {logo.icon}
+                                </span>
+                              </div>
+                              <div className="text-xs text-gray-600 text-center leading-tight">
+                                {logo.label}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {(selectedLogo !== 'none' && (selectedLogo === 'custom' ? customLogo : true)) && (
+                      <ImageControls
+                        logoSize={logoSize}
+                        logoOpacity={logoOpacity}
+                        logoPosition={logoPosition}
+                        logoShape={logoShape}
+                        onLogoSizeChange={setLogoSize}
+                        onLogoOpacityChange={setLogoOpacity}
+                        onLogoPositionChange={setLogoPosition}
+                        onLogoShapeChange={setLogoShape}
+                      />
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
           )}
         </div>
 
