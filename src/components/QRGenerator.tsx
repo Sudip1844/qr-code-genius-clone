@@ -797,8 +797,8 @@ const DesignTabs = ({
         return (
           <div className="space-y-6">
             <div>
-              <Label className="block text-slate-700 mb-3">Upload Logo</Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+              <Label className="block text-slate-700 mb-2">Upload Logo</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center">
                 <Input
                   type="file"
                   accept="image/*"
@@ -806,32 +806,32 @@ const DesignTabs = ({
                   id="logoUpload"
                 />
                 <label htmlFor="logoUpload" className="cursor-pointer">
-                  <Upload className="mx-auto h-6 w-6 text-gray-400 mb-2" />
-                  <div className="text-sm text-gray-500 mb-2">Choose file</div>
-                  <Button variant="outline" size="sm">Browse</Button>
+                  <Upload className="mx-auto h-5 w-5 text-gray-400 mb-1" />
+                  <div className="text-xs text-gray-500 mb-1">Choose file</div>
+                  <Button variant="outline" size="sm" className="text-xs px-2 py-1">Browse</Button>
                 </label>
               </div>
             </div>
 
             <div>
-              <Label className="block text-slate-700 mb-3">Or choose from here</Label>
-              <div className="grid grid-cols-4 gap-3">
+              <Label className="block text-slate-700 mb-2">Or choose from here</Label>
+              <div className="grid grid-cols-4 gap-2">
                 {logoOptions.map((logo) => (
                   <button
                     key={logo.id}
                     onClick={() => setSelectedLogo(logo.id)}
-                    className={`relative p-3 rounded-lg border transition-all duration-200 ${
+                    className={`relative p-2 rounded-lg border transition-all duration-200 ${
                       selectedLogo === logo.id 
                         ? 'border-blue-500 ring-2 ring-blue-200' 
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <div className="flex flex-col items-center space-y-2">
+                    <div className="flex flex-col items-center space-y-1">
                       <div 
-                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${logo.bgColor}`}
+                        className={`w-8 h-8 rounded-md flex items-center justify-center ${logo.bgColor}`}
                       >
                         <span 
-                          className={`${logo.iconColor} ${logo.fontSize || 'text-lg'} font-bold ${logo.isText ? 'leading-none' : ''}`}
+                          className={`${logo.iconColor} ${logo.fontSize || 'text-sm'} font-bold ${logo.isText ? 'leading-none' : ''}`}
                         >
                           {logo.icon}
                         </span>
@@ -966,7 +966,7 @@ const QRGenerator = () => {
 
   // Updated shape options based on your images - exact patterns from the uploaded image
   const shapeOptions = [
-    { id: 'classic', pattern: '▣', label: 'Classic', preview: 'M2,2 L2,14 L14,14 L14,2 Z M4,4 L4,6 L6,6 L6,4 Z M8,4 L8,6 L10,6 L10,4 Z M4,8 L4,10 L6,10 L6,8 Z M8,8 L8,10 L10,10 L10,8 Z' },
+    { id: 'classic', pattern: '▣', label: 'Classic', preview: 'M2,2 L2,14 L14,14 L2,2 Z M4,4 L4,6 L6,6 L4,4 Z M8,4 L8,6 L10,6 L8,4 Z M4,8 L4,10 L6,10 L4,8 Z M8,8 L8,10 L10,10 L8,8 Z' },
     { id: 'liquid', pattern: '◪', label: 'Liquid', preview: 'M2,2 C2,2 5,2 8,5 C11,8 14,8 14,11 C14,14 11,14 8,14 C5,14 2,11 2,8 C2,5 5,2 8,2 Z' },
     { id: 'horizontal', pattern: '▬', label: 'Horizontal', preview: 'M2,4 L14,4 L14,6 L2,6 Z M2,8 L14,8 L14,10 L2,10 Z M2,12 L14,12 L14,14 L2,14 Z' },
     { id: 'vertical', pattern: '▥', label: 'Vertical', preview: 'M4,2 L6,2 L6,14 L4,14 Z M8,2 L10,2 L10,14 L8,14 Z M12,2 L14,2 L14,14 L12,14 Z' },
@@ -1000,20 +1000,20 @@ const QRGenerator = () => {
     { id: 'plus', icon: '➕', preview: 'M8,4 L8,7 L11,7 L11,9 L8,9 L8,12 L6,12 L6,9 L3,9 L3,7 L6,7 L6,4 Z' }
   ];
 
-  // Updated professional logo options based on your reference image
+  // Updated professional logo options with smaller upload box
   const logoOptions = [
     { 
       id: 'none', 
       icon: '✕', 
       label: 'No Logo',
-      bgColor: 'bg-blue-100',
+      bgColor: 'bg-gray-100',
       iconColor: 'text-gray-800'
     },
     { 
       id: 'link', 
       icon: '🔗', 
       label: 'Link',
-      bgColor: 'bg-purple-500',
+      bgColor: 'bg-blue-500',
       iconColor: 'text-white'
     },
     { 
@@ -1027,7 +1027,7 @@ const QRGenerator = () => {
       id: 'email', 
       icon: '✉️', 
       label: 'Email',
-      bgColor: 'bg-orange-500',
+      bgColor: 'bg-blue-600',
       iconColor: 'text-white'
     },
     { 
@@ -1048,7 +1048,7 @@ const QRGenerator = () => {
       id: 'vcard', 
       icon: '👤', 
       label: 'Contact',
-      bgColor: 'bg-blue-600',
+      bgColor: 'bg-purple-500',
       iconColor: 'text-white'
     },
     { 
@@ -1067,43 +1067,28 @@ const QRGenerator = () => {
       iconColor: 'text-white'
     },
     { 
-      id: 'scan1', 
-      icon: 'SCAN ME', 
-      label: 'Scan Me 1',
-      bgColor: 'bg-gray-100',
-      iconColor: 'text-black',
+      id: 'scan', 
+      icon: 'SCAN', 
+      label: 'Scan Me',
+      bgColor: 'bg-black',
+      iconColor: 'text-white',
       isText: true,
       fontSize: 'text-xs'
     },
     { 
-      id: 'scan2', 
-      icon: 'SCAN ME', 
-      label: 'Scan Me 2',
-      bgColor: 'bg-gray-100',
-      iconColor: 'text-black',
-      isText: true,
-      fontSize: 'text-xs'
+      id: 'instagram', 
+      icon: '📷', 
+      label: 'Instagram',
+      bgColor: 'bg-gradient-to-r from-purple-500 to-pink-500',
+      iconColor: 'text-white'
     },
     { 
-      id: 'qr', 
-      icon: '⚏', 
-      label: 'QR Code',
-      bgColor: 'bg-gray-100',
-      iconColor: 'text-black'
-    },
-    { 
-      id: 'menu', 
-      icon: '⚏', 
-      label: 'Menu',
-      bgColor: 'bg-gray-100',
-      iconColor: 'text-black'
-    },
-    { 
-      id: 'fullscreen', 
-      icon: '⛶', 
-      label: 'Fullscreen',
-      bgColor: 'bg-gray-100',
-      iconColor: 'text-black'
+      id: 'facebook', 
+      icon: 'f', 
+      label: 'Facebook',
+      bgColor: 'bg-blue-600',
+      iconColor: 'text-white',
+      isText: true
     }
   ];
 
@@ -1241,8 +1226,8 @@ const QRGenerator = () => {
   }, []);
 
   return (
-    <div className="w-full bg-gray-50 rounded-2xl p-6">
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm flex flex-col">
+    <div className="w-full min-h-screen bg-gray-50 p-4">
+      <div className="w-full max-w-none mx-auto bg-white rounded-2xl shadow-sm flex flex-col">
         {/* Header */}
         <div className="text-center py-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">Preview QR Code</h2>
