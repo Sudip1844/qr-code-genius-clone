@@ -1,4 +1,3 @@
-
 import QRCode from 'qrcode';
 
 export type QROptions = {
@@ -640,73 +639,38 @@ export const createImageQR = (imageData: string): string => {
     return '';
   }
   
-  // Compress image data for QR code compatibility
-  const compressImageForQR = (dataUrl: string): string => {
-    try {
-      // Check if it's a data URL
-      if (!dataUrl.startsWith('data:')) {
-        return dataUrl;
-      }
-      
-      // Extract base64 data
-      const base64Data = dataUrl.split(',')[1];
-      if (!base64Data) {
-        return dataUrl;
-      }
-      
-      // Calculate approximate size (base64 adds ~33% overhead)
-      const sizeInBytes = (base64Data.length * 3) / 4;
-      
-      // QR code capacity limits (approximate):
-      // L: 2953 bytes, M: 2331 bytes, Q: 1663 bytes, H: 1273 bytes
-      const maxSize = 1200; // Conservative limit for reliable scanning
-      
-      if (sizeInBytes <= maxSize) {
-        return dataUrl;
-      }
-      
-      // If too large, create a smaller version
-      return new Promise<string>((resolve) => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        
-        img.onload = () => {
-          // Calculate new dimensions to reduce file size
-          let { width, height } = img;
-          const scaleFactor = Math.sqrt(maxSize / sizeInBytes);
-          
-          width = Math.floor(width * scaleFactor);
-          height = Math.floor(height * scaleFactor);
-          
-          // Ensure minimum size
-          if (width < 32) width = 32;
-          if (height < 32) height = 32;
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            // Use lower quality for smaller file size
-            const compressed = canvas.toDataURL('image/jpeg', 0.7);
-            resolve(compressed);
-          } else {
-            resolve(dataUrl);
-          }
-        };
-        
-        img.onerror = () => resolve(dataUrl);
-        img.src = dataUrl;
-      }).then(result => result).catch(() => dataUrl);
-      
-    } catch (error) {
-      console.error('Error compressing image:', error);
-      return dataUrl;
+  // For synchronous operation, we'll do basic validation
+  // and return the image data directly. The compression
+  // will be handled in the generateQRCode function if needed.
+  try {
+    // Check if it's a data URL
+    if (!imageData.startsWith('data:')) {
+      return imageData;
     }
-  };
-  
-  // For synchronous operation, return the original data
-  // The compression will be handled in the component
-  return imageData;
+    
+    // Extract base64 data
+    const base64Data = imageData.split(',')[1];
+    if (!base64Data) {
+      return imageData;
+    }
+    
+    // Calculate approximate size (base64 adds ~33% overhead)
+    const sizeInBytes = (base64Data.length * 3) / 4;
+    
+    // QR code capacity limits (approximate):
+    // L: 2953 bytes, M: 2331 bytes, Q: 1663 bytes, H: 1273 bytes
+    const maxSize = 1200; // Conservative limit for reliable scanning
+    
+    if (sizeInBytes <= maxSize) {
+      return imageData;
+    }
+    
+    // If too large, we'll need to compress it in the generateQRCode function
+    // For now, return the original data and let generateQRCode handle compression
+    return imageData;
+    
+  } catch (error) {
+    console.error('Error processing image:', error);
+    return imageData;
+  }
 };
