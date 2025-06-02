@@ -1,11 +1,19 @@
 import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
-import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle } from "lucide-react";
+import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle, Menu, X } from "lucide-react";
 import { Link, Mail, Text, Phone, MessageSquare, Wifi, UserSquare as VCard, CalendarDays } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const Index = () => {
   const qrGeneratorRef = useRef<HTMLDivElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const scrollToSection = (sectionRef: React.RefObject<HTMLElement>) => {
+    sectionRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
 
   const handleQRTypeSelect = (type: string) => {
     // Scroll to QR generator section
@@ -19,6 +27,29 @@ const Index = () => {
     window.dispatchEvent(event);
   };
 
+  const scrollToQRGenerator = () => {
+    qrGeneratorRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
+  // Create refs for all sections
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const aboutQRRef = useRef<HTMLDivElement>(null);
+  const howToUseRef = useRef<HTMLDivElement>(null);
+  const benefitsRef = useRef<HTMLDivElement>(null);
+  const qrTypesRef = useRef<HTMLDivElement>(null);
+
+  const menuItems = [
+    { label: "QR Generator", ref: qrGeneratorRef },
+    { label: "Features", ref: featuresRef },
+    { label: "About QR Codes", ref: aboutQRRef },
+    { label: "How to Use", ref: howToUseRef },
+    { label: "Why Choose QR.io", ref: benefitsRef },
+    { label: "QR Code Types", ref: qrTypesRef }
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="py-4 bg-white sticky top-0 z-10 shadow-sm">
@@ -30,13 +61,38 @@ const Index = () => {
               </div>
               <span className="text-slate-700">QR.io</span>
             </h1>
-            <button className="block md:hidden">
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
+            <div className="relative">
+              <button 
+                className="block md:hidden"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+              
+              {/* Mobile Menu */}
+              {mobileMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border z-50">
+                  <div className="py-2">
+                    {menuItems.map((item, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          scrollToSection(item.ref);
+                          setMobileMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -47,7 +103,7 @@ const Index = () => {
         </div>
         
         {/* Features section */}
-        <div className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm mx-4">
+        <div ref={featuresRef} className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm mx-4">
           <div className="text-center mb-12">
             <div className="inline-block px-6 py-2 bg-emerald-500 text-white rounded-full font-medium mb-6">
               Features
@@ -98,7 +154,7 @@ const Index = () => {
         </div>
         
         {/* What are QR Codes section */}
-        <div className="mt-16 py-16 px-4 bg-emerald-500 text-white rounded-lg mx-4">
+        <div ref={aboutQRRef} className="mt-16 py-16 px-4 bg-emerald-500 text-white rounded-lg mx-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-xl font-medium mb-3">What are QR Codes?</h2>
             <h3 className="text-4xl font-bold mb-6">QR stands for 'Quick Response'</h3>
@@ -118,6 +174,7 @@ const Index = () => {
               variant="default" 
               size="lg" 
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
+              onClick={scrollToQRGenerator}
             >
               Create QR Code <ArrowUp className="ml-2 rotate-45" />
             </Button>
@@ -178,7 +235,7 @@ const Index = () => {
         </div>
         
         {/* How to Use section */}
-        <div className="mt-16 py-16 px-4">
+        <div ref={howToUseRef} className="mt-16 py-16 px-4">
           <div className="text-center mb-12">
             <div className="inline-block px-6 py-2 bg-emerald-500 text-white rounded-full font-medium mb-6">
               How to Use
@@ -252,6 +309,7 @@ const Index = () => {
               variant="default" 
               size="lg" 
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
+              onClick={scrollToQRGenerator}
             >
               Start Creating <ArrowUp className="ml-2 rotate-45" />
             </Button>
@@ -259,7 +317,7 @@ const Index = () => {
         </div>
         
         {/* Benefits from QR.io section */}
-        <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm mx-4">
+        <div ref={benefitsRef} className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm mx-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold text-slate-800 mb-6">Why Choose QR.io?</h2>
             
@@ -329,7 +387,7 @@ const Index = () => {
         </div>
         
         {/* QR Code Types section */}
-        <div className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm mx-4">
+        <div ref={qrTypesRef} className="mt-16 py-16 px-4 bg-white rounded-lg border shadow-sm mx-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold text-slate-800 text-center mb-4">QR Code Types</h2>
             <p className="text-center text-slate-600 mb-12">Choose from our comprehensive collection of QR Code types for any business need.</p>
@@ -465,6 +523,21 @@ const Index = () => {
                 <Button 
                   className="bg-blue-600 hover:bg-blue-700 w-full"
                   onClick={() => handleQRTypeSelect('event')}
+                >
+                  Select
+                </Button>
+              </div>
+              
+              {/* Image QR - NEW */}
+              <div className="border rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                <div className="text-purple-500 mb-4">
+                  <Image className="h-12 w-12" />
+                </div>
+                <h3 className="text-xl font-medium text-slate-800 mb-2">Image</h3>
+                <p className="text-slate-600 mb-4">Embed images directly into QR codes</p>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 w-full"
+                  onClick={() => handleQRTypeSelect('image')}
                 >
                   Select
                 </Button>
