@@ -720,7 +720,60 @@ const QRGenerator = () => {
     }
   ];
 
-  const generateQRData = (): string => {
+  const compressImageForQR = async (imageData: string): Promise<string> => {
+    return new Promise((resolve) => {
+      if (!imageData.startsWith('data:')) {
+        resolve(imageData);
+        return;
+      }
+      
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Start with smaller dimensions for QR compatibility
+        let width = Math.min(img.width, 64);
+        let height = Math.min(img.height, 64);
+        
+        // Maintain aspect ratio
+        const aspectRatio = img.width / img.height;
+        if (width / height > aspectRatio) {
+          width = height * aspectRatio;
+        } else {
+          height = width / aspectRatio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          // Use JPEG with low quality for maximum compression
+          const compressed = canvas.toDataURL('image/jpeg', 0.5);
+          
+          // Check size and compress further if needed
+          const base64Data = compressed.split(',')[1];
+          const sizeInBytes = (base64Data.length * 3) / 4;
+          
+          if (sizeInBytes > 1000) {
+            // Further reduce quality
+            const veryCompressed = canvas.toDataURL('image/jpeg', 0.3);
+            resolve(veryCompressed);
+          } else {
+            resolve(compressed);
+          }
+        } else {
+          resolve(imageData);
+        }
+      };
+      
+      img.onerror = () => resolve(imageData);
+      img.src = imageData;
+    });
+  };
+
+  const generateQRData = async (): Promise<string> => {
     switch (qrType) {
       case 'url':
         return createUrlQR(url);
@@ -743,14 +796,15 @@ const QRGenerator = () => {
         const endDate = eventEnd ? new Date(eventEnd).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z' : '';
         return `BEGIN:VEVENT\nSUMMARY:${eventTitle}\nLOCATION:${eventLocation}\nDTSTART:${startDate}\nDTEND:${endDate}\nEND:VEVENT`;
       case 'image':
-        return createImageQR(imageData);
+        if (!imageData) return '';
+        return await compressImageForQR(imageData);
       default:
         return '';
     }
   };
 
   const generateQR = async () => {
-    const qrData = generateQRData();
+    const qrData = await generateQRData();
     
     if (!qrData.trim()) {
       toast({
@@ -764,6 +818,9 @@ const QRGenerator = () => {
     try {
       setLoading(true);
       
+      // Use higher error correction for images
+      const errorCorrectionLevel = qrType === 'image' ? 'H' : 'M';
+      
       const options: QROptions = {
         data: qrData,
         size: 300,
@@ -772,7 +829,7 @@ const QRGenerator = () => {
           dark: shapeColor,
           light: transparentBackground ? '#00000000' : backgroundColor,
         },
-        errorCorrectionLevel: 'M',
+        errorCorrectionLevel: errorCorrectionLevel,
         design: {
           frame: selectedFrame,
           frameText: frameText,
@@ -797,9 +854,12 @@ const QRGenerator = () => {
       setQrCode(qrDataUrl);
       setHasGenerated(true);
     } catch (error) {
+      console.error('QR Generation Error:', error);
       toast({
         title: "Error",
-        description: "Failed to generate QR code",
+        description: qrType === 'image' 
+          ? "Image too large for QR code. Try a smaller image or reduce quality."
+          : "Failed to generate QR code",
         variant: "destructive",
       });
     } finally {
@@ -862,7 +922,7 @@ const QRGenerator = () => {
 
   return (
     <div className="w-full bg-gray-50 rounded-2xl p-6">
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm flex flex-col">
+      <div className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-sm flex flex-col">
         {/* Header */}
         <div className="text-center py-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">Preview QR Code</h2>
