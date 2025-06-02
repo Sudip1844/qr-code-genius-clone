@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
-import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, createTextQR } from '@/lib/qr-service';
+import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, createTextQR, createImageQR } from '@/lib/qr-service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload, QrCode } from 'lucide-react';
+import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload, QrCode, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageUpload } from '@/components/ImageUpload';
 import { ImageControls } from '@/components/ImageControls';
 
-type QRType = 'url' | 'email' | 'text' | 'phone' | 'sms' | 'whatsapp' | 'wifi' | 'vcard' | 'event';
+type QRType = 'url' | 'email' | 'text' | 'phone' | 'sms' | 'whatsapp' | 'wifi' | 'vcard' | 'event' | 'image';
 
 const QRPreview = ({ loading, qrCode }: { loading: boolean; qrCode: string | null }) => {
   if (loading) {
@@ -100,6 +100,8 @@ const QRForm = ({
   setEventStart,
   eventEnd,
   setEventEnd,
+  imageData,
+  setImageData,
   qrTypes,
 }: {
   qrType: QRType;
@@ -146,6 +148,8 @@ const QRForm = ({
   setEventStart: (value: string) => void;
   eventEnd: string;
   setEventEnd: (value: string) => void;
+  imageData: string;
+  setImageData: (value: string) => void;
   qrTypes: { id: string; name: string; icon: React.ComponentType<any>; color: string }[];
 }) => {
   const currentType = qrTypes.find(type => type.id === qrType);
@@ -408,6 +412,26 @@ const QRForm = ({
           </div>
         );
 
+      case 'image':
+        return (
+          <div className="space-y-4">
+            <ImageUpload
+              onImageUpload={setImageData}
+              onImageRemove={() => setImageData('')}
+              currentImage={imageData}
+              label="Upload Image for QR Code"
+              maxWidth={150}
+              maxHeight={150}
+            />
+            {imageData && (
+              <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                <p className="font-medium">Note:</p>
+                <p>Images are compressed and converted to data URLs for QR encoding. Large images may require higher error correction levels for reliable scanning.</p>
+              </div>
+            )}
+          </div>
+        );
+
       default:
         return null;
     }
@@ -495,6 +519,9 @@ const QRGenerator = () => {
   const [eventStart, setEventStart] = useState('');
   const [eventEnd, setEventEnd] = useState('');
 
+  // Image field
+  const [imageData, setImageData] = useState('');
+
   // Design options state
   const [selectedFrame, setSelectedFrame] = useState('none');
   const [frameText, setFrameText] = useState('SCAN ME');
@@ -528,9 +555,10 @@ const QRGenerator = () => {
     { id: 'wifi', name: 'WiFi', icon: Wifi, color: 'text-emerald-500' },
     { id: 'vcard', name: 'VCard', icon: User, color: 'text-blue-600' },
     { id: 'event', name: 'Event', icon: Calendar, color: 'text-orange-500' },
+    { id: 'image', name: 'Image', icon: ImageIcon, color: 'text-purple-500' },
   ];
 
-  // Updated frame options based on your images
+  // Frame options
   const frameOptions = [
     { id: 'none', label: 'No Frame', preview: '✕' },
     { id: 'basic', label: 'Basic Frame', preview: '⬜' },
@@ -542,7 +570,7 @@ const QRGenerator = () => {
     { id: 'phone', label: 'Phone Frame', preview: '📱' }
   ];
 
-  // Updated shape options based on your images - exact patterns from the uploaded image
+  // Shape options
   const shapeOptions = [
     { id: 'classic', pattern: '▣', label: 'Classic', preview: 'M2,2 L2,14 L14,14 L14,2 Z M4,4 L4,6 L6,6 L6,4 Z M8,4 L8,6 L10,6 L10,4 Z M4,8 L4,10 L6,10 L6,8 Z M8,8 L8,10 L10,10 L10,8 Z' },
     { id: 'liquid', pattern: '◪', label: 'Liquid', preview: 'M2,2 C2,2 5,2 8,5 C11,8 14,8 14,11 C14,14 11,14 8,14 C5,14 2,11 2,8 C2,5 5,2 8,2 Z' },
@@ -554,7 +582,7 @@ const QRGenerator = () => {
     { id: 'circle', pattern: '⚫', label: 'Circle', preview: 'M8,3 C11,3 13,5 13,8 C13,11 11,13 8,13 C5,13 3,11 3,8 C3,5 5,3 8,3 Z' }
   ];
 
-  // Updated border options based on your images - exact styles from the uploaded image
+  // Border options
   const borderOptions = [
     { id: 'square', icon: '⬜', preview: 'M2,2 L14,2 L14,14 L2,14 Z M4,4 L12,4 L12,12 L4,12 Z' },
     { id: 'rounded-square', icon: '▢', preview: 'M4,2 C3,2 2,3 2,4 L2,12 C2,13 3,14 4,14 L12,14 C13,14 14,13 14,12 L14,4 C14,3 13,2 12,2 Z M5,4 C4.5,4 4,4.5 4,5 L4,11 C4,11.5 4.5,12 5,12 L11,12 C11.5,12 12,11.5 12,11 L12,5 C12,4.5 11.5,4 11,4 Z' },
@@ -566,7 +594,7 @@ const QRGenerator = () => {
     { id: 'rounded-bottom', icon: '⌒', preview: 'M2,2 L14,2 L14,10 C14,13 11,14 8,14 C5,14 2,13 2,10 Z M4,4 L12,4 L12,10 C12,11 10,12 8,12 C6,12 4,11 4,10 Z' }
   ];
 
-  // Updated center options based on your images - exact styles from the uploaded image
+  // Center options
   const centerOptions = [
     { id: 'square', icon: '⬛', preview: 'M4,4 L12,4 L12,12 L4,12 Z' },
     { id: 'rounded-square', icon: '▢', preview: 'M6,4 C5,4 4,5 4,6 L4,10 C4,11 5,12 6,12 L10,12 C11,12 12,11 12,10 L12,6 C12,5 11,4 10,4 Z' },
@@ -578,7 +606,7 @@ const QRGenerator = () => {
     { id: 'plus', icon: '➕', preview: 'M8,4 L8,7 L11,7 L11,9 L8,9 L8,12 L6,12 L6,9 L3,9 L3,7 L6,7 L6,4 Z' }
   ];
 
-  // Updated professional logo options based on your reference image
+  // Logo options
   const logoOptions = [
     { 
       id: 'none', 
@@ -714,6 +742,8 @@ const QRGenerator = () => {
         const startDate = eventStart ? new Date(eventStart).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z' : '';
         const endDate = eventEnd ? new Date(eventEnd).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z' : '';
         return `BEGIN:VEVENT\nSUMMARY:${eventTitle}\nLOCATION:${eventLocation}\nDTSTART:${startDate}\nDTEND:${endDate}\nEND:VEVENT`;
+      case 'image':
+        return createImageQR(imageData);
       default:
         return '';
     }
@@ -807,9 +837,9 @@ const QRGenerator = () => {
   // Reset generation when QR type or content changes
   useEffect(() => {
     resetGeneration();
-  }, [qrType, url, email, text, phone, smsPhone, whatsappPhone, wifiSSID, vcardName, eventTitle]);
+  }, [qrType, url, email, text, phone, smsPhone, whatsappPhone, wifiSSID, vcardName, eventTitle, imageData]);
 
-  // Reset generation when design options change (updated)
+  // Reset generation when design options change
   useEffect(() => {
     resetGeneration();
   }, [selectedFrame, frameText, frameFont, frameColor, selectedShape, shapeColor, backgroundColor, transparentBackground, gradient, borderStyle, borderColor, centerStyle, centerColor, selectedLogo, customLogo, logoSize, logoOpacity, logoPosition, logoShape]);
@@ -917,6 +947,8 @@ const QRGenerator = () => {
               setEventStart={setEventStart}
               eventEnd={eventEnd}
               setEventEnd={setEventEnd}
+              imageData={imageData}
+              setImageData={setImageData}
               qrTypes={qrTypes}
             />
           )}

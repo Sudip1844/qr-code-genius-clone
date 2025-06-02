@@ -633,3 +633,13 @@ export const createEventQR = (title: string, location?: string, startDate?: stri
   
   return event;
 };
+
+export const createImageQR = (imageData: string): string => {
+  if (!imageData) {
+    return '';
+  }
+  
+  // Return the data URL directly for QR encoding
+  // The QR code will contain the base64 image data
+  return imageData;
+};
