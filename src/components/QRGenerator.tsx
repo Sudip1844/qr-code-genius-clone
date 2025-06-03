@@ -558,19 +558,16 @@ const QRGenerator = () => {
     { id: 'image', name: 'Image', icon: ImageIcon, color: 'text-purple-500' },
   ];
 
-  // Frame options
+  // Frame options - removed non-working options
   const frameOptions = [
     { id: 'none', label: 'No Frame', preview: '✕' },
     { id: 'basic', label: 'Basic Frame', preview: '⬜' },
     { id: 'rounded', label: 'Rounded Frame', preview: '🔲' },
     { id: 'banner', label: 'Banner Frame', preview: '🏷️' },
-    { id: 'badge', label: 'Badge Frame', preview: '🎫' },
-    { id: 'button', label: 'Button Frame', preview: '🔘' },
-    { id: 'card', label: 'Card Frame', preview: '💳' },
-    { id: 'phone', label: 'Phone Frame', preview: '📱' }
+    { id: 'badge', label: 'Badge Frame', preview: '🎫' }
   ];
 
-  // Shape options
+  // Shape options - updated to match working implementations
   const shapeOptions = [
     { id: 'classic', pattern: '▣', label: 'Classic', preview: 'M2,2 L2,14 L14,14 L14,2 Z M4,4 L4,6 L6,6 L6,4 Z M8,4 L8,6 L10,6 L10,4 Z M4,8 L4,10 L6,10 L6,8 Z M8,8 L8,10 L10,10 L10,8 Z' },
     { id: 'liquid', pattern: '◪', label: 'Liquid', preview: 'M2,2 C2,2 5,2 8,5 C11,8 14,8 14,11 C14,14 11,14 8,14 C5,14 2,11 2,8 C2,5 5,2 8,2 Z' },
@@ -582,7 +579,7 @@ const QRGenerator = () => {
     { id: 'circle', pattern: '⚫', label: 'Circle', preview: 'M8,3 C11,3 13,5 13,8 C13,11 11,13 8,13 C5,13 3,11 3,8 C3,5 5,3 8,3 Z' }
   ];
 
-  // Border options
+  // Border options - updated to match working implementations
   const borderOptions = [
     { id: 'square', icon: '⬜', preview: 'M2,2 L14,2 L14,14 L2,14 Z M4,4 L12,4 L12,12 L4,12 Z' },
     { id: 'rounded-square', icon: '▢', preview: 'M4,2 C3,2 2,3 2,4 L2,12 C2,13 3,14 4,14 L12,14 C13,14 14,13 14,12 L14,4 C14,3 13,2 12,2 Z M5,4 C4.5,4 4,4.5 4,5 L4,11 C4,11.5 4.5,12 5,12 L11,12 C11.5,12 12,11.5 12,11 L12,5 C12,4.5 11.5,4 11,4 Z' },
@@ -594,7 +591,7 @@ const QRGenerator = () => {
     { id: 'rounded-bottom', icon: '⌒', preview: 'M2,2 L14,2 L14,10 C14,13 11,14 8,14 C5,14 2,13 2,10 Z M4,4 L12,4 L12,10 C12,11 10,12 8,12 C6,12 4,11 4,10 Z' }
   ];
 
-  // Center options
+  // Center options - updated to match working implementations
   const centerOptions = [
     { id: 'square', icon: '⬛', preview: 'M4,4 L12,4 L12,12 L4,12 Z' },
     { id: 'rounded-square', icon: '▢', preview: 'M6,4 C5,4 4,5 4,6 L4,10 C4,11 5,12 6,12 L10,12 C11,12 12,11 12,10 L12,6 C12,5 11,4 10,4 Z' },
@@ -1024,7 +1021,7 @@ const QRGenerator = () => {
                 
                 <TabsContent value="frame" className="mt-4">
                   <div className="space-y-6">
-                    <div className="grid grid-cols-4 gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       {frameOptions.map((frame) => (
                         <button
                           key={frame.id}
