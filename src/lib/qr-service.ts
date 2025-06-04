@@ -1,4 +1,3 @@
-
 import QRCode from 'qrcode';
 
 export type QROptions = {
@@ -155,8 +154,15 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
     
     const img = new Image();
     img.onload = () => {
-      // Clear canvas with background
-      ctx.fillStyle = design.frame !== 'none' ? color.light : 'transparent';
+      // Apply gradient background if enabled
+      if (design.gradient) {
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, color.light);
+        gradient.addColorStop(1, adjustColorBrightness(color.light, -20));
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = design.frame !== 'none' ? color.light : 'transparent';
+      }
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Draw frame first if selected
@@ -180,7 +186,7 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
       
       // Apply shape modifications
       if (design.shape && design.shape !== 'classic') {
-        applyShapeStyle(tempCtx, design.shape, size, color);
+        applyShapeStyle(tempCtx, design.shape, size, color, design.gradient);
       }
       
       // Apply border style
@@ -209,6 +215,18 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
     };
     img.src = qrDataUrl;
   });
+};
+
+// Helper function to adjust color brightness for gradient
+const adjustColorBrightness = (color: string, percent: number): string => {
+  const num = parseInt(color.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = (num >> 16) + amt;
+  const G = (num >> 8 & 0x00FF) + amt;
+  const B = (num & 0x0000FF) + amt;
+  return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+    (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
 };
 
 const drawCustomLogo = (
@@ -284,7 +302,7 @@ const drawCustomLogo = (
   logoImg.src = design.customLogo;
 };
 
-const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: number, color: any) => {
+const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: number, color: any, gradient?: boolean) => {
   const imageData = ctx.getImageData(0, 0, size, size);
   const data = imageData.data;
   
@@ -292,12 +310,20 @@ const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: num
   const moduleSize = Math.floor(size / 25); // Approximate QR module size for a typical QR code
   
   // Clear the canvas first
-  ctx.fillStyle = color.light;
-  ctx.fillRect(0, 0, size, size);
+  if (gradient) {
+    const grad = ctx.createLinearGradient(0, 0, size, size);
+    grad.addColorStop(0, color.dark);
+    grad.addColorStop(1, adjustColorBrightness(color.dark, 30));
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = grad;
+  } else {
+    ctx.fillStyle = color.light;
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = color.dark;
+  }
   
   // Redraw with new shapes
-  ctx.fillStyle = color.dark;
-  
   for (let y = 0; y < size; y += moduleSize) {
     for (let x = 0; x < size; x += moduleSize) {
       // Check if this area should be dark by sampling the center pixel
@@ -310,16 +336,24 @@ const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: num
         const moduleCenterX = x + moduleSize / 2;
         const moduleCenterY = y + moduleSize / 2;
         
-        drawModuleShape(ctx, shape, moduleCenterX, moduleCenterY, moduleSize * 0.85);
+        drawModuleShape(ctx, shape, moduleCenterX, moduleCenterY, moduleSize * 0.85, gradient, color);
       }
     }
   }
 };
 
-const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number, y: number, size: number) => {
+const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number, y: number, size: number, gradient?: boolean, color?: any) => {
   const radius = size / 2;
   
   ctx.save();
+  
+  // Apply gradient fill if enabled
+  if (gradient && color) {
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    grad.addColorStop(0, color.dark);
+    grad.addColorStop(1, adjustColorBrightness(color.dark, -30));
+    ctx.fillStyle = grad;
+  }
   
   switch (shape) {
     case 'liquid':
@@ -609,9 +643,10 @@ const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y:
     ctx.font = `${logoSize * 0.7}px Arial`;
     ctx.fillText(logoEmojis[logoType], x, y);
   } else {
-    // For text logos
+    // For text logos like scan1, scan2
     ctx.font = `bold ${logoSize * 0.25}px Arial`;
-    ctx.fillText(logoType === 'scan' ? 'SCAN' : '📱', x, y);
+    const logoText = logoType.includes('scan') ? 'SCAN' : logoType.toUpperCase();
+    ctx.fillText(logoText, x, y);
   }
   
   ctx.restore();
