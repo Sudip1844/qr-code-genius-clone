@@ -1,12 +1,12 @@
 import QRCode from 'qrcode';
 
-export interface QROptions {
+export type QROptions = {
   data: string;
   size?: number;
   margin?: number;
   color?: {
-    dark?: string;
-    light?: string;
+    dark: string;
+    light: string;
   };
   errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H';
   design?: {
@@ -27,245 +27,58 @@ export interface QROptions {
     logoShape?: string;
     gradient?: boolean;
   };
-}
-
-// Logo mapping with SVG paths and designs
-const logoSvgMap: Record<string, string> = {
-  'link': `<g fill="currentColor"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></g>`,
-  'location': `<g fill="currentColor"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></g>`,
-  'email': `<g fill="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></g>`,
-  'whatsapp': `<g fill="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></g>`,
-  'wifi': `<g fill="currentColor"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></g>`,
-  'vcard': `<g fill="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></g>`,
-  'paypal': `<g fill="currentColor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="7" x2="22" y2="7"></line></g>`,
-  'bitcoin': `<g fill="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="M9.5 8.5h2.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5h-2.5"></path><path d="M9.5 13.5h3c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5h-3"></path><line x1="12" y1="6" x2="12" y2="8.5"></line><line x1="12" y1="18.5" x2="12" y2="21"></line></g>`,
-  'scan-me-1': `<g fill="currentColor"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 12h10"></path></g>`,
-  'scan-me-2': `<g fill="currentColor"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></g>`,
-  'qr-scanner': `<g fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="9"></rect><rect x="14" y="7" width="3" height="5"></rect></g>`,
-  'menu-qr': `<g fill="currentColor"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></g>`,
-  'focus-qr': `<g fill="currentColor"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path></g>`
 };
 
-const createLogoSvg = (logoType: string, size: number, color: string = '#000000'): string => {
-  const svgPath = logoSvgMap[logoType];
-  if (!svgPath) return '';
-  
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    ${svgPath.replace(/currentColor/g, color)}
-  </svg>`;
-};
-
-export const generateQRCode = async (options: QROptions): Promise<string> => {
+export const generateQRCode = async ({
+  data,
+  size = 300,
+  margin = 4,
+  color = { dark: '#000000', light: '#ffffff' },
+  errorCorrectionLevel = 'M',
+  design
+}: QROptions): Promise<string> => {
   try {
-    const {
-      data,
-      size = 300,
-      margin = 4,
-      color = { dark: '#000000', light: '#FFFFFF' },
-      errorCorrectionLevel = 'M',
-      design
-    } = options;
-
-    // Generate basic QR code
-    const qrOptions = {
-      errorCorrectionLevel,
-      type: 'image/png' as const,
-      quality: 0.92,
-      margin: margin,
-      color: {
-        dark: color.dark || '#000000',
-        light: color.light || '#FFFFFF',
-      },
+    // Clean the input data to ensure it's valid
+    const cleanData = data.trim();
+    
+    if (!cleanData) {
+      throw new Error('QR code data cannot be empty');
+    }
+    
+    // For image data, convert it to a more scannable format
+    let finalData = cleanData;
+    if (cleanData.startsWith('data:image/')) {
+      finalData = await convertImageToScannable(cleanData);
+    }
+    
+    // Generate base QR code with appropriate error correction
+    const qrOptions: any = {
       width: size,
+      margin: margin,
+      color: color,
+      errorCorrectionLevel: errorCorrectionLevel,
     };
-
-    const qrDataURL = await QRCode.toDataURL(data, qrOptions);
     
-    if (!design || (!design.frame && !design.shape && !design.logo && !design.customLogo && !design.gradient)) {
-      return qrDataURL;
+    // Generate base QR code
+    let qrDataUrl = await QRCode.toDataURL(finalData, qrOptions);
+    
+    // Apply design features using canvas manipulation
+    if (design) {
+      qrDataUrl = await applyDesignFeatures(qrDataUrl, design, size, color);
     }
-
-    // Create canvas for custom design
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Could not get canvas context');
-
-    // Set canvas size with extra space for frame
-    const frameSize = design.frame && design.frame !== 'none' ? 80 : 0;
-    canvas.width = size + frameSize;
-    canvas.height = size + frameSize;
-
-    // Load QR code image
-    const qrImage = new Image();
-    await new Promise((resolve, reject) => {
-      qrImage.onload = resolve;
-      qrImage.onerror = reject;
-      qrImage.src = qrDataURL;
-    });
-
-    // Clear canvas with background
-    if (design.gradient && color.light !== '#00000000') {
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      gradient.addColorStop(0, color.light || '#FFFFFF');
-      gradient.addColorStop(1, adjustColorBrightness(color.light || '#FFFFFF', -20));
-      ctx.fillStyle = gradient;
-    } else {
-      ctx.fillStyle = color.light === '#00000000' ? 'transparent' : (color.light || '#FFFFFF');
-    }
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw frame if specified
-    if (design.frame && design.frame !== 'none') {
-      drawFrame(ctx, canvas.width, canvas.height, design.frame, design.frameText || 'SCAN ME', design.frameFont || 'Sans-Serif', design.frameColor || '#000000');
-    }
-
-    // Calculate QR position (centered, with frame offset)
-    const qrX = frameSize / 2;
-    const qrY = frameSize / 2;
-
-    // Draw QR code with custom shape if specified
-    if (design.shape && design.shape !== 'classic') {
-      await drawCustomShapeQR(ctx, qrImage, qrX, qrY, size, design.shape, color.dark || '#000000');
-    } else {
-      ctx.drawImage(qrImage, qrX, qrY, size, size);
-    }
-
-    // Add logo if specified
-    if (design.logo && design.logo !== 'none') {
-      await addLogoToQR(ctx, qrX + size/2, qrY + size/2, design.logo, design.customLogo, design.logoSize || 15, design.logoOpacity || 100, design.logoPosition || 'center', design.logoShape || 'original');
-    } else if (design.customLogo) {
-      await addLogoToQR(ctx, qrX + size/2, qrY + size/2, 'custom', design.customLogo, design.logoSize || 15, design.logoOpacity || 100, design.logoPosition || 'center', design.logoShape || 'original');
-    }
-
-    return canvas.toDataURL('image/png');
+    
+    return qrDataUrl;
   } catch (error) {
-    console.error('QR generation error:', error);
-    throw error;
-  }
-};
-
-const addLogoToQR = async (
-  ctx: CanvasRenderingContext2D,
-  centerX: number,
-  centerY: number,
-  logoType: string,
-  customLogo?: string,
-  logoSize: number = 15,
-  logoOpacity: number = 100,
-  logoPosition: string = 'center',
-  logoShape: string = 'original'
-): Promise<void> => {
-  try {
-    const qrSize = 300; // Base QR size
-    const actualLogoSize = (qrSize * logoSize) / 100;
+    console.error('Error generating QR code:', error);
     
-    // Calculate position
-    let logoX = centerX - actualLogoSize / 2;
-    let logoY = centerY - actualLogoSize / 2;
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('too big') || error.message.includes('data is too big')) {
+        throw new Error('Data is too large for QR code. Please use smaller content or reduce image size.');
+      }
+    }
     
-    if (logoPosition !== 'center') {
-      const offset = qrSize * 0.35;
-      switch (logoPosition) {
-        case 'top-left':
-          logoX = centerX - offset;
-          logoY = centerY - offset;
-          break;
-        case 'top-right':
-          logoX = centerX + offset - actualLogoSize;
-          logoY = centerY - offset;
-          break;
-        case 'bottom-left':
-          logoX = centerX - offset;
-          logoY = centerY + offset - actualLogoSize;
-          break;
-        case 'bottom-right':
-          logoX = centerX + offset - actualLogoSize;
-          logoY = centerY + offset - actualLogoSize;
-          break;
-      }
-    }
-
-    // Set opacity
-    ctx.globalAlpha = logoOpacity / 100;
-
-    // Create white background for logo
-    const bgPadding = actualLogoSize * 0.2;
-    const bgSize = actualLogoSize + bgPadding * 2;
-    const bgX = logoX - bgPadding;
-    const bgY = logoY - bgPadding;
-
-    ctx.fillStyle = '#FFFFFF';
-    if (logoShape === 'circle') {
-      ctx.beginPath();
-      ctx.arc(bgX + bgSize/2, bgY + bgSize/2, bgSize/2, 0, 2 * Math.PI);
-      ctx.fill();
-    } else {
-      const radius = logoShape === 'rounded' ? bgSize * 0.1 : 0;
-      drawRoundedRect(ctx, bgX, bgY, bgSize, bgSize, radius);
-      ctx.fill();
-    }
-
-    if (logoType === 'custom' && customLogo) {
-      // Handle custom logo
-      const logoImage = new Image();
-      await new Promise((resolve, reject) => {
-        logoImage.onload = resolve;
-        logoImage.onerror = reject;
-        logoImage.src = customLogo;
-      });
-      
-      if (logoShape === 'circle') {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(logoX + actualLogoSize/2, logoY + actualLogoSize/2, actualLogoSize/2, 0, 2 * Math.PI);
-        ctx.clip();
-      }
-      
-      ctx.drawImage(logoImage, logoX, logoY, actualLogoSize, actualLogoSize);
-      
-      if (logoShape === 'circle') {
-        ctx.restore();
-      }
-    } else {
-      // Handle predefined logos using SVG
-      const svgString = createLogoSvg(logoType, Math.round(actualLogoSize), '#000000');
-      if (svgString) {
-        const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
-        const svgUrl = URL.createObjectURL(svgBlob);
-        
-        const logoImage = new Image();
-        await new Promise((resolve, reject) => {
-          logoImage.onload = () => {
-            URL.revokeObjectURL(svgUrl);
-            resolve(undefined);
-          };
-          logoImage.onerror = () => {
-            URL.revokeObjectURL(svgUrl);
-            reject();
-          };
-          logoImage.src = svgUrl;
-        });
-        
-        if (logoShape === 'circle') {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(logoX + actualLogoSize/2, logoY + actualLogoSize/2, actualLogoSize/2, 0, 2 * Math.PI);
-          ctx.clip();
-        }
-        
-        ctx.drawImage(logoImage, logoX, logoY, actualLogoSize, actualLogoSize);
-        
-        if (logoShape === 'circle') {
-          ctx.restore();
-        }
-      }
-    }
-
-    // Reset opacity
-    ctx.globalAlpha = 1;
-  } catch (error) {
-    console.error('Error adding logo:', error);
-    // Continue without logo if there's an error
+    throw new Error('Failed to generate QR code. Please try with smaller content.');
   }
 };
 
@@ -768,14 +581,14 @@ const applyCenterStyle = (ctx: CanvasRenderingContext2D, centerStyle: string, ce
   ctx.restore();
 };
 
-const drawFrame = (ctx: CanvasRenderingContext2D, width: number, height: number, frame: string, frameText: string, frameFont: string, frameColor: string) => {
+const drawFrame = (ctx: CanvasRenderingContext2D, design: any, width: number, height: number) => {
   ctx.save();
-  ctx.fillStyle = frameColor;
-  ctx.strokeStyle = frameColor;
-  ctx.font = `bold 16px ${frameFont}`;
+  ctx.fillStyle = design.frameColor || '#000000';
+  ctx.strokeStyle = design.frameColor || '#000000';
+  ctx.font = `bold 16px ${design.frameFont || 'Arial'}`;
   ctx.textAlign = 'center';
   
-  switch (frame) {
+  switch (design.frame) {
     case 'basic':
       ctx.lineWidth = 6;
       ctx.strokeRect(8, 8, width - 16, height - 16);
@@ -792,7 +605,7 @@ const drawFrame = (ctx: CanvasRenderingContext2D, width: number, height: number,
       // Top banner
       ctx.fillRect(0, 0, width, 40);
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(frameText, width/2, 25);
+      ctx.fillText(design.frameText || 'SCAN ME', width/2, 25);
       break;
       
     case 'badge':
@@ -805,9 +618,9 @@ const drawFrame = (ctx: CanvasRenderingContext2D, width: number, height: number,
   }
   
   // Add frame text if not banner and text exists
-  if (frame !== 'banner' && frameText) {
-    ctx.fillStyle = frameColor;
-    ctx.fillText(frameText, width/2, height - 15);
+  if (design.frame !== 'banner' && design.frameText) {
+    ctx.fillStyle = design.frameColor || '#000000';
+    ctx.fillText(design.frameText, width/2, height - 15);
   }
   
   ctx.restore();
@@ -1043,50 +856,4 @@ export const createImageQR = (imageData: string): string => {
   
   // Return the image data directly - it will be processed in generateQRCode
   return imageData;
-};
-
-const drawCustomShapeQR = async (
-  ctx: CanvasRenderingContext2D,
-  qrImage: HTMLImageElement,
-  qrX: number,
-  qrY: number,
-  size: number,
-  shape: string,
-  darkColor: string
-): Promise<void> => {
-  const shapeSize = size * 0.8;
-  const shapeX = qrX + (size - shapeSize) / 2;
-  const shapeY = qrY + (size - shapeSize) / 2;
-  
-  ctx.save();
-  
-  // Apply gradient fill if enabled
-  if (darkColor) {
-    const grad = ctx.createLinearGradient(shapeX, shapeY, shapeX + shapeSize, shapeY + shapeSize);
-    grad.addColorStop(0, darkColor);
-    grad.addColorStop(1, adjustColorBrightness(darkColor, -20));
-    ctx.fillStyle = grad;
-  } else {
-    ctx.fillStyle = 'transparent';
-  }
-  ctx.fillRect(shapeX, shapeY, shapeSize, shapeSize);
-  
-  // Draw QR code
-  ctx.drawImage(qrImage, shapeX, shapeY, shapeSize, shapeSize);
-  
-  ctx.restore();
-};
-
-const drawRoundedRect = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) => {
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.arc(x + width - radius, y + radius, radius, -Math.PI / 2, 0);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.arc(x + width - radius, y + height - radius, radius, 0, Math.PI / 2);
-  ctx.lineTo(x + radius, y + height);
-  ctx.arc(x + radius, y + height - radius, radius, Math.PI / 2, Math.PI);
-  ctx.lineTo(x, y + radius);
-  ctx.arc(x + radius, y + radius, radius, Math.PI, Math.PI * 1.5);
-  ctx.closePath();
 };
