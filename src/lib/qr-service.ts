@@ -125,7 +125,7 @@ export const generateQRCode = async (options: QROptions): Promise<string> => {
 
     // Draw QR code with custom shape if specified
     if (design.shape && design.shape !== 'classic') {
-      await drawCustomShapeQR(ctx, qrImage, qrX, qrY, size, design.shape, color.dark || '#000000', design.borderStyle, design.borderColor, design.centerStyle, design.centerColor);
+      await drawCustomShapeQR(ctx, qrImage, qrX, qrY, size, design.shape, color.dark || '#000000');
     } else {
       ctx.drawImage(qrImage, qrX, qrY, size, size);
     }
@@ -768,14 +768,14 @@ const applyCenterStyle = (ctx: CanvasRenderingContext2D, centerStyle: string, ce
   ctx.restore();
 };
 
-const drawFrame = (ctx: CanvasRenderingContext2D, design: any, width: number, height: number) => {
+const drawFrame = (ctx: CanvasRenderingContext2D, width: number, height: number, frame: string, frameText: string, frameFont: string, frameColor: string) => {
   ctx.save();
-  ctx.fillStyle = design.frameColor || '#000000';
-  ctx.strokeStyle = design.frameColor || '#000000';
-  ctx.font = `bold 16px ${design.frameFont || 'Arial'}`;
+  ctx.fillStyle = frameColor;
+  ctx.strokeStyle = frameColor;
+  ctx.font = `bold 16px ${frameFont}`;
   ctx.textAlign = 'center';
   
-  switch (design.frame) {
+  switch (frame) {
     case 'basic':
       ctx.lineWidth = 6;
       ctx.strokeRect(8, 8, width - 16, height - 16);
@@ -792,7 +792,7 @@ const drawFrame = (ctx: CanvasRenderingContext2D, design: any, width: number, he
       // Top banner
       ctx.fillRect(0, 0, width, 40);
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(design.frameText || 'SCAN ME', width/2, 25);
+      ctx.fillText(frameText, width/2, 25);
       break;
       
     case 'badge':
@@ -805,9 +805,9 @@ const drawFrame = (ctx: CanvasRenderingContext2D, design: any, width: number, he
   }
   
   // Add frame text if not banner and text exists
-  if (design.frame !== 'banner' && design.frameText) {
-    ctx.fillStyle = design.frameColor || '#000000';
-    ctx.fillText(design.frameText, width/2, height - 15);
+  if (frame !== 'banner' && frameText) {
+    ctx.fillStyle = frameColor;
+    ctx.fillText(frameText, width/2, height - 15);
   }
   
   ctx.restore();
@@ -1047,16 +1047,12 @@ export const createImageQR = (imageData: string): string => {
 
 const drawCustomShapeQR = async (
   ctx: CanvasRenderingContext2D,
-  qrImage: Image,
+  qrImage: HTMLImageElement,
   qrX: number,
   qrY: number,
   size: number,
   shape: string,
-  darkColor: string,
-  borderStyle: string | undefined,
-  borderColor: string | undefined,
-  centerStyle: string | undefined,
-  centerColor: string | undefined
+  darkColor: string
 ): Promise<void> => {
   const shapeSize = size * 0.8;
   const shapeX = qrX + (size - shapeSize) / 2;
@@ -1074,25 +1070,6 @@ const drawCustomShapeQR = async (
     ctx.fillStyle = 'transparent';
   }
   ctx.fillRect(shapeX, shapeY, shapeSize, shapeSize);
-  
-  // Draw border if specified
-  if (borderStyle && borderColor) {
-    ctx.strokeStyle = borderColor;
-    ctx.lineWidth = 6;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.roundRect(shapeX, shapeY, shapeSize, shapeSize, 20);
-    ctx.stroke();
-  }
-  
-  // Draw center style
-  if (centerStyle && centerColor) {
-    ctx.fillStyle = centerColor;
-    ctx.beginPath();
-    ctx.arc(shapeX + shapeSize / 2, shapeY + shapeSize / 2, shapeSize * 0.3, 0, 2 * Math.PI);
-    ctx.fill();
-  }
   
   // Draw QR code
   ctx.drawImage(qrImage, shapeX, shapeY, shapeSize, shapeSize);
