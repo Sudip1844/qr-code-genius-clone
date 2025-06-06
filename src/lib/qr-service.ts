@@ -204,7 +204,7 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
       tempCtx.drawImage(img, 0, 0, size, size);
       
       // Apply shape modifications
-      if (design.shape && design.shape !== 'classic') {
+      if (design.shape && design.shape !== 'square') {
         applyShapeStyle(tempCtx, design.shape, size, color, design.gradient);
       }
       
@@ -375,46 +375,20 @@ const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number
   }
   
   switch (shape) {
-    case 'liquid':
-      // Organic, flowing shape
+    case 'circle':
       ctx.beginPath();
-      ctx.moveTo(x - radius * 0.8, y - radius * 0.3);
-      ctx.bezierCurveTo(x - radius * 0.2, y - radius, x + radius * 0.2, y - radius, x + radius * 0.8, y - radius * 0.3);
-      ctx.bezierCurveTo(x + radius, y + radius * 0.2, x + radius, y + radius * 0.8, x + radius * 0.3, y + radius * 0.8);
-      ctx.bezierCurveTo(x - radius * 0.2, y + radius, x - radius * 0.8, y + radius * 0.2, x - radius * 0.8, y - radius * 0.3);
-      ctx.closePath();
+      ctx.arc(x, y, radius * 0.9, 0, 2 * Math.PI);
       ctx.fill();
       break;
       
-    case 'horizontal':
-      // Horizontal lines
-      ctx.fillRect(x - radius, y - radius * 0.3, size, radius * 0.6);
-      break;
-      
-    case 'vertical':
-      // Vertical lines
-      ctx.fillRect(x - radius * 0.3, y - radius, radius * 0.6, size);
-      break;
-      
-    case 'small-square':
-      // Smaller squares
-      const smallSize = size * 0.6;
-      const smallRadius = smallSize / 2;
-      ctx.fillRect(x - smallRadius, y - smallRadius, smallSize, smallSize);
-      break;
-      
-    case 'blob':
-      // Irregular blob shape
+    case 'rounded':
+      const cornerRadius = radius * 0.3;
       ctx.beginPath();
-      ctx.moveTo(x, y - radius);
-      ctx.bezierCurveTo(x + radius * 0.8, y - radius * 0.5, x + radius, y + radius * 0.3, x + radius * 0.4, y + radius);
-      ctx.bezierCurveTo(x - radius * 0.2, y + radius * 0.8, x - radius * 0.9, y + radius * 0.1, x - radius * 0.6, y - radius * 0.4);
-      ctx.closePath();
+      ctx.roundRect(x - radius, y - radius, size, size, cornerRadius);
       ctx.fill();
       break;
       
-    case 'pointed':
-      // Diamond/pointed shape
+    case 'diamond':
       ctx.beginPath();
       ctx.moveTo(x, y - radius);
       ctx.lineTo(x + radius, y);
@@ -424,15 +398,29 @@ const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number
       ctx.fill();
       break;
       
-    case 'circle':
-      // Circle
+    case 'vertical':
+      ctx.fillRect(x - radius * 0.3, y - radius, radius * 0.6, size);
+      break;
+      
+    case 'horizontal':
+      ctx.fillRect(x - radius, y - radius * 0.3, size, radius * 0.6);
+      break;
+      
+    case 'small-square':
+      const smallSize = size * 0.6;
+      const smallRadius = smallSize / 2;
+      ctx.fillRect(x - smallRadius, y - smallRadius, smallSize, smallSize);
+      break;
+      
+    case 'leaf':
       ctx.beginPath();
-      ctx.arc(x, y, radius * 0.9, 0, 2 * Math.PI);
+      ctx.moveTo(x - radius, y);
+      ctx.bezierCurveTo(x - radius, y - radius, x, y - radius, x + radius, y);
+      ctx.bezierCurveTo(x, y + radius, x - radius, y + radius, x - radius, y);
       ctx.fill();
       break;
       
-    default: // classic
-      // Standard square
+    default: // square
       ctx.fillRect(x - radius, y - radius, size, size);
       break;
   }
@@ -454,7 +442,7 @@ const applyBorderStyle = (ctx: CanvasRenderingContext2D, borderStyle: string, bo
   const centerY = size / 2;
   
   switch (borderStyle) {
-    case 'rounded-square':
+    case 'rounded':
       ctx.beginPath();
       ctx.roundRect(margin, margin, width, height, 20);
       ctx.stroke();
@@ -492,8 +480,7 @@ const applyBorderStyle = (ctx: CanvasRenderingContext2D, borderStyle: string, bo
       ctx.stroke();
       break;
       
-    case 'dot-square':
-      // Dashed square border
+    case 'dashed':
       ctx.setLineDash([8, 8]);
       ctx.strokeRect(margin, margin, width, height);
       ctx.setLineDash([]);
@@ -534,7 +521,7 @@ const applyCenterStyle = (ctx: CanvasRenderingContext2D, centerStyle: string, ce
   ctx.fillStyle = centerColor;
   
   switch (centerStyle) {
-    case 'rounded-square':
+    case 'rounded':
       ctx.beginPath();
       ctx.roundRect(centerX - radius, centerY - radius, centerSize, centerSize, radius * 0.3);
       ctx.fill();

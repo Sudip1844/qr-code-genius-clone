@@ -563,7 +563,7 @@ const QRGenerator = () => {
     { id: 'image', name: 'Image', icon: ImageIcon, color: 'text-purple-500' },
   ];
 
-  // Frame options - only include working ones
+  // Replace frame options with working ones only
   const frameOptions = [
     { id: 'none', label: 'No Frame', preview: '✕' },
     { id: 'basic', label: 'Basic Frame', preview: '⬜' },
@@ -572,40 +572,293 @@ const QRGenerator = () => {
     { id: 'badge', label: 'Badge Frame', preview: '🎫' }
   ];
 
-  // Shape options - all these are implemented and working
+  // New Shape options with SVG previews - exactly matching QR.io
   const shapeOptions = [
-    { id: 'classic', pattern: '▣', label: 'Classic', preview: 'M2,2 L2,14 L14,14 L14,2 Z M4,4 L4,6 L6,6 L6,4 Z M8,4 L8,6 L10,6 L10,4 Z M4,8 L4,10 L6,10 L6,8 Z M8,8 L8,10 L10,10 L10,8 Z' },
-    { id: 'liquid', pattern: '◪', label: 'Liquid', preview: 'M2,2 C2,2 5,2 8,5 C11,8 14,8 14,11 C14,14 11,14 8,14 C5,14 2,11 2,8 C2,5 5,2 8,2 Z' },
-    { id: 'horizontal', pattern: '▬', label: 'Horizontal', preview: 'M2,4 L14,4 L14,6 L2,6 Z M2,8 L14,8 L14,10 L2,10 Z M2,12 L14,12 L14,14 L2,14 Z' },
-    { id: 'vertical', pattern: '▥', label: 'Vertical', preview: 'M4,2 L6,2 L6,14 L4,14 Z M8,2 L10,2 L10,14 L8,14 Z M12,2 L14,2 L14,14 L12,14 Z' },
-    { id: 'small-square', pattern: '▪', label: 'Small Square', preview: 'M3,3 L5,3 L5,5 L3,5 Z M7,3 L9,3 L9,5 L7,5 Z M11,3 L13,3 L13,5 L11,5 Z M3,7 L5,7 L5,9 L3,9 Z M7,7 L9,7 L9,9 L7,9 Z M11,7 L13,7 L13,9 L11,9 Z M3,11 L5,11 L5,13 L3,13 Z M7,11 L9,11 L9,13 L7,13 Z M11,11 L13,11 L13,13 L11,13 Z' },
-    { id: 'blob', pattern: '◉', label: 'Blob', preview: 'M8,2 C11,2 14,5 14,8 C14,11 11,14 8,14 C4,14 2,11 2,8 C2,5 4,2 8,2 Z' },
-    { id: 'pointed', pattern: '◆', label: 'Pointed', preview: 'M8,2 L14,8 L8,14 L2,8 Z' },
-    { id: 'circle', pattern: '⚫', label: 'Circle', preview: 'M8,3 C11,3 13,5 13,8 C13,11 11,13 8,13 C5,13 3,11 3,8 C3,5 5,3 8,3 Z' }
+    { 
+      id: 'square', 
+      label: 'Square',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="4" height="4" fill="#000000"/>
+          <rect x="9" y="3" width="4" height="4" fill="#000000"/>
+          <rect x="15" y="3" width="4" height="4" fill="#000000"/>
+          <rect x="3" y="9" width="4" height="4" fill="#000000"/>
+          <rect x="15" y="9" width="4" height="4" fill="#000000"/>
+          <rect x="3" y="15" width="4" height="4" fill="#000000"/>
+          <rect x="9" y="15" width="4" height="4" fill="#000000"/>
+          <rect x="15" y="15" width="4" height="4" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'circle', 
+      label: 'Circle',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="5" cy="5" r="2" fill="#000000"/>
+          <circle cx="11" cy="5" r="2" fill="#000000"/>
+          <circle cx="17" cy="5" r="2" fill="#000000"/>
+          <circle cx="5" cy="11" r="2" fill="#000000"/>
+          <circle cx="17" cy="11" r="2" fill="#000000"/>
+          <circle cx="5" cy="17" r="2" fill="#000000"/>
+          <circle cx="11" cy="17" r="2" fill="#000000"/>
+          <circle cx="17" cy="17" r="2" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'rounded', 
+      label: 'Rounded',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="4" height="4" rx="1" fill="#000000"/>
+          <rect x="9" y="3" width="4" height="4" rx="1" fill="#000000"/>
+          <rect x="15" y="3" width="4" height="4" rx="1" fill="#000000"/>
+          <rect x="3" y="9" width="4" height="4" rx="1" fill="#000000"/>
+          <rect x="15" y="9" width="4" height="4" rx="1" fill="#000000"/>
+          <rect x="3" y="15" width="4" height="4" rx="1" fill="#000000"/>
+          <rect x="9" y="15" width="4" height="4" rx="1" fill="#000000"/>
+          <rect x="15" y="15" width="4" height="4" rx="1" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'diamond', 
+      label: 'Diamond',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <polygon points="5,3 7,5 5,7 3,5" fill="#000000"/>
+          <polygon points="11,3 13,5 11,7 9,5" fill="#000000"/>
+          <polygon points="17,3 19,5 17,7 15,5" fill="#000000"/>
+          <polygon points="5,9 7,11 5,13 3,11" fill="#000000"/>
+          <polygon points="17,9 19,11 17,13 15,11" fill="#000000"/>
+          <polygon points="5,15 7,17 5,19 3,17" fill="#000000"/>
+          <polygon points="11,15 13,17 11,19 9,17" fill="#000000"/>
+          <polygon points="17,15 19,17 17,19 15,17" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'vertical', 
+      label: 'Vertical',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="4" y="3" width="2" height="4" fill="#000000"/>
+          <rect x="10" y="3" width="2" height="4" fill="#000000"/>
+          <rect x="16" y="3" width="2" height="4" fill="#000000"/>
+          <rect x="4" y="9" width="2" height="4" fill="#000000"/>
+          <rect x="16" y="9" width="2" height="4" fill="#000000"/>
+          <rect x="4" y="15" width="2" height="4" fill="#000000"/>
+          <rect x="10" y="15" width="2" height="4" fill="#000000"/>
+          <rect x="16" y="15" width="2" height="4" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'horizontal', 
+      label: 'Horizontal',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="4" width="4" height="2" fill="#000000"/>
+          <rect x="9" y="4" width="4" height="2" fill="#000000"/>
+          <rect x="15" y="4" width="4" height="2" fill="#000000"/>
+          <rect x="3" y="10" width="4" height="2" fill="#000000"/>
+          <rect x="15" y="10" width="4" height="2" fill="#000000"/>
+          <rect x="3" y="16" width="4" height="2" fill="#000000"/>
+          <rect x="9" y="16" width="4" height="2" fill="#000000"/>
+          <rect x="15" y="16" width="4" height="2" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'small-square', 
+      label: 'Small Square',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="4" y="4" width="2" height="2" fill="#000000"/>
+          <rect x="10" y="4" width="2" height="2" fill="#000000"/>
+          <rect x="16" y="4" width="2" height="2" fill="#000000"/>
+          <rect x="4" y="10" width="2" height="2" fill="#000000"/>
+          <rect x="16" y="10" width="2" height="2" fill="#000000"/>
+          <rect x="4" y="16" width="2" height="2" fill="#000000"/>
+          <rect x="10" y="16" width="2" height="2" fill="#000000"/>
+          <rect x="16" y="16" width="2" height="2" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'leaf', 
+      label: 'Leaf',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M3 5 Q5 3 7 5 Q5 7 3 5" fill="#000000"/>
+          <path d="M9 5 Q11 3 13 5 Q11 7 9 5" fill="#000000"/>
+          <path d="M15 5 Q17 3 19 5 Q17 7 15 5" fill="#000000"/>
+          <path d="M3 11 Q5 9 7 11 Q5 13 3 11" fill="#000000"/>
+          <path d="M15 11 Q17 9 19 11 Q17 13 15 11" fill="#000000"/>
+          <path d="M3 17 Q5 15 7 17 Q5 19 3 17" fill="#000000"/>
+          <path d="M9 17 Q11 15 13 17 Q11 19 9 17" fill="#000000"/>
+          <path d="M15 17 Q17 15 19 17 Q17 19 15 17" fill="#000000"/>
+        </svg>
+      )
+    }
   ];
 
-  // Border options - all these are implemented and working
+  // New Border options with SVG previews - exactly matching QR.io
   const borderOptions = [
-    { id: 'square', icon: '⬜', preview: 'M2,2 L14,2 L14,14 L2,14 Z M4,4 L12,4 L12,12 L4,12 Z' },
-    { id: 'rounded-square', icon: '▢', preview: 'M4,2 C3,2 2,3 2,4 L2,12 C2,13 3,14 4,14 L12,14 C13,14 14,13 14,12 L14,4 C14,3 13,2 12,2 Z M5,4 C4.5,4 4,4.5 4,5 L4,11 C4,11.5 4.5,12 5,12 L11,12 C11.5,12 12,11.5 12,11 L12,5 C12,4.5 11.5,4 11,4 Z' },
-    { id: 'circle', icon: '⭕', preview: 'M8,4 C10,4 12,6 12,8 C12,10 10,12 8,12 C6,12 4,10 4,8 C4,6 6,4 8,4 Z' },
-    { id: 'diamond', icon: '◇', preview: 'M8,4 L12,8 L8,12 L4,8 Z' },
-    { id: 'leaf-left', icon: '◗', preview: 'M2,8 C2,5 4,2 8,2 C12,2 14,5 14,8 C14,11 12,14 8,14 C4,14 2,11 2,8 Z M4,8 C4,6 5,4 8,4 C9,4 10,5 10,6 C10,7 9,8 8,8 C5,8 4,7 4,8 Z' },
-    { id: 'leaf-right', icon: '◖', preview: 'M8,2 C12,2 14,5 14,8 C14,11 12,14 8,14 C4,14 2,11 2,8 C2,5 4,2 8,2 Z M8,4 C6,4 6,5 6,6 C6,7 7,8 8,8 C11,8 12,7 12,8 C12,6 11,4 8,4 Z' },
-    { id: 'dot-square', icon: '⊡', preview: 'M2,2 L14,2 L14,14 L2,14 Z M6,6 L10,6 L10,10 L6,10 Z' },
-    { id: 'rounded-bottom', icon: '⌒', preview: 'M2,2 L14,2 L14,10 C14,13 11,14 8,14 C5,14 2,13 2,10 Z M4,4 L12,4 L12,10 C12,11 10,12 8,12 C6,12 4,11 4,10 Z' }
+    { 
+      id: 'square', 
+      label: 'Square',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="20" height="20" stroke="#000000" strokeWidth="2" fill="none"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'rounded', 
+      label: 'Rounded',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="20" height="20" rx="4" stroke="#000000" strokeWidth="2" fill="none"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'circle', 
+      label: 'Circle',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#000000" strokeWidth="2" fill="none"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'diamond', 
+      label: 'Diamond',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <polygon points="12,2 22,12 12,22 2,12" stroke="#000000" strokeWidth="2" fill="none"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'leaf-left', 
+      label: 'Leaf Left',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M2 12 Q2 2 12 2 Q22 2 22 12 Q22 22 12 22 Q2 22 2 12" stroke="#000000" strokeWidth="2" fill="none"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'leaf-right', 
+      label: 'Leaf Right',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M22 12 Q22 2 12 2 Q2 2 2 12 Q2 22 12 22 Q22 22 22 12" stroke="#000000" strokeWidth="2" fill="none"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'dashed', 
+      label: 'Dashed',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="20" height="20" stroke="#000000" strokeWidth="2" strokeDasharray="3,3" fill="none"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'rounded-bottom', 
+      label: 'Rounded Bottom',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M2 2 L22 2 L22 12 Q22 22 12 22 Q2 22 2 12 Z" stroke="#000000" strokeWidth="2" fill="none"/>
+        </svg>
+      )
+    }
   ];
 
-  // Center options - all these are implemented and working
+  // New Center options with SVG previews - exactly matching QR.io
   const centerOptions = [
-    { id: 'square', icon: '⬛', preview: 'M4,4 L12,4 L12,12 L4,12 Z' },
-    { id: 'rounded-square', icon: '▢', preview: 'M6,4 C5,4 4,5 4,6 L4,10 C4,11 5,12 6,12 L10,12 C11,12 12,11 12,10 L12,6 C12,5 11,4 10,4 Z' },
-    { id: 'circle', icon: '⭕', preview: 'M8,4 C10,4 12,6 12,8 C12,10 10,12 8,12 C6,12 4,10 4,8 C4,6 6,4 8,4 Z' },
-    { id: 'diamond', icon: '◆', preview: 'M8,4 L12,8 L8,12 L4,8 Z' },
-    { id: 'star', icon: '✦', preview: 'M8,4 L9,7 L12,7 L10,9 L11,12 L8,10 L5,12 L6,9 L4,7 L7,7 Z' },
-    { id: 'heart', icon: '♥', preview: 'M8,12 C8,12 4,8 4,6 C4,4 6,4 8,6 C10,4 12,4 12,6 C12,8 8,12 8,12 Z' },
-    { id: 'flower', icon: '✿', preview: 'M8,4 C9,4 10,5 10,6 C11,5 12,6 12,7 C12,8 11,9 10,8 C11,9 10,10 9,10 C8,10 7,9 8,8 C7,9 6,8 6,7 C6,6 7,5 8,6 C7,5 8,4 8,4 Z' },
-    { id: 'plus', icon: '➕', preview: 'M8,4 L8,7 L11,7 L11,9 L8,9 L8,12 L6,12 L6,9 L3,9 L3,7 L6,7 L6,4 Z' }
+    { 
+      id: 'square', 
+      label: 'Square',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="8" y="8" width="8" height="8" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'rounded', 
+      label: 'Rounded',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="8" y="8" width="8" height="8" rx="2" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'circle', 
+      label: 'Circle',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="4" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'diamond', 
+      label: 'Diamond',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <polygon points="12,8 16,12 12,16 8,12" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'star', 
+      label: 'Star',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <polygon points="12,8 13.2,10.8 16,10.8 13.8,12.6 14.4,15.2 12,13.6 9.6,15.2 10.2,12.6 8,10.8 10.8,10.8" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'heart', 
+      label: 'Heart',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 16 Q8 12 8 10 Q8 8 10 8 Q12 10 12 10 Q12 10 14 8 Q16 8 16 10 Q16 12 12 16" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'flower', 
+      label: 'Flower',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="9" r="1.5" fill="#000000"/>
+          <circle cx="15" cy="12" r="1.5" fill="#000000"/>
+          <circle cx="12" cy="15" r="1.5" fill="#000000"/>
+          <circle cx="9" cy="12" r="1.5" fill="#000000"/>
+          <circle cx="12" cy="12" r="1" fill="#000000"/>
+        </svg>
+      )
+    },
+    { 
+      id: 'plus', 
+      label: 'Plus',
+      preview: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="11" y="8" width="2" height="8" fill="#000000"/>
+          <rect x="8" y="11" width="8" height="2" fill="#000000"/>
+        </svg>
+      )
+    }
   ];
 
   // Logo options - only working logos
@@ -1015,7 +1268,7 @@ const QRGenerator = () => {
 
                           <div>
                             <Label className="block text-slate-700 mb-2">Frame color</Label>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 items-center">
                               <Input
                                 type="text"
                                 value={frameColor}
@@ -1050,7 +1303,7 @@ const QRGenerator = () => {
                       
                       <div className="mb-4">
                         <Label className="block text-slate-700 mb-2">Shape style</Label>
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 gap-3">
                           {shapeOptions.map((shape) => (
                             <button
                               key={shape.id}
@@ -1061,8 +1314,10 @@ const QRGenerator = () => {
                                   : 'bg-white border-gray-200 hover:bg-gray-50'
                               }`}
                             >
-                              <div className="text-xl mb-1">{shape.pattern}</div>
-                              <div className="text-xs">{shape.label}</div>
+                              <div className="flex flex-col items-center space-y-2">
+                                <div>{shape.preview}</div>
+                                <div className="text-xs">{shape.label}</div>
+                              </div>
                             </button>
                           ))}
                         </div>
@@ -1141,7 +1396,7 @@ const QRGenerator = () => {
                       <div className="space-y-4">
                         <div>
                           <Label className="block text-slate-700 mb-2">Border style</Label>
-                          <div className="grid grid-cols-4 gap-2">
+                          <div className="grid grid-cols-2 gap-3">
                             {borderOptions.map((border) => (
                               <button
                                 key={border.id}
@@ -1152,7 +1407,10 @@ const QRGenerator = () => {
                                     : 'bg-white border-gray-200 hover:bg-gray-50'
                                 }`}
                               >
-                                <div className="text-xl">{border.icon}</div>
+                                <div className="flex flex-col items-center space-y-2">
+                                  <div>{border.preview}</div>
+                                  <div className="text-xs">{border.label}</div>
+                                </div>
                               </button>
                             ))}
                           </div>
@@ -1185,7 +1443,7 @@ const QRGenerator = () => {
 
                         <div>
                           <Label className="block text-slate-700 mb-2">Center style</Label>
-                          <div className="grid grid-cols-4 gap-2">
+                          <div className="grid grid-cols-2 gap-3">
                             {centerOptions.map((center) => (
                               <button
                                 key={center.id}
@@ -1196,7 +1454,10 @@ const QRGenerator = () => {
                                     : 'bg-white border-gray-200 hover:bg-gray-50'
                                 }`}
                               >
-                                <div className="text-xl">{center.icon}</div>
+                                <div className="flex flex-col items-center space-y-2">
+                                  <div>{center.preview}</div>
+                                  <div className="text-xs">{center.label}</div>
+                                </div>
                               </button>
                             ))}
                           </div>
