@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Link as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload, QrCode, Image as ImageIcon } from 'lucide-react';
+import { Download, Link2 as LinkIcon, Mail, MessageSquare, Phone, Wifi, User, Calendar, MessageCircle, Upload, QrCode, Image as ImageIcon, MapPin, IdCard, Paypal, Bitcoin, Scan, Youtube } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageUpload } from '@/components/ImageUpload';
@@ -575,7 +575,7 @@ const QRGenerator = () => {
   // Shape options - all these are implemented and working
   const shapeOptions = [
     { id: 'classic', pattern: '▣', label: 'Classic', preview: 'M2,2 L2,14 L14,14 L14,2 Z M4,4 L4,6 L6,6 L6,4 Z M8,4 L8,6 L10,6 L10,4 Z M4,8 L4,10 L6,10 L6,8 Z M8,8 L8,10 L10,10 L10,8 Z' },
-    { id: 'liquid', pattern: '◪', label: 'Liquid', preview: 'M2,2 C2,2 5,2 8,5 C11,8 14,8 14,11 C14,14 11,14 8,14 C5,14 2,11 2,8 C2,5 5,2 8,2 Z' },
+    { id: 'liquid', pattern: '◪', label: 'Liquid', preview: 'M2,2 C2,2 5,2 8,5 C11,8 14,8 14,11 C14,14 11,14 8,14 C4,14 2,11 2,8 C2,5 4,2 8,2 Z' },
     { id: 'horizontal', pattern: '▬', label: 'Horizontal', preview: 'M2,4 L14,4 L14,6 L2,6 Z M2,8 L14,8 L14,10 L2,10 Z M2,12 L14,12 L14,14 L2,14 Z' },
     { id: 'vertical', pattern: '▥', label: 'Vertical', preview: 'M4,2 L6,2 L6,14 L4,14 Z M8,2 L10,2 L10,14 L8,14 Z M12,2 L14,2 L14,14 L12,14 Z' },
     { id: 'small-square', pattern: '▪', label: 'Small Square', preview: 'M3,3 L5,3 L5,5 L3,5 Z M7,3 L9,3 L9,5 L7,5 Z M11,3 L13,3 L13,5 L11,5 Z M3,7 L5,7 L5,9 L3,9 Z M7,7 L9,7 L9,9 L7,9 Z M11,7 L13,7 L13,9 L11,9 Z M3,11 L5,11 L5,13 L3,13 Z M7,11 L9,11 L9,13 L7,13 Z M11,11 L13,11 L13,13 L11,13 Z' },
@@ -628,8 +628,8 @@ const QRGenerator = () => {
       id: 'link', 
       icon: '🔗', 
       label: 'Link',
-      bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600'
+      bgColor: 'bg-purple-100',
+      iconColor: 'text-purple-600'
     },
     { 
       id: 'location', 
@@ -663,6 +663,55 @@ const QRGenerator = () => {
       id: 'vcard', 
       icon: '👤', 
       label: 'Contact',
+      bgColor: 'bg-gray-100',
+      iconColor: 'text-gray-600'
+    },
+    { 
+      id: 'paypal', 
+      icon: '💳', 
+      label: 'PayPal',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600'
+    },
+    { 
+      id: 'bitcoin', 
+      icon: '₿', 
+      label: 'Bitcoin',
+      bgColor: 'bg-orange-100',
+      iconColor: 'text-orange-600'
+    },
+    { 
+      id: 'scan-me-1', 
+      icon: '📱', 
+      label: 'Scan Me',
+      bgColor: 'bg-gray-100',
+      iconColor: 'text-gray-600'
+    },
+    { 
+      id: 'scan-me-2', 
+      icon: '📸', 
+      label: 'Scan Me 2',
+      bgColor: 'bg-gray-100',
+      iconColor: 'text-gray-600'
+    },
+    { 
+      id: 'qr-scanner', 
+      icon: '📲', 
+      label: 'QR Scanner',
+      bgColor: 'bg-gray-100',
+      iconColor: 'text-gray-600'
+    },
+    { 
+      id: 'menu-qr', 
+      icon: '📋', 
+      label: 'Menu QR',
+      bgColor: 'bg-gray-100',
+      iconColor: 'text-gray-600'
+    },
+    { 
+      id: 'focus-qr', 
+      icon: '🎯', 
+      label: 'Focus QR',
       bgColor: 'bg-gray-100',
       iconColor: 'text-gray-600'
     }
@@ -1246,7 +1295,7 @@ const QRGenerator = () => {
 
                     <div>
                       <Label className="block text-slate-700 mb-3">Choose Logo Type</Label>
-                      <div className="grid grid-cols-4 gap-3">
+                      <div className="grid grid-cols-3 gap-3 max-h-96 overflow-y-auto">
                         {logoOptions.map((logo) => (
                           <button
                             key={logo.id}
