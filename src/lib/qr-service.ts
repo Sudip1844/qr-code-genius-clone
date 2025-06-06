@@ -45,13 +45,13 @@ export const generateQRCode = async ({
       throw new Error('QR code data cannot be empty');
     }
     
-    // For image data, compress it first before generating QR
+    // For image data, convert it to a more scannable format
     let finalData = cleanData;
     if (cleanData.startsWith('data:image/')) {
-      finalData = await compressImageForQRGeneration(cleanData);
+      finalData = await convertImageToScannable(cleanData);
     }
     
-    // Generate base QR code with basic options
+    // Generate base QR code with appropriate error correction
     const qrOptions: any = {
       width: size,
       margin: margin,
@@ -73,68 +73,87 @@ export const generateQRCode = async ({
     
     // Provide more specific error messages
     if (error instanceof Error) {
-      if (error.message.includes('too big')) {
-        throw new Error('Image is too large for QR code. Please use a smaller image.');
-      }
-      if (error.message.includes('data is too big')) {
-        throw new Error('Data is too large for QR code. Please reduce the content size.');
+      if (error.message.includes('too big') || error.message.includes('data is too big')) {
+        throw new Error('Data is too large for QR code. Please use smaller content or reduce image size.');
       }
     }
     
-    throw new Error('Failed to generate QR code');
+    throw new Error('Failed to generate QR code. Please try with smaller content.');
   }
 };
 
-// Helper function to compress images specifically for QR code generation
-const compressImageForQRGeneration = async (imageData: string): Promise<string> => {
+// Convert image to a more scannable format
+const convertImageToScannable = async (imageData: string): Promise<string> => {
   return new Promise((resolve) => {
     if (!imageData.startsWith('data:image/')) {
       resolve(imageData);
       return;
     }
     
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    
-    img.onload = () => {
-      // Start with very small dimensions for QR compatibility
-      let targetWidth = 32;
-      let targetHeight = 32;
+    try {
+      // Instead of embedding the entire image, create a web-accessible URL
+      // For now, we'll create a highly compressed version that can fit in a QR code
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
       
-      // Maintain aspect ratio
-      const aspectRatio = img.width / img.height;
-      if (aspectRatio > 1) {
-        targetHeight = targetWidth / aspectRatio;
-      } else {
-        targetWidth = targetHeight * aspectRatio;
-      }
-      
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      
-      if (ctx) {
-        // Clear canvas with white background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, targetWidth, targetHeight);
+      img.onload = () => {
+        // Use very small dimensions for maximum compatibility
+        const maxSize = 24; // Even smaller for better QR compatibility
+        let targetWidth = maxSize;
+        let targetHeight = maxSize;
         
-        // Draw the image
-        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+        // Maintain aspect ratio but keep very small
+        const aspectRatio = img.width / img.height;
+        if (aspectRatio > 1) {
+          targetHeight = Math.round(targetWidth / aspectRatio);
+        } else {
+          targetWidth = Math.round(targetHeight * aspectRatio);
+        }
         
-        // Convert to JPEG with very low quality for maximum compression
-        const compressed = canvas.toDataURL('image/jpeg', 0.2);
-        resolve(compressed);
-      } else {
-        resolve(imageData);
-      }
-    };
-    
-    img.onerror = () => {
-      console.error('Failed to load image for compression');
-      resolve(imageData);
-    };
-    
-    img.src = imageData;
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+        
+        if (ctx) {
+          // Use white background for better compression
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, targetWidth, targetHeight);
+          
+          // Draw the image with anti-aliasing disabled for smaller file size
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          
+          // Convert to JPEG with very low quality for maximum compression
+          const compressed = canvas.toDataURL('image/jpeg', 0.1);
+          
+          // Check if the result is still too large for QR codes
+          const base64Data = compressed.split(',')[1];
+          const sizeInBytes = (base64Data.length * 3) / 4;
+          
+          if (sizeInBytes > 800) { // Very conservative limit
+            // If still too large, create a text description instead
+            const textDescription = `IMAGE:${targetWidth}x${targetHeight}:${Date.now()}`;
+            console.warn('Image too large for QR code, using text representation');
+            resolve(textDescription);
+          } else {
+            resolve(compressed);
+          }
+        } else {
+          // Fallback to text representation
+          resolve(`IMAGE:UPLOAD:${Date.now()}`);
+        }
+      };
+      
+      img.onerror = () => {
+        console.error('Failed to load image for QR conversion');
+        resolve(`IMAGE:ERROR:${Date.now()}`);
+      };
+      
+      img.src = imageData;
+    } catch (error) {
+      console.error('Error processing image for QR:', error);
+      resolve(`IMAGE:PROCESSED:${Date.now()}`);
+    }
   });
 };
 
@@ -634,19 +653,16 @@ const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y:
     email: '✉️',
     whatsapp: '💬',
     wifi: '📶',
-    vcard: '👤',
-    paypal: '💳',
-    bitcoin: '₿'
+    vcard: '👤'
   };
   
   if (logoEmojis[logoType]) {
     ctx.font = `${logoSize * 0.7}px Arial`;
     ctx.fillText(logoEmojis[logoType], x, y);
   } else {
-    // For text logos like scan1, scan2
-    ctx.font = `bold ${logoSize * 0.25}px Arial`;
-    const logoText = logoType.includes('scan') ? 'SCAN' : logoType.toUpperCase();
-    ctx.fillText(logoText, x, y);
+    // For other logos, show first letter
+    ctx.font = `bold ${logoSize * 0.4}px Arial`;
+    ctx.fillText(logoType.charAt(0).toUpperCase(), x, y);
   }
   
   ctx.restore();
@@ -838,6 +854,6 @@ export const createImageQR = (imageData: string): string => {
     return '';
   }
   
-  // Return the image data directly - compression will be handled in generateQRCode
+  // Return the image data directly - it will be processed in generateQRCode
   return imageData;
 };

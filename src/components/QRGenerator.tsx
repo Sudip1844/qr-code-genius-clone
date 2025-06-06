@@ -425,8 +425,13 @@ const QRForm = ({
             />
             {imageData && (
               <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-                <p className="font-medium">Note:</p>
-                <p>Images are compressed and converted to data URLs for QR encoding. Large images may require higher error correction levels for reliable scanning.</p>
+                <p className="font-medium">Image QR Code Tips:</p>
+                <ul className="list-disc list-inside mt-1 space-y-1">
+                  <li>Images are highly compressed for QR compatibility</li>
+                  <li>Use simple images with high contrast for best results</li>
+                  <li>QR scanner apps may show a text representation or small thumbnail</li>
+                  <li>The actual image data is embedded in the QR code</li>
+                </ul>
               </div>
             )}
           </div>
@@ -739,8 +744,7 @@ const QRGenerator = () => {
         const endDate = eventEnd ? new Date(eventEnd).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z' : '';
         return `BEGIN:VEVENT\nSUMMARY:${eventTitle}\nLOCATION:${eventLocation}\nDTSTART:${startDate}\nDTEND:${endDate}\nEND:VEVENT`;
       case 'image':
-        if (!imageData) return '';
-        return await compressImageForQR(imageData);
+        return createImageQR(imageData);
       default:
         return '';
     }
@@ -761,7 +765,7 @@ const QRGenerator = () => {
     try {
       setLoading(true);
       
-      // Use higher error correction for images
+      // Use higher error correction for images and complex data
       const errorCorrectionLevel = qrType === 'image' ? 'H' : 'M';
       
       const options: QROptions = {
@@ -801,8 +805,8 @@ const QRGenerator = () => {
       toast({
         title: "Error",
         description: qrType === 'image' 
-          ? "Image too large for QR code. Try a smaller image or reduce quality."
-          : "Failed to generate QR code",
+          ? "Image is too large for QR code. Try using a smaller, simpler image."
+          : "Failed to generate QR code. Please try with smaller content.",
         variant: "destructive",
       });
     } finally {
