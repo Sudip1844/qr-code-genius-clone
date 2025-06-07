@@ -34,7 +34,7 @@ export const generateQRCode = async ({
   size = 300,
   margin = 4,
   color = { dark: '#000000', light: '#ffffff' },
-  errorCorrectionLevel = 'M',
+  errorCorrectionLevel = 'H', // Use high error correction for better scannability with styles
   design
 }: QROptions): Promise<string> => {
   try {
@@ -51,7 +51,7 @@ export const generateQRCode = async ({
       finalData = await convertImageToScannable(cleanData);
     }
     
-    // Generate base QR code with appropriate error correction
+    // Generate base QR code with high error correction for styled QR codes
     const qrOptions: any = {
       width: size,
       margin: margin,
@@ -63,7 +63,7 @@ export const generateQRCode = async ({
     let qrDataUrl = await QRCode.toDataURL(finalData, qrOptions);
     
     // Apply design features using canvas manipulation
-    if (design) {
+    if (design && (design.shape !== 'square' || design.borderStyle || design.centerStyle !== 'square')) {
       qrDataUrl = await applyDesignFeatures(qrDataUrl, design, size, color);
     }
     
@@ -203,7 +203,7 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
       // Draw original QR code to temp canvas
       tempCtx.drawImage(img, 0, 0, size, size);
       
-      // Apply shape modifications
+      // Apply shape modifications with better module detection
       if (design.shape && design.shape !== 'square') {
         applyShapeStyle(tempCtx, design.shape, size, color, design.gradient);
       }
@@ -213,7 +213,7 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
         applyBorderStyle(tempCtx, design.borderStyle, design.borderColor || color.dark, size);
       }
       
-      // Apply center style
+      // Apply center style (with protection for finder patterns)
       if (design.centerStyle && design.centerStyle !== 'square') {
         applyCenterStyle(tempCtx, design.centerStyle, design.centerColor || color.dark, size);
       }
@@ -325,8 +325,9 @@ const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: num
   const imageData = ctx.getImageData(0, 0, size, size);
   const data = imageData.data;
   
-  // Detect QR modules by analyzing the image
-  const moduleSize = Math.floor(size / 25); // Approximate QR module size for a typical QR code
+  // Improved module detection - scan for actual QR structure
+  const moduleSize = detectModuleSize(data, size);
+  const quietZone = Math.floor(moduleSize * 4); // Standard quiet zone
   
   // Clear the canvas first
   if (gradient) {
@@ -342,23 +343,71 @@ const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: num
     ctx.fillStyle = color.dark;
   }
   
-  // Redraw with new shapes
-  for (let y = 0; y < size; y += moduleSize) {
-    for (let x = 0; x < size; x += moduleSize) {
-      // Check if this area should be dark by sampling the center pixel
-      const centerX = Math.min(x + moduleSize / 2, size - 1);
-      const centerY = Math.min(y + moduleSize / 2, size - 1);
-      const pixelIndex = (Math.floor(centerY) * size + Math.floor(centerX)) * 4;
+  // Redraw with new shapes, preserving finder patterns and timing patterns
+  for (let y = quietZone; y < size - quietZone; y += moduleSize) {
+    for (let x = quietZone; x < size - quietZone; x += moduleSize) {
+      // Skip finder patterns (corners) and timing patterns
+      if (isFinderPattern(x, y, size, moduleSize, quietZone) || 
+          isTimingPattern(x, y, size, moduleSize, quietZone)) {
+        // Draw original square modules for critical patterns
+        if (isModuleDark(data, x + moduleSize/2, y + moduleSize/2, size)) {
+          ctx.fillRect(x, y, moduleSize, moduleSize);
+        }
+        continue;
+      }
       
-      // If the pixel is dark (black or close to black)
-      if (data[pixelIndex] < 128) {
+      // Check if this area should be dark
+      if (isModuleDark(data, x + moduleSize/2, y + moduleSize/2, size)) {
         const moduleCenterX = x + moduleSize / 2;
         const moduleCenterY = y + moduleSize / 2;
         
-        drawModuleShape(ctx, shape, moduleCenterX, moduleCenterY, moduleSize * 0.85, gradient, color);
+        drawModuleShape(ctx, shape, moduleCenterX, moduleCenterY, moduleSize * 0.9, gradient, color);
       }
     }
   }
+};
+
+// Helper function to detect QR module size
+const detectModuleSize = (data: Uint8ClampedArray, size: number): number => {
+  // Scan from top-left to find the first transition from light to dark
+  let moduleSize = 1;
+  for (let x = 0; x < size / 2; x++) {
+    const pixelIndex = (0 * size + x) * 4;
+    if (data[pixelIndex] < 128) { // Found first dark pixel
+      // Find the width of this dark module
+      let endX = x;
+      while (endX < size && data[(0 * size + endX) * 4] < 128) {
+        endX++;
+      }
+      moduleSize = Math.max(1, endX - x);
+      break;
+    }
+  }
+  
+  // Ensure reasonable module size (typically 8-15 pixels for 300px QR)
+  return Math.max(8, Math.min(15, moduleSize));
+};
+
+// Helper function to check if a module is dark
+const isModuleDark = (data: Uint8ClampedArray, x: number, y: number, size: number): boolean => {
+  const pixelIndex = (Math.floor(y) * size + Math.floor(x)) * 4;
+  return data[pixelIndex] < 128;
+};
+
+// Helper function to identify finder patterns (corners)
+const isFinderPattern = (x: number, y: number, size: number, moduleSize: number, quietZone: number): boolean => {
+  const finderSize = moduleSize * 7; // Finder patterns are 7x7 modules
+  const topLeft = x < quietZone + finderSize && y < quietZone + finderSize;
+  const topRight = x > size - quietZone - finderSize && y < quietZone + finderSize;
+  const bottomLeft = x < quietZone + finderSize && y > size - quietZone - finderSize;
+  return topLeft || topRight || bottomLeft;
+};
+
+// Helper function to identify timing patterns
+const isTimingPattern = (x: number, y: number, size: number, moduleSize: number, quietZone: number): boolean => {
+  const timingRow = Math.abs(y - (quietZone + moduleSize * 6)) < moduleSize;
+  const timingCol = Math.abs(x - (quietZone + moduleSize * 6)) < moduleSize;
+  return timingRow || timingCol;
 };
 
 const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number, y: number, size: number, gradient?: boolean, color?: any) => {
