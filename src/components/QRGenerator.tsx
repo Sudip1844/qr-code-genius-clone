@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import QRCode from 'qrcode';
 import { Button } from "@/components/ui/button"
@@ -68,15 +69,15 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({ onGenerate }) => {
   };
 
   const handleFrameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOptions(prev => ({ design: { ...prev.design, frame: e.target.value } }));
+    setOptions(prev => ({ ...prev, design: { ...prev.design, frame: e.target.value } }));
   };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOptions(prev => ({ design: { ...prev.design, logo: e.target.value } }));
+    setOptions(prev => ({ ...prev, design: { ...prev.design, logo: e.target.value } }));
   };
 
   const handleGradientChange = (checked: boolean) => {
-    setOptions(prev => ({ design: { ...prev.design, gradient: checked } }));
+    setOptions(prev => ({ ...prev, design: { ...prev.design, gradient: checked } }));
   };
 
   return (
@@ -153,7 +154,7 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({ onGenerate }) => {
           <Label htmlFor="frame" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">
             Frame
           </Label>
-          <Select onValueChange={(value) => setOptions(prev => ({ design: { ...prev.design, frame: value } }))}>
+          <Select onValueChange={(value) => setOptions(prev => ({ ...prev, design: { ...prev.design, frame: value } }))}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select" defaultValue={options.design?.frame} />
             </SelectTrigger>
@@ -171,7 +172,7 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({ onGenerate }) => {
           <Label htmlFor="logo" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">
             Logo
           </Label>
-          <Select onValueChange={(value) => setOptions(prev => ({ design: { ...prev.design, logo: value } }))}>
+          <Select onValueChange={(value) => setOptions(prev => ({ ...prev, design: { ...prev.design, logo: value } }))}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select" defaultValue={options.design?.logo} />
             </SelectTrigger>
@@ -223,24 +224,110 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({ onGenerate }) => {
                 >
                   <div className="flex flex-col items-center gap-2">
                     <svg width="24" height="24" viewBox="0 0 24 24" className="text-foreground">
-                      {shape.id === 'square' && <rect x="4" y="4" width="16" height="16" fill="currentColor" />}
-                      {shape.id === 'circle' && <circle cx="12" cy="12" r="8" fill="currentColor" />}
-                      {shape.id === 'rounded' && <rect x="4" y="4" width="16" height="16" rx="4" fill="currentColor" />}
-                      {shape.id === 'diamond' && <polygon points="12,4 20,12 12,20 4,12" fill="currentColor" />}
+                      {shape.id === 'square' && (
+                        <g>
+                          <rect x="6" y="6" width="3" height="3" fill="currentColor" />
+                          <rect x="10" y="6" width="3" height="3" fill="currentColor" />
+                          <rect x="14" y="6" width="3" height="3" fill="currentColor" />
+                          <rect x="6" y="10" width="3" height="3" fill="currentColor" />
+                          <rect x="10" y="10" width="3" height="3" fill="currentColor" />
+                          <rect x="14" y="10" width="3" height="3" fill="currentColor" />
+                          <rect x="6" y="14" width="3" height="3" fill="currentColor" />
+                          <rect x="10" y="14" width="3" height="3" fill="currentColor" />
+                          <rect x="14" y="14" width="3" height="3" fill="currentColor" />
+                        </g>
+                      )}
+                      {shape.id === 'circle' && (
+                        <g>
+                          <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" />
+                          <circle cx="11.5" cy="7.5" r="1.5" fill="currentColor" />
+                          <circle cx="15.5" cy="7.5" r="1.5" fill="currentColor" />
+                          <circle cx="7.5" cy="11.5" r="1.5" fill="currentColor" />
+                          <circle cx="11.5" cy="11.5" r="1.5" fill="currentColor" />
+                          <circle cx="15.5" cy="11.5" r="1.5" fill="currentColor" />
+                          <circle cx="7.5" cy="15.5" r="1.5" fill="currentColor" />
+                          <circle cx="11.5" cy="15.5" r="1.5" fill="currentColor" />
+                          <circle cx="15.5" cy="15.5" r="1.5" fill="currentColor" />
+                        </g>
+                      )}
+                      {shape.id === 'rounded' && (
+                        <g>
+                          <rect x="6" y="6" width="3" height="3" rx="0.8" fill="currentColor" />
+                          <rect x="10" y="6" width="3" height="3" rx="0.8" fill="currentColor" />
+                          <rect x="14" y="6" width="3" height="3" rx="0.8" fill="currentColor" />
+                          <rect x="6" y="10" width="3" height="3" rx="0.8" fill="currentColor" />
+                          <rect x="10" y="10" width="3" height="3" rx="0.8" fill="currentColor" />
+                          <rect x="14" y="10" width="3" height="3" rx="0.8" fill="currentColor" />
+                          <rect x="6" y="14" width="3" height="3" rx="0.8" fill="currentColor" />
+                          <rect x="10" y="14" width="3" height="3" rx="0.8" fill="currentColor" />
+                          <rect x="14" y="14" width="3" height="3" rx="0.8" fill="currentColor" />
+                        </g>
+                      )}
+                      {shape.id === 'diamond' && (
+                        <g>
+                          <polygon points="7.5,6 9,7.5 7.5,9 6,7.5" fill="currentColor" />
+                          <polygon points="11.5,6 13,7.5 11.5,9 10,7.5" fill="currentColor" />
+                          <polygon points="15.5,6 17,7.5 15.5,9 14,7.5" fill="currentColor" />
+                          <polygon points="7.5,10 9,11.5 7.5,13 6,11.5" fill="currentColor" />
+                          <polygon points="11.5,10 13,11.5 11.5,13 10,11.5" fill="currentColor" />
+                          <polygon points="15.5,10 17,11.5 15.5,13 14,11.5" fill="currentColor" />
+                          <polygon points="7.5,14 9,15.5 7.5,17 6,15.5" fill="currentColor" />
+                          <polygon points="11.5,14 13,15.5 11.5,17 10,15.5" fill="currentColor" />
+                          <polygon points="15.5,14 17,15.5 15.5,17 14,15.5" fill="currentColor" />
+                        </g>
+                      )}
                       {shape.id === 'vertical' && (
-                        <>
-                          <rect x="8" y="4" width="2" height="16" fill="currentColor" />
-                          <rect x="14" y="4" width="2" height="16" fill="currentColor" />
-                        </>
+                        <g>
+                          <rect x="6.5" y="6" width="2" height="3" fill="currentColor" />
+                          <rect x="10.5" y="6" width="2" height="3" fill="currentColor" />
+                          <rect x="14.5" y="6" width="2" height="3" fill="currentColor" />
+                          <rect x="6.5" y="10" width="2" height="3" fill="currentColor" />
+                          <rect x="10.5" y="10" width="2" height="3" fill="currentColor" />
+                          <rect x="14.5" y="10" width="2" height="3" fill="currentColor" />
+                          <rect x="6.5" y="14" width="2" height="3" fill="currentColor" />
+                          <rect x="10.5" y="14" width="2" height="3" fill="currentColor" />
+                          <rect x="14.5" y="14" width="2" height="3" fill="currentColor" />
+                        </g>
                       )}
                       {shape.id === 'horizontal' && (
-                        <>
-                          <rect x="4" y="8" width="16" height="2" fill="currentColor" />
-                          <rect x="4" y="14" width="16" height="2" fill="currentColor" />
-                        </>
+                        <g>
+                          <rect x="6" y="6.5" width="3" height="2" fill="currentColor" />
+                          <rect x="10" y="6.5" width="3" height="2" fill="currentColor" />
+                          <rect x="14" y="6.5" width="3" height="2" fill="currentColor" />
+                          <rect x="6" y="10.5" width="3" height="2" fill="currentColor" />
+                          <rect x="10" y="10.5" width="3" height="2" fill="currentColor" />
+                          <rect x="14" y="10.5" width="3" height="2" fill="currentColor" />
+                          <rect x="6" y="14.5" width="3" height="2" fill="currentColor" />
+                          <rect x="10" y="14.5" width="3" height="2" fill="currentColor" />
+                          <rect x="14" y="14.5" width="3" height="2" fill="currentColor" />
+                        </g>
                       )}
-                      {shape.id === 'small-square' && <rect x="8" y="8" width="8" height="8" fill="currentColor" />}
-                      {shape.id === 'leaf' && <path d="M12 4C8 4 4 8 4 12C4 16 8 20 12 20C16 16 20 12 20 8C16 4 12 4 12 4Z" fill="currentColor" />}
+                      {shape.id === 'small-square' && (
+                        <g>
+                          <rect x="6.5" y="6.5" width="2" height="2" fill="currentColor" />
+                          <rect x="10.5" y="6.5" width="2" height="2" fill="currentColor" />
+                          <rect x="14.5" y="6.5" width="2" height="2" fill="currentColor" />
+                          <rect x="6.5" y="10.5" width="2" height="2" fill="currentColor" />
+                          <rect x="10.5" y="10.5" width="2" height="2" fill="currentColor" />
+                          <rect x="14.5" y="10.5" width="2" height="2" fill="currentColor" />
+                          <rect x="6.5" y="14.5" width="2" height="2" fill="currentColor" />
+                          <rect x="10.5" y="14.5" width="2" height="2" fill="currentColor" />
+                          <rect x="14.5" y="14.5" width="2" height="2" fill="currentColor" />
+                        </g>
+                      )}
+                      {shape.id === 'leaf' && (
+                        <g>
+                          <path d="M6 7.5C6 6.5 7.5 6 7.5 7.5C7.5 8.5 6 9 6 7.5Z" fill="currentColor" />
+                          <path d="M10 7.5C10 6.5 11.5 6 11.5 7.5C11.5 8.5 10 9 10 7.5Z" fill="currentColor" />
+                          <path d="M14 7.5C14 6.5 15.5 6 15.5 7.5C15.5 8.5 14 9 14 7.5Z" fill="currentColor" />
+                          <path d="M6 11.5C6 10.5 7.5 10 7.5 11.5C7.5 12.5 6 13 6 11.5Z" fill="currentColor" />
+                          <path d="M10 11.5C10 10.5 11.5 10 11.5 11.5C11.5 12.5 10 13 10 11.5Z" fill="currentColor" />
+                          <path d="M14 11.5C14 10.5 15.5 10 15.5 11.5C15.5 12.5 14 13 14 11.5Z" fill="currentColor" />
+                          <path d="M6 15.5C6 14.5 7.5 14 7.5 15.5C7.5 16.5 6 17 6 15.5Z" fill="currentColor" />
+                          <path d="M10 15.5C10 14.5 11.5 14 11.5 15.5C11.5 16.5 10 17 10 15.5Z" fill="currentColor" />
+                          <path d="M14 15.5C14 14.5 15.5 14 15.5 15.5C15.5 16.5 14 17 14 15.5Z" fill="currentColor" />
+                        </g>
+                      )}
                     </svg>
                     <span className="text-xs font-medium">{shape.name}</span>
                   </div>
