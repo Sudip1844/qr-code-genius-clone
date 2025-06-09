@@ -3,10 +3,15 @@ import { Button } from "@/components/ui/button";
 import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle, Menu, X } from "lucide-react";
 import { Link, Mail, Text, Phone, MessageSquare, Wifi, UserSquare as VCard, CalendarDays } from "lucide-react";
 import { useRef, useState } from "react";
+import { QROptions } from "@/lib/qr-service";
 
 const Index = () => {
   const qrGeneratorRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleQRGenerate = (options: QROptions) => {
+    console.log('QR Code generated with options:', options);
+  };
 
   const scrollToSection = (sectionRef: React.RefObject<HTMLElement>) => {
     sectionRef.current?.scrollIntoView({ 
@@ -99,7 +104,7 @@ const Index = () => {
       
       <main className="w-full py-8">
         <div ref={qrGeneratorRef} className="px-4">
-          <QRGenerator />
+          <QRGenerator onGenerate={handleQRGenerate} />
         </div>
         
         {/* Features section */}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,8 +10,8 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, createTextQR, createSMSQR, createWhatsAppQR, createWiFiQR, createVCardQR, createEventQR, createImageQR } from '@/lib/qr-service';
 import { Upload, Download, QrCode, Palette } from 'lucide-react';
-import ImageUpload from './ImageUpload';
-import ImageControls from './ImageControls';
+import { ImageUpload } from './ImageUpload';
+import { ImageControls } from './ImageControls';
 
 interface QRGeneratorProps {
   onGenerate: (options: QROptions) => void;
@@ -468,11 +467,17 @@ const QRGenerator: React.FC<QRGeneratorProps> = ({ onGenerate }) => {
       case 'image':
         return (
           <div className="space-y-4">
-            <ImageUpload onImageUpload={handleImageUpload} />
+            <ImageUpload onImageUpload={handleImageUpload} onImageRemove={() => setUploadedImage(null)} currentImage={uploadedImage || undefined} />
             {uploadedImage && (
               <ImageControls
-                onSettingsChange={handleImageSettings}
-                currentSettings={imageSettings}
+                logoSize={logoSize}
+                logoOpacity={logoOpacity}
+                logoPosition={logoPosition}
+                logoShape={logoShape}
+                onLogoSizeChange={setLogoSize}
+                onLogoOpacityChange={setLogoOpacity}
+                onLogoPositionChange={setLogoPosition}
+                onLogoShapeChange={setLogoShape}
               />
             )}
           </div>
