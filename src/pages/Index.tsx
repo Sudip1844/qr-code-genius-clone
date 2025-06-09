@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle, Menu, X } from "lucide-react";
 import { Link, Mail, Text, Phone, MessageSquare, Wifi, UserSquare as VCard, CalendarDays } from "lucide-react";
 import { useRef, useState } from "react";
-import { QROptions } from "@/lib/qr-service";
 
 const Index = () => {
   const qrGeneratorRef = useRef<HTMLDivElement>(null);
@@ -33,11 +32,6 @@ const Index = () => {
       behavior: 'smooth',
       block: 'start'
     });
-  };
-
-  const handleQRGenerate = (options: QROptions) => {
-    // Handle QR code generation logic here
-    console.log('Generating QR code with options:', options);
   };
 
   // Create refs for all sections
@@ -105,7 +99,7 @@ const Index = () => {
       
       <main className="w-full py-8">
         <div ref={qrGeneratorRef} className="px-4">
-          <QRGenerator onGenerate={handleQRGenerate} />
+          <QRGenerator />
         </div>
         
         {/* Features section */}
