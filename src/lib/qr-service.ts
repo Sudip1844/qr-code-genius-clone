@@ -15,8 +15,6 @@ export type QROptions = {
     frameFont?: string;
     frameColor?: string;
     shape?: string;
-    borderStyle?: string;
-    borderColor?: string;
     centerStyle?: string;
     centerColor?: string;
     logo?: string;
@@ -34,24 +32,17 @@ export const generateQRCode = async ({
   size = 300,
   margin = 4,
   color = { dark: '#000000', light: '#ffffff' },
-  errorCorrectionLevel = 'M',
+  errorCorrectionLevel = 'H', // Use high error correction for better scannability with styles
   design
 }: QROptions): Promise<string> => {
   try {
-    // Clean the input data to ensure it's valid
     const cleanData = data.trim();
     
     if (!cleanData) {
       throw new Error('QR code data cannot be empty');
     }
     
-    // For image data, convert it to a more scannable format
-    let finalData = cleanData;
-    if (cleanData.startsWith('data:image/')) {
-      finalData = await convertImageToScannable(cleanData);
-    }
-    
-    // Generate base QR code with appropriate error correction
+    // Generate base QR code with high error correction
     const qrOptions: any = {
       width: size,
       margin: margin,
@@ -60,101 +51,18 @@ export const generateQRCode = async ({
     };
     
     // Generate base QR code
-    let qrDataUrl = await QRCode.toDataURL(finalData, qrOptions);
+    let qrDataUrl = await QRCode.toDataURL(cleanData, qrOptions);
     
     // Apply design features using canvas manipulation
-    if (design) {
+    if (design && (design.shape !== 'square' || design.centerStyle !== 'square' || design.gradient)) {
       qrDataUrl = await applyDesignFeatures(qrDataUrl, design, size, color);
     }
     
     return qrDataUrl;
   } catch (error) {
     console.error('Error generating QR code:', error);
-    
-    // Provide more specific error messages
-    if (error instanceof Error) {
-      if (error.message.includes('too big') || error.message.includes('data is too big')) {
-        throw new Error('Data is too large for QR code. Please use smaller content or reduce image size.');
-      }
-    }
-    
     throw new Error('Failed to generate QR code. Please try with smaller content.');
   }
-};
-
-// Convert image to a more scannable format
-const convertImageToScannable = async (imageData: string): Promise<string> => {
-  return new Promise((resolve) => {
-    if (!imageData.startsWith('data:image/')) {
-      resolve(imageData);
-      return;
-    }
-    
-    try {
-      // Instead of embedding the entire image, create a web-accessible URL
-      // For now, we'll create a highly compressed version that can fit in a QR code
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
-      
-      img.onload = () => {
-        // Use very small dimensions for maximum compatibility
-        const maxSize = 24; // Even smaller for better QR compatibility
-        let targetWidth = maxSize;
-        let targetHeight = maxSize;
-        
-        // Maintain aspect ratio but keep very small
-        const aspectRatio = img.width / img.height;
-        if (aspectRatio > 1) {
-          targetHeight = Math.round(targetWidth / aspectRatio);
-        } else {
-          targetWidth = Math.round(targetHeight * aspectRatio);
-        }
-        
-        canvas.width = targetWidth;
-        canvas.height = targetHeight;
-        
-        if (ctx) {
-          // Use white background for better compression
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, targetWidth, targetHeight);
-          
-          // Draw the image with anti-aliasing disabled for smaller file size
-          ctx.imageSmoothingEnabled = false;
-          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-          
-          // Convert to JPEG with very low quality for maximum compression
-          const compressed = canvas.toDataURL('image/jpeg', 0.1);
-          
-          // Check if the result is still too large for QR codes
-          const base64Data = compressed.split(',')[1];
-          const sizeInBytes = (base64Data.length * 3) / 4;
-          
-          if (sizeInBytes > 800) { // Very conservative limit
-            // If still too large, create a text description instead
-            const textDescription = `IMAGE:${targetWidth}x${targetHeight}:${Date.now()}`;
-            console.warn('Image too large for QR code, using text representation');
-            resolve(textDescription);
-          } else {
-            resolve(compressed);
-          }
-        } else {
-          // Fallback to text representation
-          resolve(`IMAGE:UPLOAD:${Date.now()}`);
-        }
-      };
-      
-      img.onerror = () => {
-        console.error('Failed to load image for QR conversion');
-        resolve(`IMAGE:ERROR:${Date.now()}`);
-      };
-      
-      img.src = imageData;
-    } catch (error) {
-      console.error('Error processing image for QR:', error);
-      resolve(`IMAGE:PROCESSED:${Date.now()}`);
-    }
-  });
 };
 
 const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number, color: any): Promise<string> => {
@@ -166,30 +74,23 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
       return;
     }
     
-    // Set canvas size with extra space for frame
-    const frameSize = design.frame !== 'none' ? 80 : 0;
-    canvas.width = size + frameSize;
-    canvas.height = size + frameSize;
+    canvas.width = size;
+    canvas.height = size;
     
     const img = new Image();
     img.onload = () => {
-      // Apply gradient background if enabled
+      // Apply background
       if (design.gradient) {
         const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
         gradient.addColorStop(0, color.light);
         gradient.addColorStop(1, adjustColorBrightness(color.light, -20));
         ctx.fillStyle = gradient;
       } else {
-        ctx.fillStyle = design.frame !== 'none' ? color.light : 'transparent';
+        ctx.fillStyle = color.light;
       }
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Draw frame first if selected
-      if (design.frame && design.frame !== 'none') {
-        drawFrame(ctx, design, canvas.width, canvas.height);
-      }
-      
-      // Create a temporary canvas for QR code manipulation
+      // Draw original QR code to get module positions
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
       if (!tempCtx) {
@@ -199,35 +100,19 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
       
       tempCanvas.width = size;
       tempCanvas.height = size;
-      
-      // Draw original QR code to temp canvas
       tempCtx.drawImage(img, 0, 0, size, size);
       
       // Apply shape modifications
       if (design.shape && design.shape !== 'square') {
-        applyShapeStyle(tempCtx, design.shape, size, color, design.gradient);
-      }
-      
-      // Apply border style
-      if (design.borderStyle && design.borderStyle !== 'square') {
-        applyBorderStyle(tempCtx, design.borderStyle, design.borderColor || color.dark, size);
+        applyShapeStyle(ctx, tempCtx, design.shape, size, color, design.gradient);
+      } else {
+        // Just draw the original QR if no shape changes
+        ctx.drawImage(img, 0, 0, size, size);
       }
       
       // Apply center style
       if (design.centerStyle && design.centerStyle !== 'square') {
-        applyCenterStyle(tempCtx, design.centerStyle, design.centerColor || color.dark, size);
-      }
-      
-      // Draw the modified QR code to main canvas
-      const qrX = frameSize / 2;
-      const qrY = frameSize / 2;
-      ctx.drawImage(tempCanvas, qrX, qrY);
-      
-      // Draw logo if selected (either predefined or custom)
-      if (design.customLogo) {
-        drawCustomLogo(ctx, design, qrX + size/2, qrY + size/2, size);
-      } else if (design.logo && design.logo !== 'none') {
-        drawLogo(ctx, design.logo, qrX + size/2, qrY + size/2, size);
+        applyCenterStyle(ctx, design.centerStyle, design.centerColor || color.dark, size);
       }
       
       resolve(canvas.toDataURL());
@@ -236,153 +121,100 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
   });
 };
 
-// Helper function to adjust color brightness for gradient
-const adjustColorBrightness = (color: string, percent: number): string => {
-  const num = parseInt(color.replace("#", ""), 16);
-  const amt = Math.round(2.55 * percent);
-  const R = (num >> 16) + amt;
-  const G = (num >> 8 & 0x00FF) + amt;
-  const B = (num & 0x0000FF) + amt;
-  return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-    (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
-};
-
-const drawCustomLogo = (
+const applyShapeStyle = (
   ctx: CanvasRenderingContext2D, 
-  design: any, 
-  centerX: number, 
-  centerY: number, 
-  qrSize: number
+  sourceCtx: CanvasRenderingContext2D, 
+  shape: string, 
+  size: number, 
+  color: any, 
+  gradient?: boolean
 ) => {
-  const logoImg = new Image();
-  logoImg.onload = () => {
-    const logoSize = (design.logoSize || 15) / 100 * qrSize;
-    const opacity = (design.logoOpacity || 100) / 100;
-    
-    // Save context for opacity
-    ctx.save();
-    ctx.globalAlpha = opacity;
-    
-    // Calculate position
-    let x = centerX - logoSize / 2;
-    let y = centerY - logoSize / 2;
-    
-    switch (design.logoPosition) {
-      case 'top-left':
-        x = centerX - qrSize / 2 + 20;
-        y = centerY - qrSize / 2 + 20;
-        break;
-      case 'top-right':
-        x = centerX + qrSize / 2 - logoSize - 20;
-        y = centerY - qrSize / 2 + 20;
-        break;
-      case 'bottom-left':
-        x = centerX - qrSize / 2 + 20;
-        y = centerY + qrSize / 2 - logoSize - 20;
-        break;
-      case 'bottom-right':
-        x = centerX + qrSize / 2 - logoSize - 20;
-        y = centerY + qrSize / 2 - logoSize - 20;
-        break;
-    }
-    
-    // Draw white background circle for better visibility
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(x + logoSize/2, y + logoSize/2, logoSize/2 + 8, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Apply logo shape
-    ctx.save();
-    switch (design.logoShape) {
-      case 'circle':
-        ctx.beginPath();
-        ctx.arc(x + logoSize/2, y + logoSize/2, logoSize/2, 0, 2 * Math.PI);
-        ctx.clip();
-        break;
-      case 'rounded':
-        ctx.beginPath();
-        ctx.roundRect(x, y, logoSize, logoSize, logoSize * 0.2);
-        ctx.clip();
-        break;
-      case 'square':
-        ctx.beginPath();
-        ctx.rect(x, y, logoSize, logoSize);
-        ctx.clip();
-        break;
-    }
-    
-    // Draw the logo
-    ctx.drawImage(logoImg, x, y, logoSize, logoSize);
-    ctx.restore();
-    ctx.restore();
-  };
-  logoImg.src = design.customLogo;
-};
-
-const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: number, color: any, gradient?: boolean) => {
-  const imageData = ctx.getImageData(0, 0, size, size);
+  const imageData = sourceCtx.getImageData(0, 0, size, size);
   const data = imageData.data;
   
-  // Detect QR modules by analyzing the image
-  const moduleSize = Math.floor(size / 25); // Approximate QR module size for a typical QR code
+  // Calculate module size more accurately
+  const moduleSize = Math.round(size / 29); // QR codes typically have 21-177 modules, estimate for common sizes
+  const actualModuleSize = Math.max(moduleSize, 8); // Minimum size for visibility
   
-  // Clear the canvas first
+  // Set fill style
   if (gradient) {
     const grad = ctx.createLinearGradient(0, 0, size, size);
     grad.addColorStop(0, color.dark);
     grad.addColorStop(1, adjustColorBrightness(color.dark, 30));
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, size, size);
-    ctx.fillStyle = grad;
   } else {
-    ctx.fillStyle = color.light;
-    ctx.fillRect(0, 0, size, size);
     ctx.fillStyle = color.dark;
   }
   
-  // Redraw with new shapes
-  for (let y = 0; y < size; y += moduleSize) {
-    for (let x = 0; x < size; x += moduleSize) {
-      // Check if this area should be dark by sampling the center pixel
-      const centerX = Math.min(x + moduleSize / 2, size - 1);
-      const centerY = Math.min(y + moduleSize / 2, size - 1);
-      const pixelIndex = (Math.floor(centerY) * size + Math.floor(centerX)) * 4;
+  // Scan for dark modules and replace with shapes
+  for (let y = 0; y < size; y += Math.round(actualModuleSize * 0.8)) {
+    for (let x = 0; x < size; x += Math.round(actualModuleSize * 0.8)) {
+      // Sample multiple points to determine if this is a dark module
+      const samplePoints = [
+        { x: x + actualModuleSize * 0.25, y: y + actualModuleSize * 0.25 },
+        { x: x + actualModuleSize * 0.75, y: y + actualModuleSize * 0.25 },
+        { x: x + actualModuleSize * 0.25, y: y + actualModuleSize * 0.75 },
+        { x: x + actualModuleSize * 0.75, y: y + actualModuleSize * 0.75 },
+        { x: x + actualModuleSize * 0.5, y: y + actualModuleSize * 0.5 }
+      ];
       
-      // If the pixel is dark (black or close to black)
-      if (data[pixelIndex] < 128) {
-        const moduleCenterX = x + moduleSize / 2;
-        const moduleCenterY = y + moduleSize / 2;
+      let darkPixels = 0;
+      for (const point of samplePoints) {
+        const px = Math.min(Math.floor(point.x), size - 1);
+        const py = Math.min(Math.floor(point.y), size - 1);
+        const pixelIndex = (py * size + px) * 4;
         
-        drawModuleShape(ctx, shape, moduleCenterX, moduleCenterY, moduleSize * 0.85, gradient, color);
+        if (data[pixelIndex] < 128) { // Dark pixel
+          darkPixels++;
+        }
+      }
+      
+      // If majority of sampled points are dark, draw the shape
+      if (darkPixels >= 3) {
+        const centerX = x + actualModuleSize / 2;
+        const centerY = y + actualModuleSize / 2;
+        
+        // Skip if this is near a finder pattern (corners)
+        const margin = size * 0.15;
+        const isNearCorner = (
+          (x < margin && y < margin) || // Top-left
+          (x > size - margin && y < margin) || // Top-right
+          (x < margin && y > size - margin) // Bottom-left
+        );
+        
+        if (!isNearCorner) {
+          drawModuleShape(ctx, shape, centerX, centerY, actualModuleSize * 0.9, gradient, color);
+        } else {
+          // Draw square for finder patterns to maintain scannability
+          ctx.fillRect(x, y, actualModuleSize, actualModuleSize);
+        }
       }
     }
   }
 };
 
-const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number, y: number, size: number, gradient?: boolean, color?: any) => {
+const drawModuleShape = (
+  ctx: CanvasRenderingContext2D, 
+  shape: string, 
+  x: number, 
+  y: number, 
+  size: number, 
+  gradient?: boolean, 
+  color?: any
+) => {
   const radius = size / 2;
   
   ctx.save();
   
-  // Apply gradient fill if enabled
-  if (gradient && color) {
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    grad.addColorStop(0, color.dark);
-    grad.addColorStop(1, adjustColorBrightness(color.dark, -30));
-    ctx.fillStyle = grad;
-  }
-  
   switch (shape) {
     case 'circle':
       ctx.beginPath();
-      ctx.arc(x, y, radius * 0.9, 0, 2 * Math.PI);
+      ctx.arc(x, y, radius * 0.85, 0, 2 * Math.PI);
       ctx.fill();
       break;
       
     case 'rounded':
-      const cornerRadius = radius * 0.3;
+      const cornerRadius = radius * 0.25;
       ctx.beginPath();
       ctx.roundRect(x - radius, y - radius, size, size, cornerRadius);
       ctx.fill();
@@ -390,10 +222,10 @@ const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number
       
     case 'diamond':
       ctx.beginPath();
-      ctx.moveTo(x, y - radius);
-      ctx.lineTo(x + radius, y);
-      ctx.lineTo(x, y + radius);
-      ctx.lineTo(x - radius, y);
+      ctx.moveTo(x, y - radius * 0.9);
+      ctx.lineTo(x + radius * 0.9, y);
+      ctx.lineTo(x, y + radius * 0.9);
+      ctx.lineTo(x - radius * 0.9, y);
       ctx.closePath();
       ctx.fill();
       break;
@@ -414,9 +246,9 @@ const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number
       
     case 'leaf':
       ctx.beginPath();
-      ctx.moveTo(x - radius, y);
-      ctx.bezierCurveTo(x - radius, y - radius, x, y - radius, x + radius, y);
-      ctx.bezierCurveTo(x, y + radius, x - radius, y + radius, x - radius, y);
+      ctx.moveTo(x - radius * 0.8, y);
+      ctx.bezierCurveTo(x - radius * 0.8, y - radius * 0.8, x, y - radius * 0.8, x + radius * 0.8, y);
+      ctx.bezierCurveTo(x, y + radius * 0.8, x - radius * 0.8, y + radius * 0.8, x - radius * 0.8, y);
       ctx.fill();
       break;
       
@@ -428,93 +260,17 @@ const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number
   ctx.restore();
 };
 
-const applyBorderStyle = (ctx: CanvasRenderingContext2D, borderStyle: string, borderColor: string, size: number) => {
-  ctx.save();
-  ctx.strokeStyle = borderColor;
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  
-  const margin = 15;
-  const width = size - 2 * margin;
-  const height = size - 2 * margin;
-  const centerX = size / 2;
-  const centerY = size / 2;
-  
-  switch (borderStyle) {
-    case 'rounded':
-      ctx.beginPath();
-      ctx.roundRect(margin, margin, width, height, 20);
-      ctx.stroke();
-      break;
-      
-    case 'circle':
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, Math.min(width, height) / 2, 0, 2 * Math.PI);
-      ctx.stroke();
-      break;
-      
-    case 'diamond':
-      ctx.beginPath();
-      ctx.moveTo(centerX, margin);
-      ctx.lineTo(size - margin, centerY);
-      ctx.lineTo(centerX, size - margin);
-      ctx.lineTo(margin, centerY);
-      ctx.closePath();
-      ctx.stroke();
-      break;
-      
-    case 'leaf-left':
-      ctx.beginPath();
-      ctx.moveTo(margin, centerY);
-      ctx.bezierCurveTo(margin, margin, centerX, margin, size - margin, centerY);
-      ctx.bezierCurveTo(centerX, size - margin, margin, size - margin, margin, centerY);
-      ctx.stroke();
-      break;
-      
-    case 'leaf-right':
-      ctx.beginPath();
-      ctx.moveTo(size - margin, centerY);
-      ctx.bezierCurveTo(size - margin, margin, centerX, margin, margin, centerY);
-      ctx.bezierCurveTo(centerX, size - margin, size - margin, size - margin, size - margin, centerY);
-      ctx.stroke();
-      break;
-      
-    case 'dashed':
-      ctx.setLineDash([8, 8]);
-      ctx.strokeRect(margin, margin, width, height);
-      ctx.setLineDash([]);
-      break;
-      
-    case 'rounded-bottom':
-      ctx.beginPath();
-      ctx.moveTo(margin, margin);
-      ctx.lineTo(size - margin, margin);
-      ctx.lineTo(size - margin, centerY);
-      ctx.bezierCurveTo(size - margin, size - margin, centerX, size - margin, margin, centerY);
-      ctx.lineTo(margin, margin);
-      ctx.stroke();
-      break;
-      
-    default: // square
-      ctx.strokeRect(margin, margin, width, height);
-      break;
-  }
-  
-  ctx.restore();
-};
-
 const applyCenterStyle = (ctx: CanvasRenderingContext2D, centerStyle: string, centerColor: string, size: number) => {
   const centerX = size / 2;
   const centerY = size / 2;
-  const centerSize = size * 0.15;
+  const centerSize = size * 0.12; // Smaller center to avoid interfering with QR readability
   const radius = centerSize / 2;
   
-  // Clear center area first
+  // Clear center area first with white background
   ctx.save();
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
-  ctx.arc(centerX, centerY, radius + 5, 0, 2 * Math.PI);
+  ctx.arc(centerX, centerY, radius + 4, 0, 2 * Math.PI);
   ctx.fill();
   
   // Draw center style
@@ -568,94 +324,19 @@ const applyCenterStyle = (ctx: CanvasRenderingContext2D, centerStyle: string, ce
   ctx.restore();
 };
 
-const drawFrame = (ctx: CanvasRenderingContext2D, design: any, width: number, height: number) => {
-  ctx.save();
-  ctx.fillStyle = design.frameColor || '#000000';
-  ctx.strokeStyle = design.frameColor || '#000000';
-  ctx.font = `bold 16px ${design.frameFont || 'Arial'}`;
-  ctx.textAlign = 'center';
-  
-  switch (design.frame) {
-    case 'basic':
-      ctx.lineWidth = 6;
-      ctx.strokeRect(8, 8, width - 16, height - 16);
-      break;
-      
-    case 'rounded':
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.roundRect(12, 12, width - 24, height - 24, 25);
-      ctx.stroke();
-      break;
-      
-    case 'banner':
-      // Top banner
-      ctx.fillRect(0, 0, width, 40);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(design.frameText || 'SCAN ME', width/2, 25);
-      break;
-      
-    case 'badge':
-      // Badge-like frame with rounded corners
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.roundRect(10, 10, width - 20, height - 20, 15);
-      ctx.stroke();
-      break;
-  }
-  
-  // Add frame text if not banner and text exists
-  if (design.frame !== 'banner' && design.frameText) {
-    ctx.fillStyle = design.frameColor || '#000000';
-    ctx.fillText(design.frameText, width/2, height - 15);
-  }
-  
-  ctx.restore();
+// Helper function to adjust color brightness
+const adjustColorBrightness = (color: string, percent: number): string => {
+  const num = parseInt(color.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = (num >> 16) + amt;
+  const G = (num >> 8 & 0x00FF) + amt;
+  const B = (num & 0x0000FF) + amt;
+  return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+    (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
 };
 
-const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y: number, qrSize: number) => {
-  const logoSize = qrSize * 0.12;
-  
-  // Draw white background circle for logo
-  ctx.save();
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(x, y, logoSize/2 + 6, 0, 2 * Math.PI);
-  ctx.fill();
-  
-  // Draw border around logo area
-  ctx.strokeStyle = '#e0e0e0';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  
-  // Draw logo based on type
-  ctx.fillStyle = '#000000';
-  ctx.font = `bold ${logoSize * 0.5}px Arial`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  
-  const logoEmojis: { [key: string]: string } = {
-    link: '🔗',
-    location: '📍',
-    email: '✉️',
-    whatsapp: '💬',
-    wifi: '📶',
-    vcard: '👤'
-  };
-  
-  if (logoEmojis[logoType]) {
-    ctx.font = `${logoSize * 0.7}px Arial`;
-    ctx.fillText(logoEmojis[logoType], x, y);
-  } else {
-    // For other logos, show first letter
-    ctx.font = `bold ${logoSize * 0.4}px Arial`;
-    ctx.fillText(logoType.charAt(0).toUpperCase(), x, y);
-  }
-  
-  ctx.restore();
-};
-
-// Helper functions for complex shapes
+// Helper functions for complex center shapes
 const drawStar = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) => {
   const spikes = 5;
   const outerRadius = radius;
@@ -681,28 +362,12 @@ const drawHeart = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: 
   ctx.moveTo(x, y + topCurveHeight);
   
   // Left curve
-  ctx.bezierCurveTo(
-    x, y, 
-    x - radius / 2, y, 
-    x - radius / 2, y + topCurveHeight
-  );
-  ctx.bezierCurveTo(
-    x - radius / 2, y + (radius + topCurveHeight) / 2, 
-    x, y + (radius + topCurveHeight) / 2, 
-    x, y + radius
-  );
+  ctx.bezierCurveTo(x, y, x - radius / 2, y, x - radius / 2, y + topCurveHeight);
+  ctx.bezierCurveTo(x - radius / 2, y + (radius + topCurveHeight) / 2, x, y + (radius + topCurveHeight) / 2, x, y + radius);
   
   // Right curve
-  ctx.bezierCurveTo(
-    x, y + (radius + topCurveHeight) / 2, 
-    x + radius / 2, y + (radius + topCurveHeight) / 2, 
-    x + radius / 2, y + topCurveHeight
-  );
-  ctx.bezierCurveTo(
-    x + radius / 2, y, 
-    x, y, 
-    x, y + topCurveHeight
-  );
+  ctx.bezierCurveTo(x, y + (radius + topCurveHeight) / 2, x + radius / 2, y + (radius + topCurveHeight) / 2, x + radius / 2, y + topCurveHeight);
+  ctx.bezierCurveTo(x + radius / 2, y, x, y, x, y + topCurveHeight);
   
   ctx.closePath();
   ctx.fill();
@@ -710,14 +375,14 @@ const drawHeart = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: 
 
 const drawFlower = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) => {
   const petalCount = 6;
-  const petalRadius = radius * 0.6;
+  const petalRadius = radius * 0.4;
   
   ctx.save();
   
   for (let i = 0; i < petalCount; i++) {
     const angle = (i * 2 * Math.PI) / petalCount;
-    const petalX = x + Math.cos(angle) * radius * 0.4;
-    const petalY = y + Math.sin(angle) * radius * 0.4;
+    const petalX = x + Math.cos(angle) * radius * 0.3;
+    const petalY = y + Math.sin(angle) * radius * 0.3;
     
     ctx.beginPath();
     ctx.arc(petalX, petalY, petalRadius, 0, 2 * Math.PI);
@@ -726,7 +391,7 @@ const drawFlower = (ctx: CanvasRenderingContext2D, x: number, y: number, radius:
   
   // Center circle
   ctx.beginPath();
-  ctx.arc(x, y, radius * 0.3, 0, 2 * Math.PI);
+  ctx.arc(x, y, radius * 0.2, 0, 2 * Math.PI);
   ctx.fill();
   
   ctx.restore();
