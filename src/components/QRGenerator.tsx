@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +21,7 @@ const QRGenerator = () => {
   const [qrResult, setQrResult] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
-  const [designTab, setDesignTab] = useState('frame');
+  const [designTab, setDesignTab] = useState('shape');
   const [copied, setCopied] = useState(false);
   
   // Email specific fields
@@ -53,10 +54,8 @@ const QRGenerator = () => {
   // Image specific fields
   const [imageData, setImageData] = useState<string | null>(null);
 
-  // Design options state - removed shape, border, center related states
-  const [selectedFrame, setSelectedFrame] = useState('none');
-  const [frameText, setFrameText] = useState('');
-  const [frameColor, setFrameColor] = useState('#000000');
+  // Design options state
+  const [selectedShape, setSelectedShape] = useState('square');
   const [selectedLogo, setSelectedLogo] = useState('none');
   const [customLogo, setCustomLogo] = useState<string | null>(null);
   const [logoSize, setLogoSize] = useState(15);
@@ -72,28 +71,33 @@ const QRGenerator = () => {
   const [lightColor, setLightColor] = useState('#ffffff');
   const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<'L' | 'M' | 'Q' | 'H'>('M');
 
-  // Design tab options - removed shape, border, center tabs
+  // Design tab options
   const designTabs = [
-    { id: 'frame', label: 'Frame', icon: '🖼️' },
+    { id: 'shape', label: 'Shape', icon: '🔲' },
     { id: 'logo', label: 'Logo', icon: '⭐' }
   ];
 
-  // Frame options
-  const frameOptions = [
-    { value: 'none', label: 'None', preview: '⬜' },
-    { value: 'basic', label: 'Basic', preview: '⬛' },
+  // Shape options (working ones only)
+  const shapeOptions = [
+    { value: 'square', label: 'Square', preview: '⬛' },
+    { value: 'circle', label: 'Circle', preview: '⚫' },
     { value: 'rounded', label: 'Rounded', preview: '🔲' },
-    { value: 'banner', label: 'Banner', preview: '🏷️' },
-    { value: 'badge', label: 'Badge', preview: '🏆' }
+    { value: 'diamond', label: 'Diamond', preview: '🔸' }
   ];
 
-  // Logo options
+  // Logo options with social media
   const logoOptions = [
     { value: 'none', label: 'None', preview: '❌' },
     { value: 'link', label: 'Link', preview: '🔗' },
     { value: 'location', label: 'Location', preview: '📍' },
     { value: 'email', label: 'Email', preview: '✉️' },
+    { value: 'phone', label: 'Phone', preview: '📞' },
     { value: 'whatsapp', label: 'WhatsApp', preview: '💬' },
+    { value: 'facebook', label: 'Facebook', preview: '📘' },
+    { value: 'instagram', label: 'Instagram', preview: '📷' },
+    { value: 'twitter', label: 'Twitter', preview: '🐦' },
+    { value: 'linkedin', label: 'LinkedIn', preview: '💼' },
+    { value: 'youtube', label: 'YouTube', preview: '📺' },
     { value: 'wifi', label: 'WiFi', preview: '📶' },
     { value: 'vcard', label: 'Contact', preview: '👤' },
     { value: 'custom', label: 'Custom', preview: '📎' }
@@ -164,9 +168,7 @@ const QRGenerator = () => {
         color: { dark: darkColor, light: lightColor },
         errorCorrectionLevel,
         design: {
-          frame: selectedFrame,
-          frameText: frameText || undefined,
-          frameColor,
+          shape: selectedShape,
           logo: selectedLogo !== 'custom' ? selectedLogo : undefined,
           customLogo: customLogo || undefined,
           logoSize,
@@ -389,7 +391,7 @@ const QRGenerator = () => {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>QR Code Preview</CardTitle>
+                <CardTitle>Preview QR Code</CardTitle>
                 <CardDescription>
                   Your QR code will appear here
                 </CardDescription>
@@ -714,7 +716,7 @@ const QRGenerator = () => {
                 <CardHeader>
                   <CardTitle>Customize Design</CardTitle>
                   <CardDescription>
-                    Personalize your QR code with frames and logos
+                    Personalize your QR code with shapes and logos
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -807,7 +809,7 @@ const QRGenerator = () => {
                     <Label htmlFor="gradient">Enable gradient effects</Label>
                   </div>
 
-                  {/* Design Style Tabs - Only Frame and Logo */}
+                  {/* Design Style Tabs - Shape and Logo */}
                   <Tabs value={designTab} onValueChange={setDesignTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                       {designTabs.map((tab) => (
@@ -818,17 +820,17 @@ const QRGenerator = () => {
                       ))}
                     </TabsList>
 
-                    {/* Frame Tab */}
-                    <TabsContent value="frame" className="space-y-4">
+                    {/* Shape Tab */}
+                    <TabsContent value="shape" className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Frame Style</Label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {frameOptions.map((option) => (
+                        <Label>QR Code Shape Style</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {shapeOptions.map((option) => (
                             <Button
                               key={option.value}
-                              variant={selectedFrame === option.value ? "default" : "outline"}
+                              variant={selectedShape === option.value ? "default" : "outline"}
                               className="h-16 flex flex-col items-center justify-center"
-                              onClick={() => setSelectedFrame(option.value)}
+                              onClick={() => setSelectedShape(option.value)}
                             >
                               <span className="text-lg mb-1">{option.preview}</span>
                               <span className="text-xs">{option.label}</span>
@@ -836,36 +838,6 @@ const QRGenerator = () => {
                           ))}
                         </div>
                       </div>
-
-                      {selectedFrame !== 'none' && (
-                        <>
-                          <div className="space-y-2">
-                            <Label>Frame Text (Optional)</Label>
-                            <Input
-                              value={frameText}
-                              onChange={(e) => setFrameText(e.target.value)}
-                              placeholder="Enter frame text"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Frame Color</Label>
-                            <div className="flex items-center space-x-2">
-                              <input
-                                type="color"
-                                value={frameColor}
-                                onChange={(e) => setFrameColor(e.target.value)}
-                                className="w-12 h-8 rounded border"
-                              />
-                              <Input
-                                value={frameColor}
-                                onChange={(e) => setFrameColor(e.target.value)}
-                                placeholder="#000000"
-                              />
-                            </div>
-                          </div>
-                        </>
-                      )}
                     </TabsContent>
 
                     {/* Logo Tab */}
