@@ -14,11 +14,6 @@ export type QROptions = {
     frameText?: string;
     frameFont?: string;
     frameColor?: string;
-    shape?: string;
-    borderStyle?: string;
-    borderColor?: string;
-    centerStyle?: string;
-    centerColor?: string;
     logo?: string;
     customLogo?: string;
     logoSize?: number;
@@ -189,39 +184,10 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
         drawFrame(ctx, design, canvas.width, canvas.height);
       }
       
-      // Create a temporary canvas for QR code manipulation
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
-      if (!tempCtx) {
-        resolve(qrDataUrl);
-        return;
-      }
-      
-      tempCanvas.width = size;
-      tempCanvas.height = size;
-      
-      // Draw original QR code to temp canvas
-      tempCtx.drawImage(img, 0, 0, size, size);
-      
-      // Apply shape modifications
-      if (design.shape && design.shape !== 'square') {
-        applyShapeStyle(tempCtx, design.shape, size, color, design.gradient);
-      }
-      
-      // Apply border style
-      if (design.borderStyle && design.borderStyle !== 'square') {
-        applyBorderStyle(tempCtx, design.borderStyle, design.borderColor || color.dark, size);
-      }
-      
-      // Apply center style
-      if (design.centerStyle && design.centerStyle !== 'square') {
-        applyCenterStyle(tempCtx, design.centerStyle, design.centerColor || color.dark, size);
-      }
-      
-      // Draw the modified QR code to main canvas
+      // Draw the QR code to main canvas
       const qrX = frameSize / 2;
       const qrY = frameSize / 2;
-      ctx.drawImage(tempCanvas, qrX, qrY);
+      ctx.drawImage(img, qrX, qrY, size, size);
       
       // Draw logo if selected (either predefined or custom)
       if (design.customLogo) {
