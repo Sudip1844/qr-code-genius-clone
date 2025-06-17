@@ -10,7 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, createTextQR, createSMSQR, createWhatsAppQR, createWiFiQR, createVCardQR, createEventQR, createImageQR } from '@/lib/qr-service';
-import { Download, Share2, Copy, Check, Loader2 } from 'lucide-react';
+import { Download, Share2, Copy, Check, Loader2, ChevronDown, Link } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from 'sonner';
 
@@ -71,12 +71,6 @@ const QRGenerator = () => {
   const [lightColor, setLightColor] = useState('#ffffff');
   const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<'L' | 'M' | 'Q' | 'H'>('M');
 
-  // Design tab options
-  const designTabs = [
-    { id: 'shape', label: 'Shape', icon: '🔲' },
-    { id: 'logo', label: 'Logo', icon: '⭐' }
-  ];
-
   // Shape options (working ones only)
   const shapeOptions = [
     { value: 'square', label: 'Square', preview: '⬛' },
@@ -105,15 +99,15 @@ const QRGenerator = () => {
   
   // Content type options
   const contentTypes = [
-    { value: 'url', label: 'Website URL', icon: '🌐' },
-    { value: 'text', label: 'Plain Text', icon: '📝' },
-    { value: 'email', label: 'Email Address', icon: '✉️' },
-    { value: 'phone', label: 'Phone Number', icon: '📞' },
-    { value: 'sms', label: 'SMS Message', icon: '💬' },
+    { value: 'url', label: 'Link', icon: '🔗' },
+    { value: 'text', label: 'Text', icon: '📝' },
+    { value: 'email', label: 'Email', icon: '✉️' },
+    { value: 'phone', label: 'Phone', icon: '📞' },
+    { value: 'sms', label: 'SMS', icon: '💬' },
     { value: 'whatsapp', label: 'WhatsApp', icon: '📱' },
-    { value: 'wifi', label: 'WiFi Network', icon: '📶' },
-    { value: 'vcard', label: 'Contact Card', icon: '👤' },
-    { value: 'event', label: 'Calendar Event', icon: '📅' },
+    { value: 'wifi', label: 'WiFi', icon: '📶' },
+    { value: 'vcard', label: 'Contact', icon: '👤' },
+    { value: 'event', label: 'Event', icon: '📅' },
     { value: 'image', label: 'Image', icon: '🖼️' }
   ];
   
@@ -319,6 +313,10 @@ const QRGenerator = () => {
     }
   };
 
+  const getSelectedContentType = () => {
+    return contentTypes.find(type => type.value === contentType);
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center">
@@ -411,49 +409,62 @@ const QRGenerator = () => {
         <div className="w-full md:w-1/2">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="content">Content</TabsTrigger>
-              <TabsTrigger value="design">Design</TabsTrigger>
+              <TabsTrigger value="content" className="text-center">
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-full text-sm font-medium mr-2">1</span>
+                Content
+              </TabsTrigger>
+              <TabsTrigger value="design" className="text-center">
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-400 text-white rounded-full text-sm font-medium mr-2">2</span>
+                Design
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="content" className="space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>QR Code Content</CardTitle>
-                  <CardDescription>
-                    Select the type of content for your QR code
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                    {contentTypes.map((type) => (
-                      <Button
-                        key={type.value}
-                        variant={contentType === type.value ? "default" : "outline"}
-                        className="h-16 flex flex-col items-center justify-center"
-                        onClick={() => setContentType(type.value)}
-                      >
-                        <span className="text-lg mb-1">{type.icon}</span>
-                        <span className="text-xs">{type.label}</span>
-                      </Button>
-                    ))}
+                <CardContent className="p-6 space-y-6">
+                  {/* Content Type Selector */}
+                  <div className="space-y-2">
+                    <Select value={contentType} onValueChange={setContentType}>
+                      <SelectTrigger className="w-full h-16 bg-emerald-50 border-emerald-200">
+                        <div className="flex items-center gap-3">
+                          <Link className="h-6 w-6 text-emerald-600" />
+                          <div className="flex-1 text-left">
+                            <div className="font-medium text-emerald-700">{getSelectedContentType()?.label}</div>
+                          </div>
+                          <ChevronDown className="h-4 w-4 text-emerald-600" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border shadow-lg z-50">
+                        {contentTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            <div className="flex items-center gap-3">
+                              <span className="text-lg">{type.icon}</span>
+                              <span>{type.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   
+                  {/* Content Input Fields */}
                   <div className="space-y-4">
                     {contentType === 'url' && (
                       <div className="space-y-2">
-                        <Label htmlFor="url">Website URL</Label>
+                        <Label htmlFor="url" className="text-slate-700 font-medium">Enter your Website</Label>
                         <Input
                           id="url"
-                          placeholder="https://example.com"
+                          placeholder="https://"
                           value={qrData}
                           onChange={(e) => setQrData(e.target.value)}
+                          className="h-12"
                         />
                       </div>
                     )}
                     
                     {contentType === 'text' && (
                       <div className="space-y-2">
-                        <Label htmlFor="text">Text Content</Label>
+                        <Label htmlFor="text" className="text-slate-700 font-medium">Text Content</Label>
                         <Textarea
                           id="text"
                           placeholder="Enter your text here"
@@ -467,26 +478,28 @@ const QRGenerator = () => {
                     {contentType === 'email' && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="email">Email Address</Label>
+                          <Label htmlFor="email" className="text-slate-700 font-medium">Email Address</Label>
                           <Input
                             id="email"
                             placeholder="example@email.com"
                             type="email"
                             value={qrData}
                             onChange={(e) => setQrData(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="subject">Subject (Optional)</Label>
+                          <Label htmlFor="subject" className="text-slate-700 font-medium">Subject (Optional)</Label>
                           <Input
                             id="subject"
                             placeholder="Email subject"
                             value={emailSubject}
                             onChange={(e) => setEmailSubject(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="body">Body (Optional)</Label>
+                          <Label htmlFor="body" className="text-slate-700 font-medium">Body (Optional)</Label>
                           <Textarea
                             id="body"
                             placeholder="Email body"
@@ -500,12 +513,13 @@ const QRGenerator = () => {
                     
                     {contentType === 'phone' && (
                       <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone" className="text-slate-700 font-medium">Phone Number</Label>
                         <Input
                           id="phone"
                           placeholder="+1234567890"
                           value={qrData}
                           onChange={(e) => setQrData(e.target.value)}
+                          className="h-12"
                         />
                       </div>
                     )}
@@ -513,16 +527,17 @@ const QRGenerator = () => {
                     {contentType === 'sms' && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="smsPhone">Phone Number</Label>
+                          <Label htmlFor="smsPhone" className="text-slate-700 font-medium">Phone Number</Label>
                           <Input
                             id="smsPhone"
                             placeholder="+1234567890"
                             value={qrData}
                             onChange={(e) => setQrData(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="smsMessage">Message (Optional)</Label>
+                          <Label htmlFor="smsMessage" className="text-slate-700 font-medium">Message (Optional)</Label>
                           <Textarea
                             id="smsMessage"
                             placeholder="Your SMS message"
@@ -537,16 +552,17 @@ const QRGenerator = () => {
                     {contentType === 'whatsapp' && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="whatsappPhone">Phone Number (without +)</Label>
+                          <Label htmlFor="whatsappPhone" className="text-slate-700 font-medium">Phone Number (without +)</Label>
                           <Input
                             id="whatsappPhone"
                             placeholder="1234567890"
                             value={qrData}
                             onChange={(e) => setQrData(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="whatsappMessage">Message (Optional)</Label>
+                          <Label htmlFor="whatsappMessage" className="text-slate-700 font-medium">Message (Optional)</Label>
                           <Textarea
                             id="whatsappMessage"
                             placeholder="Your WhatsApp message"
@@ -561,28 +577,30 @@ const QRGenerator = () => {
                     {contentType === 'wifi' && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="ssid">Network Name (SSID)</Label>
+                          <Label htmlFor="ssid" className="text-slate-700 font-medium">Network Name (SSID)</Label>
                           <Input
                             id="ssid"
                             placeholder="WiFi Network Name"
                             value={wifiSSID}
                             onChange={(e) => setWifiSSID(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
+                          <Label htmlFor="password" className="text-slate-700 font-medium">Password</Label>
                           <Input
                             id="password"
                             type="password"
                             placeholder="WiFi Password"
                             value={wifiPassword}
                             onChange={(e) => setWifiPassword(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="security">Security Type</Label>
+                          <Label htmlFor="security" className="text-slate-700 font-medium">Security Type</Label>
                           <Select value={wifiSecurity} onValueChange={setWifiSecurity}>
-                            <SelectTrigger id="security">
+                            <SelectTrigger id="security" className="h-12">
                               <SelectValue placeholder="Select security type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -598,39 +616,43 @@ const QRGenerator = () => {
                     {contentType === 'vcard' && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="name">Full Name</Label>
+                          <Label htmlFor="name" className="text-slate-700 font-medium">Full Name</Label>
                           <Input
                             id="name"
                             placeholder="John Doe"
                             value={vcardName}
                             onChange={(e) => setVcardName(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="vcardPhone">Phone Number</Label>
+                          <Label htmlFor="vcardPhone" className="text-slate-700 font-medium">Phone Number</Label>
                           <Input
                             id="vcardPhone"
                             placeholder="+1234567890"
                             value={vcardPhone}
                             onChange={(e) => setVcardPhone(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="vcardEmail">Email</Label>
+                          <Label htmlFor="vcardEmail" className="text-slate-700 font-medium">Email</Label>
                           <Input
                             id="vcardEmail"
                             placeholder="john@example.com"
                             value={vcardEmail}
                             onChange={(e) => setVcardEmail(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="organization">Organization</Label>
+                          <Label htmlFor="organization" className="text-slate-700 font-medium">Organization</Label>
                           <Input
                             id="organization"
                             placeholder="Company Name"
                             value={vcardOrg}
                             onChange={(e) => setVcardOrg(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                       </div>
@@ -639,40 +661,44 @@ const QRGenerator = () => {
                     {contentType === 'event' && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="title">Event Title</Label>
+                          <Label htmlFor="title" className="text-slate-700 font-medium">Event Title</Label>
                           <Input
                             id="title"
                             placeholder="Meeting Title"
                             value={eventTitle}
                             onChange={(e) => setEventTitle(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="location">Location (Optional)</Label>
+                          <Label htmlFor="location" className="text-slate-700 font-medium">Location (Optional)</Label>
                           <Input
                             id="location"
                             placeholder="Event Location"
                             value={eventLocation}
                             onChange={(e) => setEventLocation(e.target.value)}
+                            className="h-12"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="start">Start Date & Time</Label>
+                            <Label htmlFor="start" className="text-slate-700 font-medium">Start Date & Time</Label>
                             <Input
                               id="start"
                               type="datetime-local"
                               value={eventStart}
                               onChange={(e) => setEventStart(e.target.value)}
+                              className="h-12"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="end">End Date & Time</Label>
+                            <Label htmlFor="end" className="text-slate-700 font-medium">End Date & Time</Label>
                             <Input
                               id="end"
                               type="datetime-local"
                               value={eventEnd}
                               onChange={(e) => setEventEnd(e.target.value)}
+                              className="h-12"
                             />
                           </div>
                         </div>
@@ -682,13 +708,13 @@ const QRGenerator = () => {
                     {contentType === 'image' && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="image">Upload Image</Label>
+                          <Label htmlFor="image" className="text-slate-700 font-medium">Upload Image</Label>
                           <Input
                             id="image"
                             type="file"
                             accept="image/*"
                             onChange={handleImageUpload}
-                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 h-12"
                           />
                         </div>
                         {imageData && (
@@ -713,17 +739,11 @@ const QRGenerator = () => {
 
             <TabsContent value="design" className="space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Customize Design</CardTitle>
-                  <CardDescription>
-                    Personalize your QR code with shapes and logos
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="p-6 space-y-6">
                   {/* Basic Options */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Size</Label>
+                      <Label className="text-slate-700 font-medium">Size</Label>
                       <Slider
                         value={[size]}
                         onValueChange={(value) => setSize(value[0])}
@@ -736,7 +756,7 @@ const QRGenerator = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Margin</Label>
+                      <Label className="text-slate-700 font-medium">Margin</Label>
                       <Slider
                         value={[margin]}
                         onValueChange={(value) => setMargin(value[0])}
@@ -751,7 +771,7 @@ const QRGenerator = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Foreground Color</Label>
+                      <Label className="text-slate-700 font-medium">Foreground Color</Label>
                       <div className="flex items-center space-x-2">
                         <input
                           type="color"
@@ -768,7 +788,7 @@ const QRGenerator = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Background Color</Label>
+                      <Label className="text-slate-700 font-medium">Background Color</Label>
                       <div className="flex items-center space-x-2">
                         <input
                           type="color"
@@ -786,9 +806,9 @@ const QRGenerator = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Error Correction Level</Label>
+                    <Label className="text-slate-700 font-medium">Error Correction Level</Label>
                     <Select value={errorCorrectionLevel} onValueChange={(value: 'L' | 'M' | 'Q' | 'H') => setErrorCorrectionLevel(value)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-12">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -806,24 +826,26 @@ const QRGenerator = () => {
                       checked={gradient}
                       onCheckedChange={setGradient}
                     />
-                    <Label htmlFor="gradient">Enable gradient effects</Label>
+                    <Label htmlFor="gradient" className="text-slate-700 font-medium">Enable gradient effects</Label>
                   </div>
 
                   {/* Design Style Tabs - Shape and Logo */}
                   <Tabs value={designTab} onValueChange={setDesignTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
-                      {designTabs.map((tab) => (
-                        <TabsTrigger key={tab.id} value={tab.id}>
-                          <span className="mr-2">{tab.icon}</span>
-                          {tab.label}
-                        </TabsTrigger>
-                      ))}
+                      <TabsTrigger value="shape">
+                        <span className="mr-2">🔲</span>
+                        Shape
+                      </TabsTrigger>
+                      <TabsTrigger value="logo">
+                        <span className="mr-2">⭐</span>
+                        Logo
+                      </TabsTrigger>
                     </TabsList>
 
                     {/* Shape Tab */}
                     <TabsContent value="shape" className="space-y-4">
                       <div className="space-y-2">
-                        <Label>QR Code Shape Style</Label>
+                        <Label className="text-slate-700 font-medium">QR Code Shape Style</Label>
                         <div className="grid grid-cols-2 gap-2">
                           {shapeOptions.map((option) => (
                             <Button
@@ -843,7 +865,7 @@ const QRGenerator = () => {
                     {/* Logo Tab */}
                     <TabsContent value="logo" className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Logo Type</Label>
+                        <Label className="text-slate-700 font-medium">Logo Type</Label>
                         <div className="grid grid-cols-3 gap-2">
                           {logoOptions.map((option) => (
                             <Button
@@ -861,12 +883,12 @@ const QRGenerator = () => {
 
                       {selectedLogo === 'custom' && (
                         <div className="space-y-2">
-                          <Label>Upload Custom Logo</Label>
+                          <Label className="text-slate-700 font-medium">Upload Custom Logo</Label>
                           <Input
                             type="file"
                             accept="image/*"
                             onChange={handleLogoUpload}
-                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 h-12"
                           />
                           {customLogo && (
                             <div className="mt-2">
@@ -880,7 +902,7 @@ const QRGenerator = () => {
                         <>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <Label>Logo Size (%)</Label>
+                              <Label className="text-slate-700 font-medium">Logo Size (%)</Label>
                               <Slider
                                 value={[logoSize]}
                                 onValueChange={(value) => setLogoSize(value[0])}
@@ -893,7 +915,7 @@ const QRGenerator = () => {
                             </div>
 
                             <div className="space-y-2">
-                              <Label>Logo Opacity (%)</Label>
+                              <Label className="text-slate-700 font-medium">Logo Opacity (%)</Label>
                               <Slider
                                 value={[logoOpacity]}
                                 onValueChange={(value) => setLogoOpacity(value[0])}
@@ -908,9 +930,9 @@ const QRGenerator = () => {
 
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <Label>Logo Position</Label>
+                              <Label className="text-slate-700 font-medium">Logo Position</Label>
                               <Select value={logoPosition} onValueChange={setLogoPosition}>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-12">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -924,9 +946,9 @@ const QRGenerator = () => {
                             </div>
 
                             <div className="space-y-2">
-                              <Label>Logo Shape</Label>
+                              <Label className="text-slate-700 font-medium">Logo Shape</Label>
                               <Select value={logoShape} onValueChange={setLogoShape}>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-12">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -948,18 +970,21 @@ const QRGenerator = () => {
           
           <div className="mt-6">
             <Button 
-              className="w-full" 
+              className="w-full h-14 text-lg font-medium" 
               size="lg" 
               onClick={generateQR}
               disabled={isGenerating}
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Generating...
                 </>
               ) : (
-                'Generate QR Code'
+                <>
+                  <Download className="mr-2 h-5 w-5" />
+                  Download QR Code
+                </>
               )}
             </Button>
           </div>
