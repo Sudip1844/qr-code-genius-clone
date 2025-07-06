@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +20,6 @@ const QRGenerator = () => {
   const [qrResult, setQrResult] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
-  const [designTab, setDesignTab] = useState('shape');
   const [copied, setCopied] = useState(false);
   
   // Email specific fields
@@ -55,7 +53,6 @@ const QRGenerator = () => {
   const [imageData, setImageData] = useState<string | null>(null);
 
   // Design options state
-  const [selectedShape, setSelectedShape] = useState('square');
   const [selectedLogo, setSelectedLogo] = useState('none');
   const [customLogo, setCustomLogo] = useState<string | null>(null);
   const [logoSize, setLogoSize] = useState(15);
@@ -70,14 +67,6 @@ const QRGenerator = () => {
   const [darkColor, setDarkColor] = useState('#000000');
   const [lightColor, setLightColor] = useState('#ffffff');
   const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<'L' | 'M' | 'Q' | 'H'>('M');
-
-  // Shape options (working ones only)
-  const shapeOptions = [
-    { value: 'square', label: 'Square', preview: '⬛' },
-    { value: 'circle', label: 'Circle', preview: '⚫' },
-    { value: 'rounded', label: 'Rounded', preview: '🔲' },
-    { value: 'diamond', label: 'Diamond', preview: '🔸' }
-  ];
 
   // Logo options with social media
   const logoOptions = [
@@ -162,7 +151,6 @@ const QRGenerator = () => {
         color: { dark: darkColor, light: lightColor },
         errorCorrectionLevel,
         design: {
-          shape: selectedShape,
           logo: selectedLogo !== 'custom' ? selectedLogo : undefined,
           customLogo: customLogo || undefined,
           logoSize,
@@ -408,7 +396,7 @@ const QRGenerator = () => {
         
         <div className="w-full md:w-1/2">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="content" className="text-center">
                 <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-full text-sm font-medium mr-2">1</span>
                 Content
@@ -416,6 +404,10 @@ const QRGenerator = () => {
               <TabsTrigger value="design" className="text-center">
                 <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-400 text-white rounded-full text-sm font-medium mr-2">2</span>
                 Design
+              </TabsTrigger>
+              <TabsTrigger value="logo" className="text-center">
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-400 text-white rounded-full text-sm font-medium mr-2">3</span>
+                Logo
               </TabsTrigger>
             </TabsList>
             
@@ -828,141 +820,110 @@ const QRGenerator = () => {
                     />
                     <Label htmlFor="gradient" className="text-slate-700 font-medium">Enable gradient effects</Label>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                  {/* Design Style Tabs - Shape and Logo */}
-                  <Tabs value={designTab} onValueChange={setDesignTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="shape">
-                        <span className="mr-2">🔲</span>
-                        Shape
-                      </TabsTrigger>
-                      <TabsTrigger value="logo">
-                        <span className="mr-2">⭐</span>
-                        Logo
-                      </TabsTrigger>
-                    </TabsList>
+            <TabsContent value="logo" className="space-y-6">
+              <Card>
+                <CardContent className="p-6 space-y-6">
+                  <div className="space-y-2">
+                    <Label className="text-slate-700 font-medium">Logo Type</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {logoOptions.map((option) => (
+                        <Button
+                          key={option.value}
+                          variant={selectedLogo === option.value ? "default" : "outline"}
+                          className="h-16 flex flex-col items-center justify-center"
+                          onClick={() => setSelectedLogo(option.value)}
+                        >
+                          <span className="text-lg mb-1">{option.preview}</span>
+                          <span className="text-xs">{option.label}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
 
-                    {/* Shape Tab */}
-                    <TabsContent value="shape" className="space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-slate-700 font-medium">QR Code Shape Style</Label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {shapeOptions.map((option) => (
-                            <Button
-                              key={option.value}
-                              variant={selectedShape === option.value ? "default" : "outline"}
-                              className="h-16 flex flex-col items-center justify-center"
-                              onClick={() => setSelectedShape(option.value)}
-                            >
-                              <span className="text-lg mb-1">{option.preview}</span>
-                              <span className="text-xs">{option.label}</span>
-                            </Button>
-                          ))}
+                  {selectedLogo === 'custom' && (
+                    <div className="space-y-2">
+                      <Label className="text-slate-700 font-medium">Upload Custom Logo</Label>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 h-12"
+                      />
+                      {customLogo && (
+                        <div className="mt-2">
+                          <img src={customLogo} alt="Custom logo preview" className="w-16 h-16 object-contain rounded border" />
                         </div>
-                      </div>
-                    </TabsContent>
+                      )}
+                    </div>
+                  )}
 
-                    {/* Logo Tab */}
-                    <TabsContent value="logo" className="space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-slate-700 font-medium">Logo Type</Label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {logoOptions.map((option) => (
-                            <Button
-                              key={option.value}
-                              variant={selectedLogo === option.value ? "default" : "outline"}
-                              className="h-16 flex flex-col items-center justify-center"
-                              onClick={() => setSelectedLogo(option.value)}
-                            >
-                              <span className="text-lg mb-1">{option.preview}</span>
-                              <span className="text-xs">{option.label}</span>
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {selectedLogo === 'custom' && (
+                  {selectedLogo !== 'none' && (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-slate-700 font-medium">Upload Custom Logo</Label>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleLogoUpload}
-                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 h-12"
+                          <Label className="text-slate-700 font-medium">Logo Size (%)</Label>
+                          <Slider
+                            value={[logoSize]}
+                            onValueChange={(value) => setLogoSize(value[0])}
+                            max={30}
+                            min={10}
+                            step={5}
+                            className="w-full"
                           />
-                          {customLogo && (
-                            <div className="mt-2">
-                              <img src={customLogo} alt="Custom logo preview" className="w-16 h-16 object-contain rounded border" />
-                            </div>
-                          )}
+                          <div className="text-sm text-gray-500">{logoSize}%</div>
                         </div>
-                      )}
 
-                      {selectedLogo !== 'none' && (
-                        <>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label className="text-slate-700 font-medium">Logo Size (%)</Label>
-                              <Slider
-                                value={[logoSize]}
-                                onValueChange={(value) => setLogoSize(value[0])}
-                                max={30}
-                                min={10}
-                                step={5}
-                                className="w-full"
-                              />
-                              <div className="text-sm text-gray-500">{logoSize}%</div>
-                            </div>
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Logo Opacity (%)</Label>
+                          <Slider
+                            value={[logoOpacity]}
+                            onValueChange={(value) => setLogoOpacity(value[0])}
+                            max={100}
+                            min={20}
+                            step={10}
+                            className="w-full"
+                          />
+                          <div className="text-sm text-gray-500">{logoOpacity}%</div>
+                        </div>
+                      </div>
 
-                            <div className="space-y-2">
-                              <Label className="text-slate-700 font-medium">Logo Opacity (%)</Label>
-                              <Slider
-                                value={[logoOpacity]}
-                                onValueChange={(value) => setLogoOpacity(value[0])}
-                                max={100}
-                                min={20}
-                                step={10}
-                                className="w-full"
-                              />
-                              <div className="text-sm text-gray-500">{logoOpacity}%</div>
-                            </div>
-                          </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Logo Position</Label>
+                          <Select value={logoPosition} onValueChange={setLogoPosition}>
+                            <SelectTrigger className="h-12">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="center">Center</SelectItem>
+                              <SelectItem value="top-left">Top Left</SelectItem>
+                              <SelectItem value="top-right">Top Right</SelectItem>
+                              <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                              <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
 
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label className="text-slate-700 font-medium">Logo Position</Label>
-                              <Select value={logoPosition} onValueChange={setLogoPosition}>
-                                <SelectTrigger className="h-12">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="center">Center</SelectItem>
-                                  <SelectItem value="top-left">Top Left</SelectItem>
-                                  <SelectItem value="top-right">Top Right</SelectItem>
-                                  <SelectItem value="bottom-left">Bottom Left</SelectItem>
-                                  <SelectItem value="bottom-right">Bottom Right</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label className="text-slate-700 font-medium">Logo Shape</Label>
-                              <Select value={logoShape} onValueChange={setLogoShape}>
-                                <SelectTrigger className="h-12">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="square">Square</SelectItem>
-                                  <SelectItem value="circle">Circle</SelectItem>
-                                  <SelectItem value="rounded">Rounded</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </>
-                      )}
-                    </TabsContent>
-                  </Tabs>
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Logo Shape</Label>
+                          <Select value={logoShape} onValueChange={setLogoShape}>
+                            <SelectTrigger className="h-12">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="square">Square</SelectItem>
+                              <SelectItem value="circle">Circle</SelectItem>
+                              <SelectItem value="rounded">Rounded</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

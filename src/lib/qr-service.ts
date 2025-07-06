@@ -10,7 +10,6 @@ export type QROptions = {
   };
   errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H';
   design?: {
-    shape?: string;
     logo?: string;
     customLogo?: string;
     logoSize?: number;
@@ -54,7 +53,7 @@ export const generateQRCode = async ({
     // Generate base QR code
     let qrDataUrl = await QRCode.toDataURL(finalData, qrOptions);
     
-    // Apply design features using canvas manipulation
+    // Apply design features using canvas manipulation (logo only now)
     if (design) {
       qrDataUrl = await applyDesignFeatures(qrDataUrl, design, size, color);
     }
@@ -176,11 +175,6 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
       // Draw the base QR code
       ctx.drawImage(img, 0, 0, size, size);
       
-      // Apply shape style if specified and not square (default)
-      if (design.shape && design.shape !== 'square') {
-        applyShapeStyle(ctx, design.shape, size, color, design.gradient);
-      }
-      
       // Draw logo if selected (either predefined or custom)
       if (design.customLogo) {
         drawCustomLogo(ctx, design, size/2, size/2, size);
@@ -204,90 +198,6 @@ const adjustColorBrightness = (color: string, percent: number): string => {
   return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
     (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
     (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
-};
-
-const applyShapeStyle = (ctx: CanvasRenderingContext2D, shape: string, size: number, color: any, gradient?: boolean) => {
-  const imageData = ctx.getImageData(0, 0, size, size);
-  const data = imageData.data;
-  
-  // Clear the canvas with background
-  if (gradient) {
-    const grad = ctx.createLinearGradient(0, 0, size, size);
-    grad.addColorStop(0, color.light);
-    grad.addColorStop(1, adjustColorBrightness(color.light, -20));
-    ctx.fillStyle = grad;
-  } else {
-    ctx.fillStyle = color.light;
-  }
-  ctx.fillRect(0, 0, size, size);
-  
-  // Approximate QR module detection
-  const moduleSize = Math.floor(size / 25); // Typical QR code has ~25x25 modules
-  
-  // Set fill style for QR modules
-  if (gradient) {
-    const grad = ctx.createLinearGradient(0, 0, size, size);
-    grad.addColorStop(0, color.dark);
-    grad.addColorStop(1, adjustColorBrightness(color.dark, 30));
-    ctx.fillStyle = grad;
-  } else {
-    ctx.fillStyle = color.dark;
-  }
-  
-  // Redraw QR code with new shapes
-  for (let y = 0; y < size; y += moduleSize) {
-    for (let x = 0; x < size; x += moduleSize) {
-      // Sample the center of each potential module
-      const centerX = Math.min(x + moduleSize / 2, size - 1);
-      const centerY = Math.min(y + moduleSize / 2, size - 1);
-      const pixelIndex = (Math.floor(centerY) * size + Math.floor(centerX)) * 4;
-      
-      // If the pixel is dark (part of QR code)
-      if (data[pixelIndex] < 128) {
-        const moduleCenterX = x + moduleSize / 2;
-        const moduleCenterY = y + moduleSize / 2;
-        
-        drawModuleShape(ctx, shape, moduleCenterX, moduleCenterY, moduleSize * 0.8);
-      }
-    }
-  }
-};
-
-const drawModuleShape = (ctx: CanvasRenderingContext2D, shape: string, x: number, y: number, size: number) => {
-  const radius = size / 2;
-  
-  ctx.save();
-  
-  switch (shape) {
-    case 'circle':
-      ctx.beginPath();
-      ctx.arc(x, y, radius * 0.9, 0, 2 * Math.PI);
-      ctx.fill();
-      break;
-      
-    case 'rounded':
-      const cornerRadius = radius * 0.3;
-      ctx.beginPath();
-      ctx.roundRect(x - radius, y - radius, size, size, cornerRadius);
-      ctx.fill();
-      break;
-      
-    case 'diamond':
-      ctx.beginPath();
-      ctx.moveTo(x, y - radius);
-      ctx.lineTo(x + radius, y);
-      ctx.lineTo(x, y + radius);
-      ctx.lineTo(x - radius, y);
-      ctx.closePath();
-      ctx.fill();
-      break;
-      
-    default: // square
-      ctx.fillRect(x - radius, y - radius, size, size);
-      break;
-  }
-  
-  ctx.restore();
 };
 
 const drawCustomLogo = (
@@ -410,8 +320,6 @@ const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y:
   
   ctx.restore();
 };
-
-// ... keep existing code (utility functions to create specific QR code formats)
 
 export const createUrlQR = (url: string): string => {
   if (url && !/^https?:\/\//i.test(url)) {
