@@ -207,6 +207,8 @@ const drawCustomLogo = (
   centerY: number, 
   qrSize: number
 ) => {
+  if (!design.customLogo) return;
+  
   const logoImg = new Image();
   logoImg.onload = () => {
     const logoSize = (design.logoSize || 15) / 100 * qrSize;
@@ -270,6 +272,11 @@ const drawCustomLogo = (
     ctx.restore();
     ctx.restore();
   };
+  
+  logoImg.onerror = () => {
+    console.error('Failed to load custom logo');
+  };
+  
   logoImg.src = design.customLogo;
 };
 

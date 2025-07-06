@@ -9,7 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, createTextQR, createSMSQR, createWhatsAppQR, createWiFiQR, createVCardQR, createEventQR, createImageQR } from '@/lib/qr-service';
-import { Download, Share2, Copy, Check, Loader2, ChevronDown, Link } from 'lucide-react';
+import { Download, Share2, Copy, Check, Loader2, ChevronDown, Link, QrCode } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from 'sonner';
 
@@ -151,8 +151,8 @@ const QRGenerator = () => {
         color: { dark: darkColor, light: lightColor },
         errorCorrectionLevel,
         design: {
-          logo: selectedLogo !== 'custom' ? selectedLogo : undefined,
-          customLogo: customLogo || undefined,
+          logo: selectedLogo !== 'custom' && selectedLogo !== 'none' ? selectedLogo : undefined,
+          customLogo: selectedLogo === 'custom' ? customLogo : undefined,
           logoSize,
           logoOpacity,
           logoPosition,
@@ -930,24 +930,35 @@ const QRGenerator = () => {
           </Tabs>
           
           <div className="mt-6">
-            <Button 
-              className="w-full h-14 text-lg font-medium" 
-              size="lg" 
-              onClick={generateQR}
-              disabled={isGenerating}
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Download className="mr-2 h-5 w-5" />
-                  Download QR Code
-                </>
-              )}
-            </Button>
+            {!qrResult ? (
+              <Button 
+                className="w-full h-14 text-lg font-medium" 
+                size="lg" 
+                onClick={generateQR}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <QrCode className="mr-2 h-5 w-5" />
+                    Generate QR Code
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button 
+                className="w-full h-14 text-lg font-medium" 
+                size="lg" 
+                onClick={downloadQR}
+              >
+                <Download className="mr-2 h-5 w-5" />
+                Download QR Code
+              </Button>
+            )}
           </div>
         </div>
       </div>
