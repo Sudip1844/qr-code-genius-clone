@@ -51,9 +51,25 @@ const Index = ({ qrType }: IndexProps) => {
   };
 
   const handleQRTypeSelect = (type: string) => {
-    // Navigate to the specific route instead of just triggering event
+    // Update URL without page reload for SEO
     const seoConfig = getSEOByQRType(type);
     navigate(seoConfig.route);
+    
+    // Scroll to QR generator section
+    setTimeout(() => {
+      if (qrGeneratorRef.current) {
+        qrGeneratorRef.current.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 100);
+    
+    // Dispatch custom event to QRGenerator component
+    const event = new CustomEvent('qrTypeSelect', {
+      detail: { type }
+    });
+    window.dispatchEvent(event);
   };
 
   const scrollToQRGenerator = () => {

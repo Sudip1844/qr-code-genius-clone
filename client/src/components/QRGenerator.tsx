@@ -190,8 +190,45 @@ const QRGenerator = () => {
   };
 
   const generateQR = async () => {
-    if (!qrData && contentType === 'url') {
+    // Validation based on content type
+    if (contentType === 'url' && !qrData) {
       toast.error('Please enter a URL');
+      return;
+    }
+    if (contentType === 'text' && !qrData) {
+      toast.error('Please enter text content');
+      return;
+    }
+    if (contentType === 'email' && !qrData) {
+      toast.error('Please enter an email address');
+      return;
+    }
+    if (contentType === 'phone' && !qrData) {
+      toast.error('Please enter a phone number');
+      return;
+    }
+    if (contentType === 'sms' && !qrData) {
+      toast.error('Please enter a phone number');
+      return;
+    }
+    if (contentType === 'whatsapp' && !qrData) {
+      toast.error('Please enter a WhatsApp number');
+      return;
+    }
+    if (contentType === 'wifi' && !wifiSSID) {
+      toast.error('Please enter WiFi network name (SSID)');
+      return;
+    }
+    if (contentType === 'vcard' && !vcardName) {
+      toast.error('Please enter a name for the contact');
+      return;
+    }
+    if (contentType === 'event' && !eventTitle) {
+      toast.error('Please enter an event title');
+      return;
+    }
+    if (contentType === 'image' && !imageData) {
+      toast.error('Please provide an image URL or upload an image');
       return;
     }
 
@@ -428,6 +465,281 @@ const QRGenerator = () => {
                           onChange={(e) => setQrData(e.target.value)}
                           className="min-h-[100px]"
                         />
+                      </div>
+                    )}
+
+                    {contentType === 'email' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="email" className="text-slate-700 font-medium">Email Address</Label>
+                          <Input
+                            id="email"
+                            placeholder="example@email.com"
+                            value={qrData}
+                            onChange={(e) => setQrData(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="emailSubject" className="text-slate-700 font-medium">Subject (Optional)</Label>
+                          <Input
+                            id="emailSubject"
+                            placeholder="Email subject"
+                            value={emailSubject}
+                            onChange={(e) => setEmailSubject(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="emailBody" className="text-slate-700 font-medium">Message (Optional)</Label>
+                          <Textarea
+                            id="emailBody"
+                            placeholder="Email message"
+                            value={emailBody}
+                            onChange={(e) => setEmailBody(e.target.value)}
+                            className="min-h-[80px]"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {contentType === 'phone' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-slate-700 font-medium">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          placeholder="+880123456789"
+                          value={qrData}
+                          onChange={(e) => setQrData(e.target.value)}
+                          className="h-12"
+                        />
+                      </div>
+                    )}
+
+                    {contentType === 'sms' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="smsPhone" className="text-slate-700 font-medium">Phone Number</Label>
+                          <Input
+                            id="smsPhone"
+                            placeholder="+880123456789"
+                            value={qrData}
+                            onChange={(e) => setQrData(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="smsMessage" className="text-slate-700 font-medium">SMS Message (Optional)</Label>
+                          <Textarea
+                            id="smsMessage"
+                            placeholder="Your SMS message"
+                            value={smsMessage}
+                            onChange={(e) => setSmsMessage(e.target.value)}
+                            className="min-h-[80px]"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {contentType === 'whatsapp' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="whatsappPhone" className="text-slate-700 font-medium">WhatsApp Number</Label>
+                          <Input
+                            id="whatsappPhone"
+                            placeholder="+880123456789"
+                            value={qrData}
+                            onChange={(e) => setQrData(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="whatsappMessage" className="text-slate-700 font-medium">Pre-filled Message (Optional)</Label>
+                          <Textarea
+                            id="whatsappMessage"
+                            placeholder="Hello! I'm interested in..."
+                            value={whatsappMessage}
+                            onChange={(e) => setWhatsappMessage(e.target.value)}
+                            className="min-h-[80px]"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {contentType === 'wifi' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="wifiSSID" className="text-slate-700 font-medium">Network Name (SSID)</Label>
+                          <Input
+                            id="wifiSSID"
+                            placeholder="MyWiFiNetwork"
+                            value={wifiSSID}
+                            onChange={(e) => setWifiSSID(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="wifiPassword" className="text-slate-700 font-medium">Password</Label>
+                          <Input
+                            id="wifiPassword"
+                            type="password"
+                            placeholder="WiFi password"
+                            value={wifiPassword}
+                            onChange={(e) => setWifiPassword(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Security Type</Label>
+                          <Select value={wifiSecurity} onValueChange={setWifiSecurity}>
+                            <SelectTrigger className="h-12">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="WPA">WPA/WPA2</SelectItem>
+                              <SelectItem value="WEP">WEP</SelectItem>
+                              <SelectItem value="nopass">No Password</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    )}
+
+                    {contentType === 'vcard' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="vcardName" className="text-slate-700 font-medium">Full Name</Label>
+                          <Input
+                            id="vcardName"
+                            placeholder="John Doe"
+                            value={vcardName}
+                            onChange={(e) => setVcardName(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="vcardPhone" className="text-slate-700 font-medium">Phone Number (Optional)</Label>
+                          <Input
+                            id="vcardPhone"
+                            placeholder="+880123456789"
+                            value={vcardPhone}
+                            onChange={(e) => setVcardPhone(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="vcardEmail" className="text-slate-700 font-medium">Email (Optional)</Label>
+                          <Input
+                            id="vcardEmail"
+                            placeholder="john@example.com"
+                            value={vcardEmail}
+                            onChange={(e) => setVcardEmail(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="vcardOrg" className="text-slate-700 font-medium">Organization (Optional)</Label>
+                          <Input
+                            id="vcardOrg"
+                            placeholder="Company Name"
+                            value={vcardOrg}
+                            onChange={(e) => setVcardOrg(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {contentType === 'event' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="eventTitle" className="text-slate-700 font-medium">Event Title</Label>
+                          <Input
+                            id="eventTitle"
+                            placeholder="Meeting Title"
+                            value={eventTitle}
+                            onChange={(e) => setEventTitle(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="eventLocation" className="text-slate-700 font-medium">Location (Optional)</Label>
+                          <Input
+                            id="eventLocation"
+                            placeholder="Conference Room A"
+                            value={eventLocation}
+                            onChange={(e) => setEventLocation(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="eventStart" className="text-slate-700 font-medium">Start Date & Time</Label>
+                            <Input
+                              id="eventStart"
+                              type="datetime-local"
+                              value={eventStart}
+                              onChange={(e) => setEventStart(e.target.value)}
+                              className="h-12"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="eventEnd" className="text-slate-700 font-medium">End Date & Time</Label>
+                            <Input
+                              id="eventEnd"
+                              type="datetime-local"
+                              value={eventEnd}
+                              onChange={(e) => setEventEnd(e.target.value)}
+                              className="h-12"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {contentType === 'image' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Image URL</Label>
+                          <Input
+                            placeholder="https://example.com/image.jpg or paste Drive/hosting link"
+                            value={imageData || ''}
+                            onChange={(e) => setImageData(e.target.value)}
+                            className="h-12"
+                          />
+                          <p className="text-sm text-gray-500">
+                            Upload your image to Google Drive, Imgur, or any image hosting service and paste the direct link here.
+                          </p>
+                        </div>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                  setImageData(e.target?.result as string);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="w-full"
+                          />
+                          <p className="text-sm text-gray-500 mt-2">
+                            Or select an image file from your device (will be converted to data URL)
+                          </p>
+                        </div>
+                        {imageData && (
+                          <div className="mt-4">
+                            <img 
+                              src={imageData} 
+                              alt="Preview" 
+                              className="max-w-full h-32 object-contain border rounded"
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
