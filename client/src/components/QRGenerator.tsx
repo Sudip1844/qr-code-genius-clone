@@ -12,6 +12,7 @@ import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, c
 import { Download, Share2, Copy, Check, Loader2, ChevronDown, Link, QrCode } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from 'sonner';
+import SiteLinks from './SiteLinks';
 
 const QRGenerator = () => {
   // Content type and data
@@ -121,6 +122,38 @@ const QRGenerator = () => {
   useEffect(() => {
     setQrResult(null);
   }, [selectedLogo, logoSize, logoOpacity, gradient, size, margin, darkColor, lightColor, errorCorrectionLevel]);
+
+  // Listen for QR type selection events from quick links
+  useEffect(() => {
+    const handleQRTypeSelect = (event: CustomEvent) => {
+      const { type } = event.detail;
+      setContentType(type);
+      // Reset QR result when type changes
+      setQrResult(null);
+      // Reset form data
+      setQrData('');
+      setEmailSubject('');
+      setEmailBody('');
+      setSmsMessage('');
+      setWhatsappMessage('');
+      setWifiSSID('');
+      setWifiPassword('');
+      setVcardName('');
+      setVcardPhone('');
+      setVcardEmail('');
+      setVcardOrg('');
+      setEventTitle('');
+      setEventLocation('');
+      setEventStart('');
+      setEventEnd('');
+      setImageData(null);
+    };
+
+    window.addEventListener('qrTypeSelect', handleQRTypeSelect as EventListener);
+    return () => {
+      window.removeEventListener('qrTypeSelect', handleQRTypeSelect as EventListener);
+    };
+  }, []);
   
   // Reset copied state after 2 seconds
   useEffect(() => {
@@ -308,26 +341,28 @@ const QRGenerator = () => {
             {/* Left Side - QR Preview */}
             <div className="w-full lg:w-2/5">
               {qrResult ? (
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Your QR Code</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Scan with any QR code reader</p>
-                  </div>
-                  <div className="flex justify-center">
+                <div className="bg-gray-50 rounded-lg p-4 border">
+                  <div className="flex justify-center mb-3">
                     <div className="relative">
                       <img 
                         src={qrResult} 
                         alt="Generated QR Code" 
-                        className="max-w-full h-auto border rounded-lg shadow-sm"
+                        className="w-48 h-48 border rounded-lg shadow-sm"
                       />
                     </div>
                   </div>
-                  <div className="flex justify-center gap-2">
+                  <div className="text-center space-y-2 mb-3">
+                    <h3 className="text-sm font-semibold">Your QR Code</h3>
+                    <p className="text-xs text-muted-foreground">Scan with any QR code reader</p>
+                    <p className="text-xs text-blue-600 break-all">{getSelectedContentType()?.label}: {formData[contentType as keyof typeof formData] || 'Ready to generate'}</p>
+                  </div>
+                  <div className="flex justify-center gap-1">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="outline" size="icon" onClick={downloadQR}>
-                            <Download className="h-4 w-4" />
+                          <Button variant="outline" size="sm" onClick={downloadQR}>
+                            <Download className="h-3 w-3 mr-1" />
+                            Download
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -339,8 +374,9 @@ const QRGenerator = () => {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="outline" size="icon" onClick={copyQR}>
-                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          <Button variant="outline" size="sm" onClick={copyQR}>
+                            {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                            Copy
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -353,8 +389,9 @@ const QRGenerator = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="outline" size="icon" onClick={shareQR}>
-                              <Share2 className="h-4 w-4" />
+                            <Button variant="outline" size="sm" onClick={shareQR}>
+                              <Share2 className="h-3 w-3 mr-1" />
+                              Share
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -366,21 +403,27 @@ const QRGenerator = () => {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Preview QR Code</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Your QR code will appear here</p>
-                  </div>
-                  <div className="flex justify-center items-center h-[300px]">
+                <div className="bg-gray-50 rounded-lg p-4 border">
+                  <div className="flex justify-center items-center h-48 mb-3">
                     <div className="text-center text-muted-foreground">
-                      <div className="border-2 border-dashed rounded-lg p-12 mb-4">
-                        QR Code Preview
+                      <div className="border-2 border-dashed rounded-lg p-8 mb-2">
+                        <QrCode className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                        <p className="text-sm">QR Code Preview</p>
                       </div>
-                      <p>Fill in the details and click Generate</p>
                     </div>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-sm font-semibold">Preview QR Code</h3>
+                    <p className="text-xs text-muted-foreground">Fill in the details and click Generate</p>
+                    <p className="text-xs text-blue-600">{getSelectedContentType()?.label} - Ready to create</p>
                   </div>
                 </div>
               )}
+              
+              {/* Site Links - SEO Quick Links */}
+              <div className="mt-4">
+                <SiteLinks currentType={contentType} />
+              </div>
             </div>
             
             {/* Right Side - Options */}

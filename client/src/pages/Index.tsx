@@ -2,11 +2,46 @@ import QRGenerator from "@/components/QRGenerator";
 import { Button } from "@/components/ui/button";
 import { QrCode, ArrowUp, MessageCircle, UserSquare, Briefcase, Megaphone, MousePointer, FileEdit, Send, Smartphone, List, Image, CheckCircle, Menu, X } from "lucide-react";
 import { Link, Mail, Text, Phone, MessageSquare, Wifi, UserSquare as VCard, CalendarDays } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { seoConfigs, getSEOByRoute, getSEOByQRType, updatePageSEO, getDefaultSEO, generateSiteLinks } from "@/lib/seo-config";
+import StructuredData from "@/components/StructuredData";
 
-const Index = () => {
+interface IndexProps {
+  qrType?: string;
+}
+
+const Index = ({ qrType }: IndexProps) => {
   const qrGeneratorRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Update SEO based on route or QR type
+  useEffect(() => {
+    let seoConfig;
+    if (qrType) {
+      seoConfig = getSEOByQRType(qrType);
+    } else {
+      seoConfig = getSEOByRoute(location.pathname);
+    }
+    
+    updatePageSEO(seoConfig);
+    
+    // If we have a specific QR type, trigger the selection
+    if (qrType) {
+      const event = new CustomEvent('qrTypeSelect', { detail: { type: qrType } });
+      window.dispatchEvent(event);
+      
+      // Auto scroll to QR generator
+      setTimeout(() => {
+        qrGeneratorRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+  }, [qrType, location.pathname]);
 
   const scrollToSection = (sectionRef: React.RefObject<HTMLElement>) => {
     sectionRef.current?.scrollIntoView({ 
@@ -16,15 +51,9 @@ const Index = () => {
   };
 
   const handleQRTypeSelect = (type: string) => {
-    // Scroll to QR generator section
-    qrGeneratorRef.current?.scrollIntoView({ 
-      behavior: 'smooth',
-      block: 'start'
-    });
-    
-    // Trigger QR type selection in the generator
-    const event = new CustomEvent('qrTypeSelect', { detail: { type } });
-    window.dispatchEvent(event);
+    // Navigate to the specific route instead of just triggering event
+    const seoConfig = getSEOByQRType(type);
+    navigate(seoConfig.route);
   };
 
   const scrollToQRGenerator = () => {
@@ -52,6 +81,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Structured Data for SEO */}
+      <StructuredData qrType={qrType} />
       <header className="py-4 bg-white sticky top-0 z-10 shadow-sm">
         <div className="w-full px-4">
           <div className="flex items-center justify-between">
