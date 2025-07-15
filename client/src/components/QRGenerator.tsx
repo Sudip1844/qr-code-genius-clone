@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +12,6 @@ import { generateQRCode, QROptions, createUrlQR, createEmailQR, createPhoneQR, c
 import { Download, Share2, Copy, Check, Loader2, ChevronDown, Link, QrCode } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from 'sonner';
-import SiteLinks from './SiteLinks';
 
 const QRGenerator = () => {
   // Content type and data
@@ -158,82 +157,12 @@ const QRGenerator = () => {
   // Reset copied state after 2 seconds
   useEffect(() => {
     if (copied) {
-      const timer = setTimeout(() => {
-        setCopied(false);
-      }, 2000);
+      const timer = setTimeout(() => setCopied(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [copied]);
 
-  const generateQR = async () => {
-    try {
-      setIsGenerating(true);
-      
-      // Validate input based on content type
-      if (!validateInput()) {
-        toast.error('Please fill in all required fields');
-        setIsGenerating(false);
-        return;
-      }
-      
-      // Format data based on content type
-      const finalData = formatData();
-      
-      const options: QROptions = {
-        data: finalData,
-        size,
-        margin,
-        color: { dark: darkColor, light: lightColor },
-        errorCorrectionLevel,
-        design: {
-          logo: selectedLogo !== 'none' ? selectedLogo : undefined,
-          logoSize,
-          logoOpacity,
-          gradient
-        }
-      };
-      
-      const result = await generateQRCode(options);
-      setQrResult(result);
-      
-      // Switch to the QR tab after generation
-      setActiveTab('content');
-      
-      toast.success('QR code generated successfully!');
-    } catch (error) {
-      console.error('Error generating QR code:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to generate QR code');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-  
-  const validateInput = (): boolean => {
-    switch (contentType) {
-      case 'url':
-        return qrData.trim() !== '';
-      case 'email':
-        return qrData.trim() !== '' && qrData.includes('@');
-      case 'phone':
-        return qrData.trim() !== '';
-      case 'sms':
-        return qrData.trim() !== '';
-      case 'whatsapp':
-        return qrData.trim() !== '';
-      case 'wifi':
-        return wifiSSID.trim() !== '';
-      case 'vcard':
-        return vcardName.trim() !== '';
-      case 'event':
-        return eventTitle.trim() !== '';
-      case 'image':
-        return !!imageData;
-      default:
-        return qrData.trim() !== '';
-    }
-  };
-  
-  const formatData = (): string => {
+  const generateData = () => {
     switch (contentType) {
       case 'url':
         return createUrlQR(qrData);
@@ -259,33 +188,56 @@ const QRGenerator = () => {
         return qrData;
     }
   };
-  
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setImageData(event.target?.result as string);
+
+  const generateQR = async () => {
+    if (!qrData && contentType === 'url') {
+      toast.error('Please enter a URL');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const data = generateData();
+      const options: QROptions = {
+        data,
+        size,
+        margin,
+        color: {
+          dark: darkColor,
+          light: lightColor
+        },
+        errorCorrectionLevel,
+        design: {
+          logo: selectedLogo,
+          logoSize,
+          logoOpacity,
+          gradient
+        }
       };
-      reader.readAsDataURL(file);
+
+      const qrDataUrl = await generateQRCode(options);
+      setQrResult(qrDataUrl);
+      toast.success('QR code generated successfully!');
+    } catch (error) {
+      console.error('Error generating QR:', error);
+      toast.error('Failed to generate QR code. Please try again.');
+    } finally {
+      setIsGenerating(false);
     }
   };
-  
 
-  
   const downloadQR = () => {
     if (!qrResult) return;
     
     const link = document.createElement('a');
-    link.download = `qr-code-${new Date().getTime()}.png`;
+    link.download = 'qr-code.png';
     link.href = qrResult;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    toast.success('QR code downloaded successfully!');
+    toast.success('QR code downloaded!');
   };
-  
+
   const copyQR = async () => {
     if (!qrResult) return;
     
@@ -297,11 +249,11 @@ const QRGenerator = () => {
       setCopied(true);
       toast.success('QR code copied to clipboard!');
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error('Error copying:', err);
       toast.error('Failed to copy QR code');
     }
   };
-  
+
   const shareQR = async () => {
     if (!qrResult) return;
     
@@ -329,40 +281,34 @@ const QRGenerator = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 space-y-6">
-      <div className="text-center">
+    <div className="w-full max-w-4xl mx-auto p-4">
+      <div className="text-center mb-6">
         <h1 className="text-3xl font-bold mb-2">QR Code Generator</h1>
         <p className="text-muted-foreground">Create customized QR codes for various content types</p>
       </div>
       
       <Card className="w-full">
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left Side - QR Preview */}
-            <div className="w-full lg:w-2/5">
+          <div className="space-y-6">
+            {/* QR Preview Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">QR Code Preview</h3>
               {qrResult ? (
-                <div className="bg-gray-50 rounded-lg p-4 border">
-                  <div className="flex justify-center mb-3">
-                    <div className="relative">
-                      <img 
-                        src={qrResult} 
-                        alt="Generated QR Code" 
-                        className="w-48 h-48 border rounded-lg shadow-sm"
-                      />
-                    </div>
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="flex justify-center">
+                    <img 
+                      src={qrResult} 
+                      alt="Generated QR Code" 
+                      className="w-64 h-64 border rounded-lg shadow-sm"
+                    />
                   </div>
-                  <div className="text-center space-y-2 mb-3">
-                    <h3 className="text-sm font-semibold">Your QR Code</h3>
-                    <p className="text-xs text-muted-foreground">Scan with any QR code reader</p>
-                    <p className="text-xs text-blue-600 break-all">{getSelectedContentType()?.label}: {formData[contentType as keyof typeof formData] || 'Ready to generate'}</p>
-                  </div>
-                  <div className="flex justify-center gap-1">
+                  <p className="text-sm text-muted-foreground text-center">Your QR code will appear here</p>
+                  <div className="flex justify-center gap-2">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" onClick={downloadQR}>
-                            <Download className="h-3 w-3 mr-1" />
-                            Download
+                          <Button variant="outline" size="icon" onClick={downloadQR}>
+                            <Download className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -374,9 +320,8 @@ const QRGenerator = () => {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm" onClick={copyQR}>
-                            {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
-                            Copy
+                          <Button variant="outline" size="icon" onClick={copyQR}>
+                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -389,9 +334,8 @@ const QRGenerator = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={shareQR}>
-                              <Share2 className="h-3 w-3 mr-1" />
-                              Share
+                            <Button variant="outline" size="icon" onClick={shareQR}>
+                              <Share2 className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -403,31 +347,20 @@ const QRGenerator = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-gray-50 rounded-lg p-4 border">
-                  <div className="flex justify-center items-center h-48 mb-3">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="flex justify-center items-center h-64 w-64 border-2 border-dashed rounded-lg">
                     <div className="text-center text-muted-foreground">
-                      <div className="border-2 border-dashed rounded-lg p-8 mb-2">
-                        <QrCode className="h-12 w-12 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm">QR Code Preview</p>
-                      </div>
+                      <QrCode className="h-16 w-16 mx-auto mb-2" />
+                      <p>Your QR code will appear here</p>
                     </div>
-                  </div>
-                  <div className="text-center space-y-2">
-                    <h3 className="text-sm font-semibold">Preview QR Code</h3>
-                    <p className="text-xs text-muted-foreground">Fill in the details and click Generate</p>
-                    <p className="text-xs text-blue-600">{getSelectedContentType()?.label} - Ready to create</p>
                   </div>
                 </div>
               )}
-              
-              {/* Site Links - SEO Quick Links */}
-              <div className="mt-4">
-                <SiteLinks currentType={contentType} />
-              </div>
             </div>
             
-            {/* Right Side - Options */}
-            <div className="w-full lg:w-3/5">
+            {/* Configuration Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Configuration</h3>
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-3 mb-6">
                   <TabsTrigger value="content" className="text-center">
@@ -445,7 +378,6 @@ const QRGenerator = () => {
                 </TabsList>
                 
                 <TabsContent value="content" className="space-y-6">
-                  <div className="space-y-6">
                   {/* Content Type Selector */}
                   <div className="space-y-2">
                     <Select value={contentType} onValueChange={setContentType}>
@@ -494,448 +426,188 @@ const QRGenerator = () => {
                           placeholder="Enter your text here"
                           value={qrData}
                           onChange={(e) => setQrData(e.target.value)}
-                          rows={4}
+                          className="min-h-[100px]"
                         />
                       </div>
                     )}
-                    
-                    {contentType === 'email' && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="email" className="text-slate-700 font-medium">Email Address</Label>
-                          <Input
-                            id="email"
-                            placeholder="example@email.com"
-                            type="email"
-                            value={qrData}
-                            onChange={(e) => setQrData(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="subject" className="text-slate-700 font-medium">Subject (Optional)</Label>
-                          <Input
-                            id="subject"
-                            placeholder="Email subject"
-                            value={emailSubject}
-                            onChange={(e) => setEmailSubject(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="body" className="text-slate-700 font-medium">Body (Optional)</Label>
-                          <Textarea
-                            id="body"
-                            placeholder="Email body"
-                            value={emailBody}
-                            onChange={(e) => setEmailBody(e.target.value)}
-                            rows={3}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {contentType === 'phone' && (
-                      <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-slate-700 font-medium">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          placeholder="+1234567890"
-                          value={qrData}
-                          onChange={(e) => setQrData(e.target.value)}
-                          className="h-12"
-                        />
-                      </div>
-                    )}
-                    
-                    {contentType === 'sms' && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="smsPhone" className="text-slate-700 font-medium">Phone Number</Label>
-                          <Input
-                            id="smsPhone"
-                            placeholder="+1234567890"
-                            value={qrData}
-                            onChange={(e) => setQrData(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="smsMessage" className="text-slate-700 font-medium">Message (Optional)</Label>
-                          <Textarea
-                            id="smsMessage"
-                            placeholder="Your SMS message"
-                            value={smsMessage}
-                            onChange={(e) => setSmsMessage(e.target.value)}
-                            rows={3}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {contentType === 'whatsapp' && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="whatsappPhone" className="text-slate-700 font-medium">Phone Number (without +)</Label>
-                          <Input
-                            id="whatsappPhone"
-                            placeholder="1234567890"
-                            value={qrData}
-                            onChange={(e) => setQrData(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="whatsappMessage" className="text-slate-700 font-medium">Message (Optional)</Label>
-                          <Textarea
-                            id="whatsappMessage"
-                            placeholder="Your WhatsApp message"
-                            value={whatsappMessage}
-                            onChange={(e) => setWhatsappMessage(e.target.value)}
-                            rows={3}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {contentType === 'wifi' && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="ssid" className="text-slate-700 font-medium">Network Name (SSID)</Label>
-                          <Input
-                            id="ssid"
-                            placeholder="WiFi Network Name"
-                            value={wifiSSID}
-                            onChange={(e) => setWifiSSID(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="password" className="text-slate-700 font-medium">Password</Label>
-                          <Input
-                            id="password"
-                            type="password"
-                            placeholder="WiFi Password"
-                            value={wifiPassword}
-                            onChange={(e) => setWifiPassword(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="security" className="text-slate-700 font-medium">Security Type</Label>
-                          <Select value={wifiSecurity} onValueChange={setWifiSecurity}>
-                            <SelectTrigger id="security" className="h-12">
-                              <SelectValue placeholder="Select security type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="WPA">WPA/WPA2/WPA3</SelectItem>
-                              <SelectItem value="WEP">WEP</SelectItem>
-                              <SelectItem value="nopass">No Password</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {contentType === 'vcard' && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="name" className="text-slate-700 font-medium">Full Name</Label>
-                          <Input
-                            id="name"
-                            placeholder="John Doe"
-                            value={vcardName}
-                            onChange={(e) => setVcardName(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="vcardPhone" className="text-slate-700 font-medium">Phone Number</Label>
-                          <Input
-                            id="vcardPhone"
-                            placeholder="+1234567890"
-                            value={vcardPhone}
-                            onChange={(e) => setVcardPhone(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="vcardEmail" className="text-slate-700 font-medium">Email</Label>
-                          <Input
-                            id="vcardEmail"
-                            placeholder="john@example.com"
-                            value={vcardEmail}
-                            onChange={(e) => setVcardEmail(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="organization" className="text-slate-700 font-medium">Organization</Label>
-                          <Input
-                            id="organization"
-                            placeholder="Company Name"
-                            value={vcardOrg}
-                            onChange={(e) => setVcardOrg(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {contentType === 'event' && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="title" className="text-slate-700 font-medium">Event Title</Label>
-                          <Input
-                            id="title"
-                            placeholder="Meeting Title"
-                            value={eventTitle}
-                            onChange={(e) => setEventTitle(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="location" className="text-slate-700 font-medium">Location (Optional)</Label>
-                          <Input
-                            id="location"
-                            placeholder="Event Location"
-                            value={eventLocation}
-                            onChange={(e) => setEventLocation(e.target.value)}
-                            className="h-12"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="start" className="text-slate-700 font-medium">Start Date & Time</Label>
-                            <Input
-                              id="start"
-                              type="datetime-local"
-                              value={eventStart}
-                              onChange={(e) => setEventStart(e.target.value)}
-                              className="h-12"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="end" className="text-slate-700 font-medium">End Date & Time</Label>
-                            <Input
-                              id="end"
-                              type="datetime-local"
-                              value={eventEnd}
-                              onChange={(e) => setEventEnd(e.target.value)}
-                              className="h-12"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {contentType === 'image' && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="image" className="text-slate-700 font-medium">Upload Image</Label>
-                          <Input
-                            id="image"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 h-12"
-                          />
-                        </div>
-                        {imageData && (
-                          <div className="mt-2">
-                            <p className="text-sm text-muted-foreground mb-2">Preview:</p>
-                            <img 
-                              src={imageData} 
-                              alt="Image preview" 
-                              className="max-h-32 max-w-full object-contain rounded border"
-                            />
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Note: Images will be compressed to fit in QR code
-                            </p>
-                          </div>
+                  </div>
+                  
+                  <div className="mt-6">
+                    {!qrResult ? (
+                      <Button 
+                        className="w-full h-14 text-lg font-medium" 
+                        size="lg" 
+                        onClick={generateQR}
+                        disabled={isGenerating}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <QrCode className="mr-2 h-5 w-5" />
+                            Generate QR Code
+                          </>
                         )}
-                      </div>
+                      </Button>
+                    ) : (
+                      <Button 
+                        className="w-full h-14 text-lg font-medium" 
+                        size="lg" 
+                        onClick={downloadQR}
+                      >
+                        <Download className="mr-2 h-5 w-5" />
+                        Download QR Code
+                      </Button>
                     )}
-                    </div>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="design" className="space-y-6">
                   <div className="space-y-6">
-                  {/* Basic Options */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-slate-700 font-medium">Size</Label>
-                      <Slider
-                        value={[size]}
-                        onValueChange={(value) => setSize(value[0])}
-                        max={600}
-                        min={200}
-                        step={50}
-                        className="w-full"
-                      />
-                      <div className="text-sm text-gray-500">{size}px</div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-slate-700 font-medium">Size (px)</Label>
+                        <Slider
+                          value={[size]}
+                          onValueChange={(value) => setSize(value[0])}
+                          max={500}
+                          min={200}
+                          step={50}
+                          className="w-full"
+                        />
+                        <div className="text-sm text-gray-500">{size}px</div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-slate-700 font-medium">Margin</Label>
+                        <Slider
+                          value={[margin]}
+                          onValueChange={(value) => setMargin(value[0])}
+                          max={10}
+                          min={0}
+                          step={1}
+                          className="w-full"
+                        />
+                        <div className="text-sm text-gray-500">{margin}</div>
+                      </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label className="text-slate-700 font-medium">Margin</Label>
-                      <Slider
-                        value={[margin]}
-                        onValueChange={(value) => setMargin(value[0])}
-                        max={8}
-                        min={0}
-                        step={1}
-                        className="w-full"
-                      />
-                      <div className="text-sm text-gray-500">{margin}</div>
-                    </div>
-                  </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-slate-700 font-medium">Foreground Color</Label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="color"
+                            value={darkColor}
+                            onChange={(e) => setDarkColor(e.target.value)}
+                            className="w-12 h-8 rounded border"
+                          />
+                          <Input
+                            value={darkColor}
+                            onChange={(e) => setDarkColor(e.target.value)}
+                            placeholder="#000000"
+                          />
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-slate-700 font-medium">Foreground Color</Label>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="color"
-                          value={darkColor}
-                          onChange={(e) => setDarkColor(e.target.value)}
-                          className="w-12 h-8 rounded border"
-                        />
-                        <Input
-                          value={darkColor}
-                          onChange={(e) => setDarkColor(e.target.value)}
-                          placeholder="#000000"
-                        />
+                      <div className="space-y-2">
+                        <Label className="text-slate-700 font-medium">Background Color</Label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="color"
+                            value={lightColor}
+                            onChange={(e) => setLightColor(e.target.value)}
+                            className="w-12 h-8 rounded border"
+                          />
+                          <Input
+                            value={lightColor}
+                            onChange={(e) => setLightColor(e.target.value)}
+                            placeholder="#ffffff"
+                          />
+                        </div>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-slate-700 font-medium">Background Color</Label>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="color"
-                          value={lightColor}
-                          onChange={(e) => setLightColor(e.target.value)}
-                          className="w-12 h-8 rounded border"
-                        />
-                        <Input
-                          value={lightColor}
-                          onChange={(e) => setLightColor(e.target.value)}
-                          placeholder="#ffffff"
-                        />
-                      </div>
+                      <Label className="text-slate-700 font-medium">Error Correction Level</Label>
+                      <Select value={errorCorrectionLevel} onValueChange={(value: 'L' | 'M' | 'Q' | 'H') => setErrorCorrectionLevel(value)}>
+                        <SelectTrigger className="h-12">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="L">Low (7%)</SelectItem>
+                          <SelectItem value="M">Medium (15%)</SelectItem>
+                          <SelectItem value="Q">Quartile (25%)</SelectItem>
+                          <SelectItem value="H">High (30%)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">Error Correction Level</Label>
-                    <Select value={errorCorrectionLevel} onValueChange={(value: 'L' | 'M' | 'Q' | 'H') => setErrorCorrectionLevel(value)}>
-                      <SelectTrigger className="h-12">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="L">Low (7%)</SelectItem>
-                        <SelectItem value="M">Medium (15%)</SelectItem>
-                        <SelectItem value="Q">Quartile (25%)</SelectItem>
-                        <SelectItem value="H">High (30%)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="gradient"
-                      checked={gradient}
-                      onCheckedChange={setGradient}
-                    />
-                    <Label htmlFor="gradient" className="text-slate-700 font-medium">Enable gradient effects</Label>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="gradient"
+                        checked={gradient}
+                        onCheckedChange={setGradient}
+                      />
+                      <Label htmlFor="gradient" className="text-slate-700 font-medium">Enable gradient effects</Label>
                     </div>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="logo" className="space-y-6">
                   <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">Logo Type</Label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {logoOptions.map((option) => (
-                        <Button
-                          key={option.value}
-                          variant={selectedLogo === option.value ? "default" : "outline"}
-                          className="h-16 flex flex-col items-center justify-center"
-                          onClick={() => setSelectedLogo(option.value)}
-                        >
-                          <span className="text-lg mb-1">{option.preview}</span>
-                          <span className="text-xs">{option.label}</span>
-                        </Button>
-                      ))}
+                    <div className="space-y-2">
+                      <Label className="text-slate-700 font-medium">Logo Type</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {logoOptions.map((option) => (
+                          <Button
+                            key={option.value}
+                            variant={selectedLogo === option.value ? "default" : "outline"}
+                            className="h-16 flex flex-col items-center justify-center"
+                            onClick={() => setSelectedLogo(option.value)}
+                          >
+                            <span className="text-lg mb-1">{option.preview}</span>
+                            <span className="text-xs">{option.label}</span>
+                          </Button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  {selectedLogo !== 'none' && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-slate-700 font-medium">Logo Size (%)</Label>
-                        <Slider
-                          value={[logoSize]}
-                          onValueChange={(value) => setLogoSize(value[0])}
-                          max={30}
-                          min={10}
-                          step={5}
-                          className="w-full"
-                        />
-                        <div className="text-sm text-gray-500">{logoSize}%</div>
-                      </div>
+                    {selectedLogo !== 'none' && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Logo Size (%)</Label>
+                          <Slider
+                            value={[logoSize]}
+                            onValueChange={(value) => setLogoSize(value[0])}
+                            max={30}
+                            min={10}
+                            step={5}
+                            className="w-full"
+                          />
+                          <div className="text-sm text-gray-500">{logoSize}%</div>
+                        </div>
 
-                      <div className="space-y-2">
-                        <Label className="text-slate-700 font-medium">Logo Opacity (%)</Label>
-                        <Slider
-                          value={[logoOpacity]}
-                          onValueChange={(value) => setLogoOpacity(value[0])}
-                          max={100}
-                          min={20}
-                          step={10}
-                          className="w-full"
-                        />
-                        <div className="text-sm text-gray-500">{logoOpacity}%</div>
-                      </div>
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Logo Opacity (%)</Label>
+                          <Slider
+                            value={[logoOpacity]}
+                            onValueChange={(value) => setLogoOpacity(value[0])}
+                            max={100}
+                            min={20}
+                            step={10}
+                            className="w-full"
+                          />
+                          <div className="text-sm text-gray-500">{logoOpacity}%</div>
+                        </div>
                       </div>
                     )}
                   </div>
                 </TabsContent>
               </Tabs>
-              
-              <div className="mt-6">
-                {!qrResult ? (
-                  <Button 
-                    className="w-full h-14 text-lg font-medium" 
-                    size="lg" 
-                    onClick={generateQR}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <QrCode className="mr-2 h-5 w-5" />
-                        Generate QR Code
-                      </>
-                    )}
-                  </Button>
-                ) : (
-                  <Button 
-                    className="w-full h-14 text-lg font-medium" 
-                    size="lg" 
-                    onClick={downloadQR}
-                  >
-                    <Download className="mr-2 h-5 w-5" />
-                    Download QR Code
-                  </Button>
-                )}
-              </div>
             </div>
           </div>
         </CardContent>

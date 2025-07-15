@@ -133,6 +133,79 @@ const Index = ({ qrType }: IndexProps) => {
           <QRGenerator />
         </div>
         
+        {/* Quick Links Section - অন্যান্য QR সার্ভিস */}
+        <div className="mt-16 py-12 px-4 bg-white rounded-lg border shadow-sm mx-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-slate-800 text-center mb-8">অন্যান্য QR সার্ভিস</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Button
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center"
+                onClick={() => handleQRTypeSelect('email')}
+              >
+                <span className="text-lg mb-1">✉️</span>
+                <span className="text-sm">Email QR</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center"
+                onClick={() => handleQRTypeSelect('text')}
+              >
+                <span className="text-lg mb-1">📝</span>
+                <span className="text-sm">Text QR</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center"
+                onClick={() => handleQRTypeSelect('phone')}
+              >
+                <span className="text-lg mb-1">📞</span>
+                <span className="text-sm">Phone QR</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center"
+                onClick={() => handleQRTypeSelect('sms')}
+              >
+                <span className="text-lg mb-1">💬</span>
+                <span className="text-sm">SMS QR</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center"
+                onClick={() => handleQRTypeSelect('whatsapp')}
+              >
+                <span className="text-lg mb-1">📱</span>
+                <span className="text-sm">WhatsApp QR</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center"
+                onClick={() => handleQRTypeSelect('wifi')}
+              >
+                <span className="text-lg mb-1">📶</span>
+                <span className="text-sm">WiFi QR</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center"
+                onClick={() => handleQRTypeSelect('vcard')}
+              >
+                <span className="text-lg mb-1">👤</span>
+                <span className="text-sm">vCard QR</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center"
+                onClick={() => handleQRTypeSelect('event')}
+              >
+                <span className="text-lg mb-1">📅</span>
+                <span className="text-sm">Event QR</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+        
         {/* Features section */}
         <div ref={featuresRef} className="mt-16 py-16 px-4 bg-white rounded-lg shadow-sm mx-4">
           <div className="text-center mb-12">
