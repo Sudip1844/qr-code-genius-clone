@@ -54,11 +54,8 @@ const QRGenerator = () => {
 
   // Design options state
   const [selectedLogo, setSelectedLogo] = useState('none');
-  const [customLogo, setCustomLogo] = useState<string | null>(null);
   const [logoSize, setLogoSize] = useState(15);
   const [logoOpacity, setLogoOpacity] = useState(100);
-  const [logoPosition, setLogoPosition] = useState('center');
-  const [logoShape, setLogoShape] = useState('square');
   const [gradient, setGradient] = useState(false);
   
   // Basic QR options
@@ -82,8 +79,7 @@ const QRGenerator = () => {
     { value: 'linkedin', label: 'LinkedIn', preview: '💼' },
     { value: 'youtube', label: 'YouTube', preview: '📺' },
     { value: 'wifi', label: 'WiFi', preview: '📶' },
-    { value: 'vcard', label: 'Contact', preview: '👤' },
-    { value: 'custom', label: 'Custom', preview: '📎' }
+    { value: 'vcard', label: 'Contact', preview: '👤' }
   ];
   
   // Content type options
@@ -118,7 +114,13 @@ const QRGenerator = () => {
     setEventStart('');
     setEventEnd('');
     setImageData(null);
+    setQrResult(null); // Reset QR result when content type changes
   }, [contentType]);
+
+  // Reset QR result when design options change
+  useEffect(() => {
+    setQrResult(null);
+  }, [selectedLogo, logoSize, logoOpacity, gradient, size, margin, darkColor, lightColor, errorCorrectionLevel]);
   
   // Reset copied state after 2 seconds
   useEffect(() => {
@@ -151,12 +153,9 @@ const QRGenerator = () => {
         color: { dark: darkColor, light: lightColor },
         errorCorrectionLevel,
         design: {
-          logo: selectedLogo !== 'custom' && selectedLogo !== 'none' ? selectedLogo : undefined,
-          customLogo: selectedLogo === 'custom' ? customLogo : undefined,
+          logo: selectedLogo !== 'none' ? selectedLogo : undefined,
           logoSize,
           logoOpacity,
-          logoPosition,
-          logoShape,
           gradient
         }
       };
@@ -239,16 +238,7 @@ const QRGenerator = () => {
     }
   };
   
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setCustomLogo(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
   
   const downloadQR = () => {
     if (!qrResult) return;
@@ -306,114 +296,113 @@ const QRGenerator = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
+    <div className="w-full max-w-6xl mx-auto p-4 space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">QR Code Generator</h1>
         <p className="text-muted-foreground">Create customized QR codes for various content types</p>
       </div>
       
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="w-full md:w-1/2">
-          {qrResult ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>Your QR Code</CardTitle>
-                <CardDescription>
-                  Scan with any QR code reader
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center">
-                <div className="relative">
-                  <img 
-                    src={qrResult} 
-                    alt="Generated QR Code" 
-                    className="max-w-full h-auto border rounded-lg shadow-sm"
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-center gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" onClick={downloadQR}>
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Download QR Code</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" onClick={copyQR}>
-                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Copy to Clipboard</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                {navigator.share && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" onClick={shareQR}>
-                          <Share2 className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Share QR Code</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </CardFooter>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Preview QR Code</CardTitle>
-                <CardDescription>
-                  Your QR code will appear here
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center items-center h-[300px]">
-                <div className="text-center text-muted-foreground">
-                  <div className="border-2 border-dashed rounded-lg p-12 mb-4">
-                    QR Code Preview
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left Side - QR Preview */}
+            <div className="w-full lg:w-2/5">
+              {qrResult ? (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Your QR Code</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Scan with any QR code reader</p>
                   </div>
-                  <p>Fill in the details and click Generate</p>
+                  <div className="flex justify-center">
+                    <div className="relative">
+                      <img 
+                        src={qrResult} 
+                        alt="Generated QR Code" 
+                        className="max-w-full h-auto border rounded-lg shadow-sm"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-center gap-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline" size="icon" onClick={downloadQR}>
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Download QR Code</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline" size="icon" onClick={copyQR}>
+                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Copy to Clipboard</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    {navigator.share && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="outline" size="icon" onClick={shareQR}>
+                              <Share2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Share QR Code</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-        
-        <div className="w-full md:w-1/2">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="content" className="text-center">
-                <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-full text-sm font-medium mr-2">1</span>
-                Content
-              </TabsTrigger>
-              <TabsTrigger value="design" className="text-center">
-                <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-400 text-white rounded-full text-sm font-medium mr-2">2</span>
-                Design
-              </TabsTrigger>
-              <TabsTrigger value="logo" className="text-center">
-                <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-400 text-white rounded-full text-sm font-medium mr-2">3</span>
-                Logo
-              </TabsTrigger>
-            </TabsList>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Preview QR Code</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Your QR code will appear here</p>
+                  </div>
+                  <div className="flex justify-center items-center h-[300px]">
+                    <div className="text-center text-muted-foreground">
+                      <div className="border-2 border-dashed rounded-lg p-12 mb-4">
+                        QR Code Preview
+                      </div>
+                      <p>Fill in the details and click Generate</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             
-            <TabsContent value="content" className="space-y-6">
-              <Card>
-                <CardContent className="p-6 space-y-6">
+            {/* Right Side - Options */}
+            <div className="w-full lg:w-3/5">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsTrigger value="content" className="text-center">
+                    <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-full text-sm font-medium mr-2">1</span>
+                    Content
+                  </TabsTrigger>
+                  <TabsTrigger value="design" className="text-center">
+                    <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-400 text-white rounded-full text-sm font-medium mr-2">2</span>
+                    Design
+                  </TabsTrigger>
+                  <TabsTrigger value="logo" className="text-center">
+                    <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-400 text-white rounded-full text-sm font-medium mr-2">3</span>
+                    Logo
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="content" className="space-y-6">
+                  <div className="space-y-6">
                   {/* Content Type Selector */}
                   <div className="space-y-2">
                     <Select value={contentType} onValueChange={setContentType}>
@@ -724,14 +713,12 @@ const QRGenerator = () => {
                         )}
                       </div>
                     )}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                </TabsContent>
 
-            <TabsContent value="design" className="space-y-6">
-              <Card>
-                <CardContent className="p-6 space-y-6">
+                <TabsContent value="design" className="space-y-6">
+                  <div className="space-y-6">
                   {/* Basic Options */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -819,14 +806,12 @@ const QRGenerator = () => {
                       onCheckedChange={setGradient}
                     />
                     <Label htmlFor="gradient" className="text-slate-700 font-medium">Enable gradient effects</Label>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                </TabsContent>
 
-            <TabsContent value="logo" className="space-y-6">
-              <Card>
-                <CardContent className="p-6 space-y-6">
+                <TabsContent value="logo" className="space-y-6">
+                  <div className="space-y-6">
                   <div className="space-y-2">
                     <Label className="text-slate-700 font-medium">Logo Type</Label>
                     <div className="grid grid-cols-3 gap-2">
@@ -844,124 +829,74 @@ const QRGenerator = () => {
                     </div>
                   </div>
 
-                  {selectedLogo === 'custom' && (
-                    <div className="space-y-2">
-                      <Label className="text-slate-700 font-medium">Upload Custom Logo</Label>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoUpload}
-                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 h-12"
-                      />
-                      {customLogo && (
-                        <div className="mt-2">
-                          <img src={customLogo} alt="Custom logo preview" className="w-16 h-16 object-contain rounded border" />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
                   {selectedLogo !== 'none' && (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-slate-700 font-medium">Logo Size (%)</Label>
-                          <Slider
-                            value={[logoSize]}
-                            onValueChange={(value) => setLogoSize(value[0])}
-                            max={30}
-                            min={10}
-                            step={5}
-                            className="w-full"
-                          />
-                          <div className="text-sm text-gray-500">{logoSize}%</div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label className="text-slate-700 font-medium">Logo Opacity (%)</Label>
-                          <Slider
-                            value={[logoOpacity]}
-                            onValueChange={(value) => setLogoOpacity(value[0])}
-                            max={100}
-                            min={20}
-                            step={10}
-                            className="w-full"
-                          />
-                          <div className="text-sm text-gray-500">{logoOpacity}%</div>
-                        </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-slate-700 font-medium">Logo Size (%)</Label>
+                        <Slider
+                          value={[logoSize]}
+                          onValueChange={(value) => setLogoSize(value[0])}
+                          max={30}
+                          min={10}
+                          step={5}
+                          className="w-full"
+                        />
+                        <div className="text-sm text-gray-500">{logoSize}%</div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-slate-700 font-medium">Logo Position</Label>
-                          <Select value={logoPosition} onValueChange={setLogoPosition}>
-                            <SelectTrigger className="h-12">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="center">Center</SelectItem>
-                              <SelectItem value="top-left">Top Left</SelectItem>
-                              <SelectItem value="top-right">Top Right</SelectItem>
-                              <SelectItem value="bottom-left">Bottom Left</SelectItem>
-                              <SelectItem value="bottom-right">Bottom Right</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label className="text-slate-700 font-medium">Logo Shape</Label>
-                          <Select value={logoShape} onValueChange={setLogoShape}>
-                            <SelectTrigger className="h-12">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="square">Square</SelectItem>
-                              <SelectItem value="circle">Circle</SelectItem>
-                              <SelectItem value="rounded">Rounded</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                      <div className="space-y-2">
+                        <Label className="text-slate-700 font-medium">Logo Opacity (%)</Label>
+                        <Slider
+                          value={[logoOpacity]}
+                          onValueChange={(value) => setLogoOpacity(value[0])}
+                          max={100}
+                          min={20}
+                          step={10}
+                          className="w-full"
+                        />
+                        <div className="text-sm text-gray-500">{logoOpacity}%</div>
                       </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-          
-          <div className="mt-6">
-            {!qrResult ? (
-              <Button 
-                className="w-full h-14 text-lg font-medium" 
-                size="lg" 
-                onClick={generateQR}
-                disabled={isGenerating}
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Generating...
-                  </>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
+              
+              <div className="mt-6">
+                {!qrResult ? (
+                  <Button 
+                    className="w-full h-14 text-lg font-medium" 
+                    size="lg" 
+                    onClick={generateQR}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <QrCode className="mr-2 h-5 w-5" />
+                        Generate QR Code
+                      </>
+                    )}
+                  </Button>
                 ) : (
-                  <>
-                    <QrCode className="mr-2 h-5 w-5" />
-                    Generate QR Code
-                  </>
+                  <Button 
+                    className="w-full h-14 text-lg font-medium" 
+                    size="lg" 
+                    onClick={downloadQR}
+                  >
+                    <Download className="mr-2 h-5 w-5" />
+                    Download QR Code
+                  </Button>
                 )}
-              </Button>
-            ) : (
-              <Button 
-                className="w-full h-14 text-lg font-medium" 
-                size="lg" 
-                onClick={downloadQR}
-              >
-                <Download className="mr-2 h-5 w-5" />
-                Download QR Code
-              </Button>
-            )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

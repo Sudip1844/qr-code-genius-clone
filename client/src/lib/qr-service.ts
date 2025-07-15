@@ -11,11 +11,8 @@ export type QROptions = {
   errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H';
   design?: {
     logo?: string;
-    customLogo?: string;
     logoSize?: number;
     logoOpacity?: number;
-    logoPosition?: string;
-    logoShape?: string;
     gradient?: boolean;
   };
 };
@@ -175,11 +172,9 @@ const applyDesignFeatures = async (qrDataUrl: string, design: any, size: number,
       // Draw the base QR code
       ctx.drawImage(img, 0, 0, size, size);
       
-      // Draw logo if selected (either predefined or custom)
-      if (design.customLogo) {
-        drawCustomLogo(ctx, design, size/2, size/2, size);
-      } else if (design.logo && design.logo !== 'none') {
-        drawLogo(ctx, design.logo, size/2, size/2, size);
+      // Draw logo if selected (predefined only)
+      if (design.logo && design.logo !== 'none') {
+        drawLogo(ctx, design.logo, size/2, size/2, size, design.logoSize, design.logoOpacity);
       }
       
       resolve(canvas.toDataURL());
@@ -200,91 +195,14 @@ const adjustColorBrightness = (color: string, percent: number): string => {
     (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
 };
 
-const drawCustomLogo = (
-  ctx: CanvasRenderingContext2D, 
-  design: any, 
-  centerX: number, 
-  centerY: number, 
-  qrSize: number
-) => {
-  if (!design.customLogo) return;
-  
-  const logoImg = new Image();
-  logoImg.onload = () => {
-    const logoSize = (design.logoSize || 15) / 100 * qrSize;
-    const opacity = (design.logoOpacity || 100) / 100;
-    
-    // Save context for opacity
-    ctx.save();
-    ctx.globalAlpha = opacity;
-    
-    // Calculate position
-    let x = centerX - logoSize / 2;
-    let y = centerY - logoSize / 2;
-    
-    switch (design.logoPosition) {
-      case 'top-left':
-        x = centerX - qrSize / 2 + 20;
-        y = centerY - qrSize / 2 + 20;
-        break;
-      case 'top-right':
-        x = centerX + qrSize / 2 - logoSize - 20;
-        y = centerY - qrSize / 2 + 20;
-        break;
-      case 'bottom-left':
-        x = centerX - qrSize / 2 + 20;
-        y = centerY + qrSize / 2 - logoSize - 20;
-        break;
-      case 'bottom-right':
-        x = centerX + qrSize / 2 - logoSize - 20;
-        y = centerY + qrSize / 2 - logoSize - 20;
-        break;
-    }
-    
-    // Draw white background circle for better visibility
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(x + logoSize/2, y + logoSize/2, logoSize/2 + 8, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Apply logo shape
-    ctx.save();
-    switch (design.logoShape) {
-      case 'circle':
-        ctx.beginPath();
-        ctx.arc(x + logoSize/2, y + logoSize/2, logoSize/2, 0, 2 * Math.PI);
-        ctx.clip();
-        break;
-      case 'rounded':
-        ctx.beginPath();
-        ctx.roundRect(x, y, logoSize, logoSize, logoSize * 0.2);
-        ctx.clip();
-        break;
-      case 'square':
-        ctx.beginPath();
-        ctx.rect(x, y, logoSize, logoSize);
-        ctx.clip();
-        break;
-    }
-    
-    // Draw the logo
-    ctx.drawImage(logoImg, x, y, logoSize, logoSize);
-    ctx.restore();
-    ctx.restore();
-  };
-  
-  logoImg.onerror = () => {
-    console.error('Failed to load custom logo');
-  };
-  
-  logoImg.src = design.customLogo;
-};
-
-const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y: number, qrSize: number) => {
-  const logoSize = qrSize * 0.12;
+const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y: number, qrSize: number, customLogoSize?: number, customOpacity?: number) => {
+  const logoSizePercent = customLogoSize || 15;
+  const opacity = (customOpacity || 100) / 100;
+  const logoSize = (logoSizePercent / 100) * qrSize;
   
   // Draw white background circle for logo
   ctx.save();
+  ctx.globalAlpha = opacity;
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
   ctx.arc(x, y, logoSize/2 + 6, 0, 2 * Math.PI);
