@@ -122,6 +122,11 @@ const QRGenerator = () => {
     setQrResult(null);
   }, [selectedLogo, logoSize, logoOpacity, gradient, size, margin, darkColor, lightColor, errorCorrectionLevel]);
 
+  // Reset QR result when any input data changes
+  useEffect(() => {
+    setQrResult(null);
+  }, [qrData, emailSubject, emailBody, smsMessage, whatsappMessage, wifiSSID, wifiPassword, wifiSecurity, vcardName, vcardPhone, vcardEmail, vcardOrg, eventTitle, eventLocation, eventStart, eventEnd, imageData]);
+
   // Listen for QR type selection events from quick links
   useEffect(() => {
     const handleQRTypeSelect = (event: CustomEvent) => {
@@ -743,38 +748,6 @@ const QRGenerator = () => {
                       </div>
                     )}
                   </div>
-                  
-                  <div className="mt-6">
-                    {!qrResult ? (
-                      <Button 
-                        className="w-full h-14 text-lg font-medium" 
-                        size="lg" 
-                        onClick={generateQR}
-                        disabled={isGenerating}
-                      >
-                        {isGenerating ? (
-                          <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Generating...
-                          </>
-                        ) : (
-                          <>
-                            <QrCode className="mr-2 h-5 w-5" />
-                            Generate QR Code
-                          </>
-                        )}
-                      </Button>
-                    ) : (
-                      <Button 
-                        className="w-full h-14 text-lg font-medium" 
-                        size="lg" 
-                        onClick={downloadQR}
-                      >
-                        <Download className="mr-2 h-5 w-5" />
-                        Download QR Code
-                      </Button>
-                    )}
-                  </div>
                 </TabsContent>
 
                 <TabsContent value="design" className="space-y-6">
@@ -920,6 +893,39 @@ const QRGenerator = () => {
                   </div>
                 </TabsContent>
               </Tabs>
+              
+              {/* Generate Button - Always visible */}
+              <div className="mt-6">
+                {!qrResult ? (
+                  <Button 
+                    className="w-full h-14 text-lg font-medium" 
+                    size="lg" 
+                    onClick={generateQR}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <QrCode className="mr-2 h-5 w-5" />
+                        Generate QR Code
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button 
+                    className="w-full h-14 text-lg font-medium" 
+                    size="lg" 
+                    onClick={downloadQR}
+                  >
+                    <Download className="mr-2 h-5 w-5" />
+                    Download QR Code
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
