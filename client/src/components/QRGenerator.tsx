@@ -56,6 +56,8 @@ const QRGenerator = () => {
   const [selectedLogo, setSelectedLogo] = useState('none');
   const [logoSize, setLogoSize] = useState(15);
   const [logoOpacity, setLogoOpacity] = useState(100);
+  const [customLogo, setCustomLogo] = useState<string>('');
+  const [customEmoji, setCustomEmoji] = useState<string>('');
   const [gradient, setGradient] = useState(false);
   
   // Basic QR options
@@ -65,7 +67,7 @@ const QRGenerator = () => {
   const [lightColor, setLightColor] = useState('#ffffff');
   const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<'L' | 'M' | 'Q' | 'H'>('M');
 
-  // Logo options with social media
+  // Logo options with social media and custom options
   const logoOptions = [
     { value: 'none', label: 'None', preview: '❌' },
     { value: 'link', label: 'Link', preview: '🔗' },
@@ -79,7 +81,9 @@ const QRGenerator = () => {
     { value: 'linkedin', label: 'LinkedIn', preview: '💼' },
     { value: 'youtube', label: 'YouTube', preview: '📺' },
     { value: 'wifi', label: 'WiFi', preview: '📶' },
-    { value: 'vcard', label: 'Contact', preview: '👤' }
+    { value: 'vcard', label: 'Contact', preview: '👤' },
+    { value: 'custom-logo', label: 'Custom Logo', preview: '🖼️' },
+    { value: 'custom-emoji', label: 'Custom Emoji', preview: '😀' }
   ];
   
   // Content type options
@@ -120,12 +124,40 @@ const QRGenerator = () => {
   // Reset QR result when design options change
   useEffect(() => {
     setQrResult(null);
-  }, [selectedLogo, logoSize, logoOpacity, gradient, size, margin, darkColor, lightColor, errorCorrectionLevel]);
+  }, [selectedLogo, logoSize, logoOpacity, gradient, size, margin, darkColor, lightColor, errorCorrectionLevel, customLogo, customEmoji]);
 
   // Reset QR result when any input data changes
   useEffect(() => {
     setQrResult(null);
-  }, [qrData, emailSubject, emailBody, smsMessage, whatsappMessage, wifiSSID, wifiPassword, wifiSecurity, vcardName, vcardPhone, vcardEmail, vcardOrg, eventTitle, eventLocation, eventStart, eventEnd, imageData]);
+  }, [qrData, emailSubject, emailBody, smsMessage, whatsappMessage, wifiSSID, wifiPassword, wifiSecurity, vcardName, vcardPhone, vcardEmail, vcardOrg, eventTitle, eventLocation, eventStart, eventEnd, imageData, customLogo, customEmoji]);
+
+  // Emoji validation function
+  const validateEmoji = (text: string): boolean => {
+    // Check if text contains only one emoji and no other characters
+    const emojiRegex = /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)$/u;
+    return emojiRegex.test(text) && text.length <= 2; // Allow for emoji with modifiers
+  };
+
+  // Handle custom emoji input with validation
+  const handleCustomEmojiChange = (value: string) => {
+    if (value === '' || validateEmoji(value)) {
+      setCustomEmoji(value);
+    }
+  };
+
+  // Handle custom logo upload
+  const handleCustomLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setCustomLogo(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Listen for QR type selection events from quick links
   useEffect(() => {
@@ -250,7 +282,9 @@ const QRGenerator = () => {
         },
         errorCorrectionLevel,
         design: {
-          logo: selectedLogo,
+          logo: selectedLogo === 'custom-logo' && customLogo ? customLogo : 
+                selectedLogo === 'custom-emoji' && customEmoji ? customEmoji : 
+                selectedLogo !== 'none' ? selectedLogo : undefined,
           logoSize,
           logoOpacity,
           gradient
@@ -860,6 +894,63 @@ const QRGenerator = () => {
                         ))}
                       </div>
                     </div>
+
+                    {/* Custom Logo Upload */}
+                    {selectedLogo === 'custom-logo' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Upload Custom Logo</Label>
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleCustomLogoUpload}
+                            className="h-12"
+                          />
+                          <p className="text-sm text-gray-500">
+                            Upload an image from your device to use as QR code logo
+                          </p>
+                        </div>
+                        {customLogo && (
+                          <div className="flex justify-center">
+                            <img 
+                              src={customLogo} 
+                              alt="Custom Logo Preview" 
+                              className="w-16 h-16 object-contain border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Custom Emoji Input */}
+                    {selectedLogo === 'custom-emoji' && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-slate-700 font-medium">Enter Custom Emoji</Label>
+                          <Input
+                            type="text"
+                            placeholder="😀"
+                            value={customEmoji}
+                            onChange={(e) => handleCustomEmojiChange(e.target.value)}
+                            className="h-12 text-2xl text-center"
+                            maxLength={2}
+                          />
+                          <p className="text-sm text-gray-500">
+                            Enter only one emoji from your keyboard. No text allowed.
+                          </p>
+                          {customEmoji && !validateEmoji(customEmoji) && (
+                            <p className="text-sm text-red-500">
+                              Please enter only one emoji, no text
+                            </p>
+                          )}
+                        </div>
+                        {customEmoji && validateEmoji(customEmoji) && (
+                          <div className="flex justify-center">
+                            <div className="text-4xl">{customEmoji}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {selectedLogo !== 'none' && (
                       <div className="grid grid-cols-2 gap-4">
