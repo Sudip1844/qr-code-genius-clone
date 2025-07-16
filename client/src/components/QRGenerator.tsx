@@ -21,34 +21,34 @@ const QRGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
   const [copied, setCopied] = useState(false);
-  
+
   // Email specific fields
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
-  
+
   // SMS specific fields
   const [smsMessage, setSmsMessage] = useState('');
-  
+
   // WhatsApp specific fields
   const [whatsappMessage, setWhatsappMessage] = useState('');
-  
+
   // WiFi specific fields
   const [wifiSSID, setWifiSSID] = useState('');
   const [wifiPassword, setWifiPassword] = useState('');
   const [wifiSecurity, setWifiSecurity] = useState('WPA');
-  
+
   // vCard specific fields
   const [vcardName, setVcardName] = useState('');
   const [vcardPhone, setVcardPhone] = useState('');
   const [vcardEmail, setVcardEmail] = useState('');
   const [vcardOrg, setVcardOrg] = useState('');
-  
+
   // Event specific fields
   const [eventTitle, setEventTitle] = useState('');
   const [eventLocation, setEventLocation] = useState('');
   const [eventStart, setEventStart] = useState('');
   const [eventEnd, setEventEnd] = useState('');
-  
+
   // Image specific fields
   const [imageData, setImageData] = useState<string | null>(null);
 
@@ -59,7 +59,7 @@ const QRGenerator = () => {
   const [customLogo, setCustomLogo] = useState<string>('');
   const [customEmoji, setCustomEmoji] = useState<string>('');
   const [gradient, setGradient] = useState(false);
-  
+
   // Basic QR options
   const [size, setSize] = useState(300);
   const [margin, setMargin] = useState(4);
@@ -85,7 +85,7 @@ const QRGenerator = () => {
     { value: 'custom-logo', label: 'Custom Logo', preview: '🖼️' },
     { value: 'custom-emoji', label: 'Custom Emoji', preview: '😀' }
   ];
-  
+
   // Content type options
   const contentTypes = [
     { value: 'url', label: 'Link', icon: '🔗' },
@@ -97,9 +97,10 @@ const QRGenerator = () => {
     { value: 'wifi', label: 'WiFi', icon: '📶' },
     { value: 'vcard', label: 'Contact', icon: '👤' },
     { value: 'event', label: 'Event', icon: '📅' },
-    { value: 'image', label: 'Image', icon: '🖼️' }
+    // Removing image type
+    // { value: 'image', label: 'Image', icon: '🖼️' }
   ];
-  
+
   // Reset form when content type changes
   useEffect(() => {
     setQrData('');
@@ -190,7 +191,7 @@ const QRGenerator = () => {
       window.removeEventListener('qrTypeSelect', handleQRTypeSelect as EventListener);
     };
   }, []);
-  
+
   // Reset copied state after 2 seconds
   useEffect(() => {
     if (copied) {
@@ -219,8 +220,9 @@ const QRGenerator = () => {
         return createVCardQR(vcardName, vcardPhone, vcardEmail, vcardOrg);
       case 'event':
         return createEventQR(eventTitle, eventLocation, eventStart, eventEnd);
-      case 'image':
-        return createImageQR(imageData || '');
+      // Removing image type
+      // case 'image':
+      //   return createImageQR(imageData || '');
       default:
         return qrData;
     }
@@ -264,10 +266,11 @@ const QRGenerator = () => {
       toast.error('Please enter an event title');
       return;
     }
-    if (contentType === 'image' && !imageData) {
-      toast.error('Please provide an image URL or upload an image');
-      return;
-    }
+    // Removing image type
+    // if (contentType === 'image' && !imageData) {
+    //   toast.error('Please provide an image URL or upload an image');
+    //   return;
+    // }
 
     setIsGenerating(true);
     try {
@@ -304,7 +307,7 @@ const QRGenerator = () => {
 
   const downloadQR = () => {
     if (!qrResult) return;
-    
+
     const link = document.createElement('a');
     link.download = 'qr-code.png';
     link.href = qrResult;
@@ -316,7 +319,7 @@ const QRGenerator = () => {
 
   const copyQR = async () => {
     if (!qrResult) return;
-    
+
     try {
       const blob = await fetch(qrResult).then(r => r.blob());
       await navigator.clipboard.write([
@@ -332,11 +335,11 @@ const QRGenerator = () => {
 
   const shareQR = async () => {
     if (!qrResult) return;
-    
+
     try {
       const blob = await fetch(qrResult).then(r => r.blob());
       const file = new File([blob], 'qr-code.png', { type: 'image/png' });
-      
+
       if (navigator.share) {
         await navigator.share({
           title: 'QR Code',
@@ -362,7 +365,7 @@ const QRGenerator = () => {
         <h1 className="text-3xl font-bold mb-2">QR Code Generator</h1>
         <p className="text-muted-foreground">Create customized QR codes for various content types</p>
       </div>
-      
+
       <Card className="w-full">
         <CardContent className="p-6">
           <div className="space-y-6">
@@ -392,7 +395,7 @@ const QRGenerator = () => {
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                    
+
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -405,7 +408,7 @@ const QRGenerator = () => {
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                    
+
                     {navigator.share && (
                       <TooltipProvider>
                         <Tooltip>
@@ -433,7 +436,7 @@ const QRGenerator = () => {
                 </div>
               )}
             </div>
-            
+
             {/* Configuration Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Configuration</h3>
@@ -452,7 +455,7 @@ const QRGenerator = () => {
                     Logo
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="content" className="space-y-6">
                   {/* Content Type Selector */}
                   <div className="space-y-2">
@@ -478,7 +481,7 @@ const QRGenerator = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   {/* Content Input Fields */}
                   <div className="space-y-4">
                     {contentType === 'url' && (
@@ -491,9 +494,12 @@ const QRGenerator = () => {
                           onChange={(e) => setQrData(e.target.value)}
                           className="h-12"
                         />
+                        <p className="text-sm text-gray-500">
+                            Accepts all types of links (e.g., website, profile, video).
+                        </p>
                       </div>
                     )}
-                    
+
                     {contentType === 'text' && (
                       <div className="space-y-2">
                         <Label htmlFor="text" className="text-slate-700 font-medium">Text Content</Label>
@@ -736,7 +742,8 @@ const QRGenerator = () => {
                       </div>
                     )}
 
-                    {contentType === 'image' && (
+                    {/* Removing image type */}
+                    {/* {contentType === 'image' && (
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label className="text-slate-700 font-medium">Image URL</Label>
@@ -780,7 +787,7 @@ const QRGenerator = () => {
                           </div>
                         )}
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </TabsContent>
 
@@ -984,7 +991,7 @@ const QRGenerator = () => {
                   </div>
                 </TabsContent>
               </Tabs>
-              
+
               {/* Generate Button - Always visible */}
               <div className="mt-6">
                 {!qrResult ? (
@@ -1026,3 +1033,13 @@ const QRGenerator = () => {
 };
 
 export default QRGenerator;
+
+export const createUrlQR = (url: string): string => {
+  if (!url) return '';
+
+  // If URL doesn't start with http:// or https://, add https://
+  if (!/^https?:\/\//i.test(url)) {
+    return `https://${url}`;
+  }
+  return url;
+};
