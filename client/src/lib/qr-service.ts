@@ -247,7 +247,9 @@ const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y:
 };
 
 export const createUrlQR = (url: string): string => {
-  if (url && !/^https?:\/\//i.test(url)) {
+  // Accept all types of URLs and links without strict validation
+  // This includes social media profiles, YouTube links, etc.
+  if (url && !/^https?:\/\//i.test(url) && !/^[a-zA-Z][a-zA-Z\d+\.-]*:/.test(url)) {
     return `https://${url}`;
   }
   return url;

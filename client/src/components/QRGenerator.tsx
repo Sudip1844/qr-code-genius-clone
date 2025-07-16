@@ -483,7 +483,7 @@ const QRGenerator = () => {
                   <div className="space-y-4">
                     {contentType === 'url' && (
                       <div className="space-y-2">
-                        <Label htmlFor="url" className="text-slate-700 font-medium">Enter your Website</Label>
+                        <Label htmlFor="url" className="text-slate-700 font-medium">Enter your Link</Label>
                         <Input
                           id="url"
                           placeholder="https://"
@@ -491,6 +491,16 @@ const QRGenerator = () => {
                           onChange={(e) => setQrData(e.target.value)}
                           className="h-12"
                         />
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="text-sm text-blue-700 font-medium mb-1">Supported Links:</p>
+                          <p className="text-xs text-blue-600">
+                            • Website URLs (https://example.com)<br/>
+                            • Social Media Profiles (Facebook, Instagram, Twitter, LinkedIn)<br/>
+                            • YouTube Channel Links & Video Links<br/>
+                            • YouTube Shorts Links<br/>
+                            • Any valid web URL or deep link
+                          </p>
+                        </div>
                       </div>
                     )}
                     
@@ -748,26 +758,6 @@ const QRGenerator = () => {
                           />
                           <p className="text-sm text-gray-500">
                             Upload your image to Google Drive, Imgur, or any image hosting service and paste the direct link here.
-                          </p>
-                        </div>
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                  setImageData(e.target?.result as string);
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                            className="w-full"
-                          />
-                          <p className="text-sm text-gray-500 mt-2">
-                            Or select an image file from your device (will be converted to data URL)
                           </p>
                         </div>
                         {imageData && (
