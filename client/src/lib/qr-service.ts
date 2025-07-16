@@ -247,17 +247,10 @@ const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y:
 };
 
 export const createUrlQR = (url: string): string => {
-  if (!url) return '';
-  
-  // Trim whitespace
-  const trimmedUrl = url.trim();
-  
-  // If URL doesn't start with http:// or https://, add https://
-  if (!/^https?:\/\//i.test(trimmedUrl)) {
-    return `https://${trimmedUrl}`;
+  if (url && !/^https?:\/\//i.test(url)) {
+    return `https://${url}`;
   }
-  
-  return trimmedUrl;
+  return url;
 };
 
 export const createEmailQR = (email: string, subject?: string, body?: string): string => {
