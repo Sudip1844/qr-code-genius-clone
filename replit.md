@@ -1,6 +1,6 @@
 # QR Code Generator Web Application
 
-## Overview
+## Overview (🙂)
 
 This is a full-stack QR code generator web application built with a modern tech stack. The application provides a comprehensive QR code generation service with support for multiple content types including URLs, emails, phone numbers, WiFi credentials, vCards, events, and more. It features a clean, responsive design with advanced customization options for generated QR codes.
 
