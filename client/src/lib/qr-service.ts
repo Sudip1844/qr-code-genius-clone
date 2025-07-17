@@ -249,10 +249,17 @@ const drawLogo = (ctx: CanvasRenderingContext2D, logoType: string, x: number, y:
 export const createUrlQR = (url: string): string => {
   // Accept all types of URLs and links without strict validation
   // This includes social media profiles, YouTube links, etc.
-  if (url && !/^https?:\/\//i.test(url) && !/^[a-zA-Z][a-zA-Z\d+\.-]*:/.test(url)) {
-    return `https://${url}`;
+  if (!url) return '';
+  
+  // Clean and normalize the URL
+  let cleanUrl = url.trim();
+  
+  // If no protocol is specified, add https://
+  if (!/^[a-zA-Z][a-zA-Z\d+\.-]*:/.test(cleanUrl)) {
+    cleanUrl = `https://${cleanUrl}`;
   }
-  return url;
+  
+  return cleanUrl;
 };
 
 export const createEmailQR = (email: string, subject?: string, body?: string): string => {
@@ -260,11 +267,12 @@ export const createEmailQR = (email: string, subject?: string, body?: string): s
     return '';
   }
   
-  let mailtoLink = `mailto:${encodeURIComponent(email)}`;
+  // Don't encode the email in the main mailto part
+  let mailtoLink = `mailto:${email}`;
   
   const params: string[] = [];
-  if (subject) params.push(`subject=${encodeURIComponent(subject)}`);
-  if (body) params.push(`body=${encodeURIComponent(body)}`);
+  if (subject && subject.trim()) params.push(`subject=${encodeURIComponent(subject.trim())}`);
+  if (body && body.trim()) params.push(`body=${encodeURIComponent(body.trim())}`);
   
   if (params.length > 0) {
     mailtoLink += '?' + params.join('&');
@@ -274,7 +282,10 @@ export const createEmailQR = (email: string, subject?: string, body?: string): s
 };
 
 export const createPhoneQR = (phoneNumber: string): string => {
-  const cleaned = phoneNumber.replace(/[^\d+]/g, '');
+  if (!phoneNumber) return '';
+  
+  // Keep the phone number format more flexible, just remove spaces and special chars except + and -
+  const cleaned = phoneNumber.replace(/[^\d+\-]/g, '');
   
   if (!cleaned) {
     return '';
@@ -288,43 +299,73 @@ export const createTextQR = (text: string): string => {
 };
 
 export const createSMSQR = (phoneNumber: string, message?: string): string => {
-  const cleaned = phoneNumber.replace(/[^\d+]/g, '');
+  if (!phoneNumber) return '';
+  
+  // Keep the phone number format more flexible
+  const cleaned = phoneNumber.replace(/[^\d+\-]/g, '');
   
   if (!cleaned) {
     return '';
   }
   
-  return `sms:${cleaned}${message ? `?body=${encodeURIComponent(message)}` : ''}`;
+  // Use SMSTO format which is more universally supported
+  if (message && message.trim()) {
+    return `smsto:${cleaned}:${message.trim()}`;
+  }
+  return `smsto:${cleaned}:`;
 };
 
 export const createWhatsAppQR = (phoneNumber: string, message?: string): string => {
-  const cleaned = phoneNumber.replace(/[^\d]/g, '');
+  if (!phoneNumber) return '';
+  
+  // Remove all non-digits except +
+  let cleaned = phoneNumber.replace(/[^\d+]/g, '');
+  
+  // Remove + from the beginning if present, as wa.me expects number without +
+  if (cleaned.startsWith('+')) {
+    cleaned = cleaned.substring(1);
+  }
   
   if (!cleaned) {
     return '';
   }
   
-  return `https://wa.me/${cleaned}${message ? `?text=${encodeURIComponent(message)}` : ''}`;
+  let whatsappUrl = `https://wa.me/${cleaned}`;
+  if (message && message.trim()) {
+    whatsappUrl += `?text=${encodeURIComponent(message.trim())}`;
+  }
+  
+  return whatsappUrl;
 };
 
 export const createWiFiQR = (ssid: string, password: string, security: string = 'WPA'): string => {
-  if (!ssid) {
+  if (!ssid || !ssid.trim()) {
     return '';
   }
   
-  return `WIFI:T:${security};S:${ssid};P:${password};;`;
+  // Escape special characters in SSID and password
+  const escapedSSID = ssid.replace(/([;,:"\\])/g, '\\$1');
+  const escapedPassword = password ? password.replace(/([;,:"\\])/g, '\\$1') : '';
+  
+  return `WIFI:T:${security};S:${escapedSSID};P:${escapedPassword};;`;
 };
 
 export const createVCardQR = (name: string, phone?: string, email?: string, organization?: string): string => {
-  if (!name) {
+  if (!name || !name.trim()) {
     return '';
   }
   
-  let vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}`;
+  let vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${name.trim()}`;
   
-  if (phone) vcard += `\nTEL:${phone}`;
-  if (email) vcard += `\nEMAIL:${email}`;
-  if (organization) vcard += `\nORG:${organization}`;
+  if (phone && phone.trim()) {
+    vcard += `\nTEL:${phone.trim()}`;
+  }
+  if (email && email.trim()) {
+    vcard += `\nEMAIL:${email.trim()}`;
+  }
+  if (organization && organization.trim()) {
+    vcard += `\nORG:${organization.trim()}`;
+  }
   
   vcard += '\nEND:VCARD';
   
@@ -332,7 +373,7 @@ export const createVCardQR = (name: string, phone?: string, email?: string, orga
 };
 
 export const createEventQR = (title: string, location?: string, startDate?: string, endDate?: string): string => {
-  if (!title) {
+  if (!title || !title.trim()) {
     return '';
   }
   
@@ -340,13 +381,23 @@ export const createEventQR = (title: string, location?: string, startDate?: stri
     return new Date(dateString).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   };
   
-  let event = `BEGIN:VEVENT\nSUMMARY:${title}`;
+  // Create a complete iCalendar format
+  let event = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//QR Generator//EN\nBEGIN:VEVENT\nSUMMARY:${title.trim()}`;
   
-  if (location) event += `\nLOCATION:${location}`;
-  if (startDate) event += `\nDTSTART:${formatDate(startDate)}`;
-  if (endDate) event += `\nDTEND:${formatDate(endDate)}`;
+  if (location && location.trim()) {
+    event += `\nLOCATION:${location.trim()}`;
+  }
+  if (startDate) {
+    event += `\nDTSTART:${formatDate(startDate)}`;
+  }
+  if (endDate) {
+    event += `\nDTEND:${formatDate(endDate)}`;
+  }
   
-  event += '\nEND:VEVENT';
+  // Add unique ID and timestamp
+  event += `\nUID:${Date.now()}@qrgenerator.com`;
+  event += `\nDTSTAMP:${formatDate(new Date().toISOString())}`;
+  event += '\nEND:VEVENT\nEND:VCALENDAR';
   
   return event;
 };
